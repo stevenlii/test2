@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- 兑换券取码订单管理 -->
+<Options>
+	<!-- 补发按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/coupongcorder/regive.do</url>
+	</Option>
+	
+	<!-- 注销按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/coupongcorder/cancel.do</url>
+	</Option>
+</Options>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="OperLog">
+	<typeAlias alias="OperLog" type="com.umpay.hfmng.model.OperLog" />
+	<statement id="Insert" resultClass="OperLog">
+		insert into umpay.t_hfoper_log(operId
+				<isNotEmpty	property="tableName" prepend=" , "> tableName </isNotEmpty>
+				<isNotEmpty	property="dataId" prepend=" , "> dataId </isNotEmpty>
+				<isNotEmpty	property="detail" prepend=" , "> detail </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+				<isNotEmpty	property="operType" prepend=" , "> operType </isNotEmpty>
+			) values(#operId#
+				<isNotEmpty	property="tableName" prepend=" , "> #tableName# </isNotEmpty>
+				<isNotEmpty	property="dataId" prepend=" , "> #dataId# </isNotEmpty>
+				<isNotEmpty	property="detail" prepend=" , "> #detail# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+				<isNotEmpty	property="operType" prepend=" , "> #operType# </isNotEmpty>
+			)
+	</statement>
+</sqlMap>

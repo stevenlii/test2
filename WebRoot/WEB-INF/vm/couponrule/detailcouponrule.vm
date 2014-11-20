@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css"
+			href="${request.contextPath}/profile/default/css/common.css">
+		<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+		<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+		<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+		<script type="text/javascript"
+			src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+		<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+		<script> 
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+   
+   $(document).ready(function() {
+	   if( $!{couponRule.generateMethod} == 1 ){
+		   // 第三方导入
+		   $("tr.modeDiv").hide();
+		   $("tr.subModeDiv").hide();
+		   $("tr.subModeDiv1").hide();
+	    }else {
+	        // 本平台实时生成
+	    	$("tr.modeDiv").show();
+			if( $!{couponRule.effType} == 2 ){
+                // 售出后有效天数
+        	    $("tr.subModeDiv").hide();
+        	    $("tr.subModeDiv1").show();
+            }else{
+                $("tr.subModeDiv1").hide();
+        	    $("tr.subModeDiv").show();
+            }
+	    }
+       
+   });
+</script>
+	</head>
+	<body>
+		<div>
+			<table class="infowrite" cellspacing="0" cellpadding="0">
+				<tr>
+					<th width="30%">
+						兑换券：
+					</th>
+					<td class="td">
+						$!{couponRule.couponName}（$!{couponRule.couponId}）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						商 户：
+					</th>
+					<td class="td1">
+						$!{couponRule.merName}（$!{couponRule.merId}）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						商 品：
+					</th>
+					<td class="td">
+						$!{couponRule.goodsName}（$!{couponRule.goodsId}）
+					</td>
+				</tr>
+				<tr>
+                 <th>是否为代金劵：</th>
+                 <td class="td1">
+        			 #if($couponRule.consumetype== 2)
+            			是
+                     #else
+            			否
+                     #end
+                 </td>
+               </tr>
+        	   #if($couponRule.consumetype== 2)
+        	   <tr>
+                 <th>一笔订单中能否使用多个该类型的劵码：</th>
+                 <td class="td">
+        			#if($couponRule.ismulti== 1)
+            			是
+                     #else
+            			否
+                     #end
+                 </td>
+               </tr>
+        	   <tr>
+                 <th>是否能转赠他人：</th>
+                 <td class="td1">
+        			#if($couponRule.istransfer== 1)
+            			是
+                     #else
+            			否
+                     #end
+                 </td>
+               </tr>
+        	   <tr>
+                 <th>可兑换商户：</th>
+                 <td class="td">
+        			#foreach($rmg in $list)
+                        $rmg.mername
+        				#if($rmg.mername == '全部商户')
+                			#break
+                         #end
+        				<br/>
+        			#end 
+                 </td>
+               </tr>
+        	   <tr>
+                 <th>可兑换商品：</th>
+                 <td class="td1">
+        			#foreach($rmg in $list)
+                        $rmg.goodsname
+        				#if($rmg.goodsname == '可兑换商户的全部商品')
+                			#break
+                         #end
+        				<br/>
+        			#end 
+                 </td>
+               </tr>
+        	   #end 
+				<tr>
+					<th>
+						兑换码形式：
+					</th>
+					<td class="td1">
+						$!{couponRule.couponCodeTypeName}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换码生成方式：
+					</th>
+					<td class="td">
+						$!{couponRule.generateMethodName}
+					</td>
+				</tr>
+				<tr class="modeDiv">
+					<th>
+						兑换券有效期类型：
+					</th>
+					<td class="td1">
+						$!{couponRule.effTypeName}
+					</td>
+				</tr>
+				<tr class="subModeDiv1">
+					<th>
+						售出后：
+					</th>
+					<td class="td">
+						$!{couponRule.effDays}&nbsp;天有效
+					</td>
+				</tr>
+				<tr class="subModeDiv">
+					<th>
+						兑换券有效期：
+					</th>
+					<td class="td">
+						$!{couponRule.useStartDate} 至 $!{couponRule.useEndDate}
+					</td>
+				</tr>
+				<tr class="modeDiv">
+					<th>
+						兑换券销售期：
+					</th>
+					<td class="td1">
+						$!{couponRule.sellStartDate} 至 $!{couponRule.sellEndDate}
+					</td>
+				</tr>
+				<tr class="modeDiv">
+					<th>
+						兑换码库存数量：
+					</th>
+					<td class="td">
+						$!{couponRule.goodsSum}&nbsp;（注：-1为不限库存数量）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						库存告警阀值：
+					</th>
+					<td class="td1">
+						$!{couponRule.switchAmt}&nbsp;（注：0为不告警）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						库存告警邮件地址：
+					</th>
+					<td class="td">
+						$!{couponRule.alarmEmail}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						库存告警短信手机号：
+					</th>
+					<td class="td1">
+						$!{couponRule.alarmMobile}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						码过期提醒天数：
+					</th>
+					<td class="td">
+						$!{couponRule.effWarnDays} 天（注：0为不提醒）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						启用状态：
+					</th>
+					<td class="td1">
+						$!{couponRule.stateName}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						添加时间：
+					</th>
+					<td class="td">
+						$!{couponRule.inTime.toString().replace('.0', '')}
+					</td>
+				</tr>
+				<tr>
+                 <th>是否需批量导出：</th>
+                 <td class="td" >#if(${couponRule.ruletype}=='0')
+                 否
+               #else
+                 是
+               #end</td>
+               </tr>
+			   #if(${couponRule.originalprice}!='0')
+        	   <tr>
+                 <th>面值：</th>
+                 <td class="td" > #set ( $value = $couponRule.originalprice / 100.00) $value 元
+               </tr>
+			   #end
+			</table>
+		</div>
+		<div class="pop_btn">
+			<input name="close" type="button" class="popbtn" value="关闭"
+				onclick="closeDialog();" onmouseover="this.className='popbtnhover'"
+				onmouseout="this.className='popbtn'" />
+		</div>
+	</body>
+</html>

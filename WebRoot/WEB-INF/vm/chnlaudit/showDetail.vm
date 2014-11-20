@@ -1,0 +1,54 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/chnlaudit.js"></script>
+</head>
+<body>
+<!--审核后的商户详情页面-->
+<form id="dataform" method="post" name="dataform">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0" width="100%" >
+		<tr>
+		    <th width="115">渠道编号：</th>
+			<td class="td" colspan="2">${newChnl.channelId}</td>
+		</tr>
+		<tr>
+		    <th >渠道名称：</th>
+			<td class="td1" colspan="2">$!{newChnl.channelName}</td>
+		</tr>
+		<tr>
+		    <th width="115">运营负责人：</th>
+			<td class="td" colspan="2">$!{newChnl.service_user}</td>
+		</tr>
+		<tr>
+		    <th>联系人：</th>
+			<td class="td1" colspan="2">$!{newChnl.contact}</td>
+		</tr>
+		<tr>
+		    <th>联系电话：</th>
+			<td class="td" colspan="2">$!{newChnl.linkTel}</td>
+		</tr>
+		<tr>
+		    <th>电子邮件：</th>
+			<td class="td1" colspan="2">$!{newChnl.email}</td>      
+		</tr>
+		#if(${resultDesc} == "")
+	     #else
+	     	<tr><td height="63" colspan="3" align="left" valign="bottom"><textarea id="resultDesc1" rows="3" disabled="disabled" style="{width:100%;}">$!{resultDesc}</textarea></td></tr>
+	     #end
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	 </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Bank">
+	<typeAlias alias="BankInfo" type="com.umpay.hfmng.model.BankInfo" />
+	
+	<sql id="select_what">
+		select t.bankId,t.bankName,t.bankType,t.timelTd,t.daylTd,t.monlTd
+		       from umpay.t_bank_inf t  where 1=1
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="bankId" prepend=" and ">
+				t.bankId = #bankId#
+			</isNotEmpty>
+			<isNotEmpty	property="bankName" prepend=" and ">
+				t.bankName = #bankName#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="key_find">
+	   <dynamic prepend=" and ">
+		  t.bankId=#bankId#
+	   </dynamic>
+	</sql>
+	
+	<statement id="Get" resultClass="BankInfo" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="BankInfo" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_bank_inf  t 
+		<include refid="where_find" />
+	</statement>
+	
+	
+
+	<statement id="updateBank" resultClass="integer">
+	   update umpay.t_bank_inf set modTime=CURRENT TIMESTAMP
+	   <isNotEmpty	property="bankType" prepend=" , "> bankType=#bankType# </isNotEmpty>
+	   <isNotEmpty	property="bankName" prepend=" , "> bankName=#bankName# </isNotEmpty>
+	   <isNotEmpty	property="timeLtd" prepend=" , "> timeLtd=#timeLtd# </isNotEmpty>
+	   <isNotEmpty	property="dayLtd" prepend=" , "> dayLtd=#dayLtd# </isNotEmpty>
+	   <isNotEmpty	property="monLtd" prepend=" , "> monLtd=#monLtd# </isNotEmpty>
+	    <isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+	    where bankId=#bankId# 
+	</statement>
+	
+	<statement id="insert" >
+		insert into umpay.t_bank_inf(bankId, bankName, bankType
+				<isNotEmpty	property="timeLtd" prepend=" , "> timeLtd </isNotEmpty>
+				<isNotEmpty	property="dayLtd" prepend=" , "> dayLtd </isNotEmpty>
+				<isNotEmpty	property="monLtd" prepend=" , "> monLtd </isNotEmpty>
+			) values(#bankId#, #bankName#, #bankType#
+				<isNotEmpty	property="timeLtd" prepend=" , "> #timeLtd# </isNotEmpty>
+				<isNotEmpty	property="dayLtd" prepend=" , "> #dayLtd# </isNotEmpty>
+				<isNotEmpty	property="monLtd" prepend=" , "> #monLtd# </isNotEmpty>
+			)
+	</statement>
+
+	<statement id="isOrNotAble" resultClass="BankInfo">
+		update umpay.t_mer_inf set state=#state# 
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+			<isNotEmpty	property="modTime" prepend=" , "> modTime=#modTime# </isNotEmpty>
+		where merId=#merId#
+	</statement>
+
+   <statement id="checkFromBank" resultClass="BankInfo">
+	     select bankId from umpay.t_bank_inf where  1=1
+	  <isNotEmpty property="bankId" prepend=" and ">
+		 bankId=#bankId#
+	  </isNotEmpty>	
+   </statement>
+  <!--  获取综合支付支付银行（包括不限于小额，游戏基地，博升） 数据 树形 结构-->
+  <statement id="GetUPTree" resultClass="BankInfo" >
+		select bankid,bankname,banktype,state,timeltd,monltd,dayltd,minamount,
+		tinterval,moduser,modtime,intime,depagenttype
+		from umpay.t_bank_inf  where banktype=3 or banktype=6 or banktype=61 or banktype=62
+	</statement>
+	
+	<!-- 获取小额支付银行 -->
+  	<statement id="findXEBankInfos" resultClass="BankInfo" >
+		select bankid, bankname, banktype, state
+		  from umpay.t_bank_inf
+		 where banktype = 6
+		   and state = 2
+	</statement>
+		<!-- 获取全网支付银行 -->
+  	<statement id="findQWBankInfos" resultClass="BankInfo" >
+		select bankid, bankname, banktype, state
+		  from umpay.t_bank_inf
+		 where banktype = 3
+		   and state = 2
+	</statement>
+</sqlMap>

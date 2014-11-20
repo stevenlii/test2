@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-mouse.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-draggable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-position.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-resizable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-dialog.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagetip.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js">
+        </script>
+        <script src="$request.contextPath/js/busi/stl.js">
+        </script>
+        <style>
+            .input_text { border: 1px solid #6D869E; height: 17px; vertical-align:
+            middle; width: 50%; } .errorMsg { background: url("$request.contextPath/profile/validate/images/alert.png)
+            center no-repeat white; background-position: 5px 50%; background-color:
+            #FCEFE3; text-align: left; padding: 2px 2px 2px 25px; border: 1px solid
+            red; display: none; width: 100px; margin-top: -18px; margin-left: 18px;
+            position: absolute; border-radius: 4px; } .errorImg{ background: url("$request.contextPath/profile/validate/images/invalid.png")
+            no-repeat scroll 0 0 transparent; height: 16px; width: 16px; cursor: pointer;
+            vertical-align: inherit; } /*自定义图标，样式前加上om-messageTip，提高其优先级*/ .om - messageTip.om
+            - messageTip - image - aomsdk { background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+            } .none_underline a{text-decoration:none;} .none_underline a:hover{ text-decoration:underline;}
+            }
+        </style>
+        <script type="text/javascript">
+            jQuery(document).ready(function() {
+                $('#query').omButton({
+                    width: 40
+                });
+                $('#delete').omButton({
+                    width: 40
+                });
+                $('#submitinfo').omButton({
+                    width: 40
+                });
+                $('#grid').omGrid({
+                    singleSelect: false,
+                    width: '100%',
+                    height: 440,
+                    limit: 15,
+                    colModel: [{
+                        header: '账户ID',
+                        name: 'ACCID',
+                        align: 'left',
+                        width: "60px"
+                    },
+                    {
+                        header: '结算账期',
+                        name: 'STLCYCLE',
+                        align: 'left',
+                        width: "50px"
+                    },
+                    {
+                        header: '结算日期',
+                        name: 'STLDATE',
+                        align: 'left',
+                        width: "120px"
+                    },
+                    {
+                        header: '子商户号',
+                        name: 'GOODSID',
+                        align: 'left',
+                        width: "60px"
+                    },
+                    {
+                        header: '本外地结算标志',
+                        name: 'LOCALFLAG',
+                        align: 'left',
+                        width: "60px"
+                    },
+                    {
+                        header: '序列号',
+                        name: 'SEQID',
+                        align: 'left',
+                        width: "50px"
+                    },
+                    {
+                        header: '账户名称',
+                        name: 'ACCNAME',
+                        align: 'left',
+                        width: "120px"
+                    },
+                    {
+                        header: '商户ID',
+                        name: 'MERID',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '账单类型',
+                        name: 'BILLTYPE',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    
+                    {
+                        header: '代理商id',
+                        name: 'AGENTID',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '代理商名称',
+                        name: 'AGENTNAME',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '移动按次结算率',
+                        name: 'CMCCSTLRATES',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '移动包月结算率',
+                        name: 'CMCCSTLRATEM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '包月成功交易笔数',
+                        name: 'SUCCNUMM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '包月成功交易金额',
+                        name: 'SUCCAMTM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '按次成功笔数',
+                        name: 'SUCCNUMS',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '按次成功金额',
+                        name: 'SUCCAMTS',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '包月计费成功笔数',
+                        name: 'BILLSUCCNUMM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '包月计费成功金额',
+                        name: 'BILLSUCCAMTM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '成功交易笔数',
+                        name: 'SUCCALLNUMM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '成功交易金额',
+                        name: 'SUCCALLAMTM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    
+                    {
+                        header: '100%移动应收信息费',
+                        name: 'MSGAMTM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    
+                    
+                    {
+                        header: '移动核减笔数',
+                        name: 'MUTENUM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '移动核减金额',
+                        name: 'MUTEAMT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '虚假交易笔数',
+                        name: 'SHAMNUM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '虚假交易金额',
+                        name: 'SHAMAMT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '上行短信数',
+                        name: 'MONUM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                     {
+                        header: '下行短信数',
+                        name: 'MTNUM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '不均衡短信数',
+                        name: 'NBSMNUM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '不均衡短信费',
+                        name: 'NBSMAMT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    
+                     {
+                        header: '退费笔数',
+                        name: 'PAYBACKNUM',
+                        align: 'left',
+                        width: "70px"
+                    },
+                     {
+                        header: '退费金额',
+                        name: 'PAYBACKAMT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '应结商户金额',
+                        name: 'MERSTLAMT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '应付商户金额',
+                        name: 'MERSTLPAY',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '平台收入',
+                        name: 'CMCCAMOUNT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '结算状态',
+                        name: 'SETTSTATUS',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '审核状态',
+                        name: 'STATE',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '是否有效',
+                        name: 'ISUSE',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '修改人',
+                        name: 'MODUSER',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '修改时间',
+                        name: 'MODTIME',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '入库时间',
+                        name: 'INTIME',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '坏账金额',
+                        name: 'BAD_BILL',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '平台收入',
+                        name: 'UMP_INCOME',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    
+                     {
+                        header: '结算金额',
+                        name: 'BALANCE_AMOUNT',
+                        align: 'left',
+                        width: "70px"
+                    },
+                     {
+                        header: '是否可见',
+                        name: 'IS_SHOW',
+                        align: 'left',
+                        width: "70px"
+                    },
+                     {
+                        header: '是否隐藏',
+                        name: 'IS_VALID',
+                        align: 'left',
+                        width: "70px"
+                    }
+                    ],
+                    autoFit: true
+                });
+                //查询
+                $('#query').bind('click',
+                function(e) {
+                    var key = "query.do?queryKey=merset.getMerset";
+                    var ACCID = jQuery('#ACCID').val();
+                    var STLCYCLE = jQuery('#STLCYCLE').val();
+                    var STLDATE = jQuery('#STLDATE').val();
+                    var GOODSID = jQuery('#GOODSID').val();
+                    var LOCALFLAG = jQuery('#LOCALFLAG').val();
+                    if (ACCID != "") {
+                        key = key + '&ACCID=' + encodeURI(ACCID);
+                    }
+                    if (STLCYCLE != "") {
+                        key = key + '&STLCYCLE=' + encodeURI(STLCYCLE);
+                    }
+                    if (STLDATE != "") {
+                        key = key + '&STLDATE=' + encodeURI(STLDATE);
+                    }
+                    if (GOODSID != "") {
+                        key = key + '&GOODSID=' + encodeURI(GOODSID);
+                    }
+                    if (LOCALFLAG != "") {
+                        key = key + '&LOCALFLAG=' + encodeURI(LOCALFLAG);
+                    }
+                    $('#grid').omGrid("setData", key);
+                });
+            });
+        </script>
+    </head>
+    
+    <body>
+        <div class="list_search" style="height: 90px;">
+            <!--列表查询区-->
+            <table width="100%" border="0" style="height:30px;margin-top:20px">
+                <tr>
+                    <th width="7%">
+                        账户ID：
+                    </th>
+                    <td width="12%">
+                        <input id="ACCID" name="ACCID" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        结算账期：
+                    </th>
+                    <td width="12%">
+                        <input id="STLCYCLE" name="STLCYCLE" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        结算日期：
+                    </th>
+                    <td width="12%">
+                        <input id="STLDATE" name="STLDATE" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        子商户号：
+                    </th>
+                    <td width="12%">
+                        <input id="GOODSID" name="GOODSID" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        本外地结算标志：
+                    </th>
+                    <td width="12%">
+                        <input id="LOCALFLAG" name="LOCALFLAG" type="text" class="input2" />
+                    </td>
+                    <td>
+                        <input id="query" name="query" type="button" value="查询" />
+                    </td>
+                </tr>
+            </table>
+            <!--列表查询区-->
+        </div>
+        <div align="center">
+            <table align="left" id="grid">
+            </table>
+        </div>
+    </body>
+
+</html>

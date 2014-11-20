@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="proxyorder">
+	<sql id="all">
+	<![CDATA[
+		 SELECT p.ORDERDATE,p.ORDERID,p.SUBMERID,p.MERID,p.GOODSID,p.MOBILEID,
+		 p.ORDERSTATE,p.AMOUNT,p.RPID,p.BUSINESSTYPE,g.CATEGORY
+		 FROM UMPAY.T_PROXYORDER_$year p
+		 INNER JOIN UMPAY.T_HFGOODS_EXP  g ON p.MERID=g.MERID AND p.GOODSID=g.GOODSID
+		 WHERE 1=1
+		 #if( $orderId && $orderId!='' )
+		   AND p.ORDERID=:orderId
+		 #end
+		 #if( $merId && $merId!='' )
+		   AND p.MERID=:merId
+		 #end
+		 #if( $subMerId && $subMerId!='' )
+		   AND p.SUBMERID=:subMerId
+		 #end
+		 #if( $goodsId && $goodsId!='' )
+		   AND p.GOODSID=:goodsId
+		 #end
+		 #if( $businessType && $businessType!='' )
+		   AND p.BUSINESSTYPE=:businessType
+		 #end
+		 #if( $mobileId && $mobileId!='' )
+		   AND MOBILEID=:mobileId
+		 #end
+		 #if( $category && $category!='' )
+		   AND g.CATEGORY like '$category%'
+		 #end
+		 #if( $from && $from != '' && $to && $to != '')
+		   and  p.INTIME between '$from' and '$to'
+		 #end
+		 #if( $orderState && $orderState!='' )
+		   AND p.ORDERSTATE=:orderState
+		 #end
+		 ORDER BY p.INTIME DESC
+	  ]]>
+	</sql>
+</mapper> 

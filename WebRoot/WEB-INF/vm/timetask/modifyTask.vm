@@ -1,0 +1,453 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+
+<script type="text/javascript" src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/rules.js"></script>
+<style type="text/css" >
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 5px;
+		border: 1px solid red;
+		display: none;
+		width: 80px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+     	//自定义校验
+        $.validator.addMethod("checkTryTimes",
+            function(value) {
+        		var isTryV=$("input[name='isReTry']:checked").val();  
+        		if("4"==isTryV){
+        			return true;
+        		}
+        		return checkNum(value);
+            }, "请输入整数"
+         );
+        
+        $.validator.addMethod("checkCycTime",
+            function(value) {
+            	var ruleType=$("input[name='ruleType']:checked").val();  
+    	        if("cyc"!=ruleType){
+    	        	return true;
+    	        }
+    	        return ""!=value;
+            }, "请输入时间周期"
+        );
+        
+        $.validator.addMethod("checkSpaceTime",
+            function(value) {
+        		var ruleType=$("input[name='ruleType']:checked").val();  
+	        	if("space"!=ruleType){
+	        		return true;
+	        	}
+	        	return checkNum(value);
+            }, "请输入正确的间隔时间"
+        );
+        
+        $.validator.addMethod("checkRunTime",
+            function(value) {
+            	var ruleType=$("input[name='ruleType']:checked").val();  
+    	        if("onlyone"!=ruleType){
+    	        	return true;
+    	        }
+    	        return ""!=value;
+            }, "请输入执行时间点"
+         );
+        
+  	 	jQuery(document).ready(function() {
+  	 		//页面初始化
+  	 		//radio赋值
+  	 		if("2"=="$!{taskInf.state}"){
+  	 			$("#state_open").attr("checked", "checked");
+  	 		}else{
+  	 			$("#state_close").attr("checked", "checked");
+  	 		}
+  	 		if("2"=="$!{taskInf.isReTry}"){
+  	 			$("#isReTry_2").attr("checked", "checked");
+  	 		}else{
+  	 			$("#isReTry_4").attr("checked", "checked");
+  	 		}
+  	 		if("cyc"=="$!{taskRule.ruleType}"){
+  	 			$("#ruleType_cyc").attr("checked", "checked");
+  	 		}else if("space"=="$!{taskRule.ruleType}"){
+  	 			$("#ruleType_space").attr("checked", "checked");
+  	 		}else if("onlyone"=="$!{taskRule.ruleType}"){
+  	 			$("#ruleType_onlyone").attr("checked", "checked");
+  	 		}
+  	 		
+  	 		//面板显示
+  	 		selectRuleType();
+  	 		setTimeFormat();
+  	 		setError();
+  	 		
+  	 		//初始化星期下拉框
+	  	 	$('#weeks').omCombo({
+	            dataSource: [{text:'一',value:'2'},{text:'二',value:'3'}, 
+	                         {text:'三',value:'4'},{text:'四',value:'5'}, 
+	                         {text:'五',value:'6'},{text:'六',value:'7'}, 
+	                         {text:'日',value:'1'}], 
+	            width: '40px',
+	            value: '$!{taskRule.weeks}',
+	            forceSelection: true
+	        });
+  	 		
+	  		//定时周期下拉框
+            $('#cycType').omCombo({
+            	dataSource: [{text:'年',value:'y'},{text:'月',value:'m'}, 
+	                         {text:'周',value:'w'},{text:'日',value:'d'}, 
+	                         {text:'小时',value:'h'}], 
+                width: '50px',
+                forceSelection: true,
+                value: '$!{taskRule.cycType}',
+				onValueChange:function(target,newValue,oldValue,event){ 
+					setTimeFormat();
+                }
+            });
+  	 		
+          	//初始化所属平台名称下拉框
+            $('#platName').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=platNames',
+                width: '398px',
+                emptyText: '请选择..',
+                value: '$!{taskInf.platName}',
+                forceSelection: true
+            });
+	  		
+  	 		//页面元素校验
+			jQuery("#taskdataform").validate({
+                rules: {
+                    "platName": "required",
+                    "taskDesc": "required",
+                    "postUrl": "isURL",
+                    "reTryTimes": "checkTryTimes",
+                    "reTryInterval": "checkTryTimes",
+                    "retTimeout":"checkTryTimes",
+                    "runTime": "checkRunTime",
+                    "cycTime": "checkCycTime",
+                    "spaceTime":"checkSpaceTime"
+                },
+                messages: {
+                	"platName": {
+                        required: "请选择所属应用"
+                    },
+                    "taskDesc": {
+                        required: "请输入任务说明"
+                    },
+               		"isReTry": {
+                   		required: "请输入任务说明"
+                	}
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                	//alert(errorMap);
+                	//alert(errorList);
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                	$("#btn_modify").attr("disabled", "disabled");
+                	$('#taskdataform').omAjaxSubmit({
+                        success: function(res) {
+        					window.parent.showSimpleTip(res);
+        					if( res == '1' ){
+        						window.parent.gridReload();
+        						closeDialog();
+        					}
+                        }
+                    });
+                    return false;
+                }
+            });
+			
+	        $(".errorImg").bind('mouseover', function() {
+	            $(this).next().css('display', 'block');
+	        }).bind('mouseout', function() {
+	            $(this).next().css('display', 'none');
+	        });
+        
+      		//赋值
+	 		$("#cycTime").val("$!{taskRule.cycTime}");
+		});
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+        
+        //定时规则类型选择
+        function selectRuleType(){
+        	var ruleType=$("input[name='ruleType']:checked").val();  
+        	if("cyc"==ruleType){
+        		$("#cycDiv").show();
+        		$("#spaceDiv").hide();
+        		$("#onlyoneDiv").hide();
+        	}else if("space"==ruleType){
+        		$("#cycDiv").hide();
+        		$("#spaceDiv").show();
+        		$("#onlyoneDiv").hide();
+        	}else if("onlyone"==ruleType){
+        		$("#cycDiv").hide();
+        		$("#spaceDiv").hide();
+        		$("#onlyoneDiv").show();
+        	}
+        	$("#cycError").hide();
+        }
+        
+        //按周期设置时间格式
+        var dataFormat="MM月dd日   HH:mm";
+        function  setTimeFormat() {
+        	var cyctp=$("#cycType").val();
+			if("w"==cyctp){
+        		$("#weekSP").show();
+        	}else{
+        		$("#weekSP").hide();
+        	}
+			
+			if("m"==cyctp){
+        		$("#lastDaySP").show();
+        		$("#cycTime").width("110px");
+            	$("#isLastDay").val("N");
+            	$("#cycTimeSP").hide();
+            	$("#isLastDayCB").removeAttr("checked");
+        		 
+        	}else{
+        		$("#cycTime").width("80px");
+        		$("#lastDaySP").hide();
+        		$("#cycTimeSP").hide();
+        	}
+			
+        	if("y"==cyctp){
+        		dataFormat="MM月dd日  HH:mm分";
+        		$("#cycTime").width("158px");
+        	}else if("m"==cyctp){
+        		dataFormat="dd日  HH:mm分";
+        	}else if("d"==cyctp){
+        		dataFormat="HH:mm分";
+        	}else if("w"==cyctp){
+        		dataFormat="HH:mm分";
+        	}else if("h"==cyctp){
+        		dataFormat="mm分";
+        	}
+        	$("#cycTime").val("");	
+        	$("#cycTimeDF").val(dataFormat);
+        }
+        
+        //时间选择
+        function setTime(){
+        	WdatePicker({dateFmt:dataFormat,el:'cycTime'});
+        }
+        
+        //是否最后一天
+        function setIsLastDay(){
+        	$("#cycTime").val("");
+        	if($("#isLastDayCB").is(':checked')){
+        		$("#cycTimeSP").show();
+        		$("#isLastDay").val("Y");
+        		dataFormat="HH:mm分";
+        	}else{
+        		$("#cycTimeSP").hide();
+        		$("#isLastDay").val("N");
+        		dataFormat="dd日   HH:mm分";
+        	}
+        }
+        
+        //是否进行异常处理
+ 		function setError(){
+ 			var isTryV=$("input[name='isReTry']:checked").val();
+        	if("2"==isTryV){
+        		$("#isReTryDiv").show();
+        	}else if("4"==isTryV){
+        		$("#isReTryDiv").hide();
+        		$('#reTryTimes').val(0);
+    			$('#reTryInterval').val(0);
+    			$('#retTimeout').val(0);
+    			$("#tryError").hide();
+        	}
+        }
+</script>
+</head>
+<body>
+  <div>
+   <form id ="taskdataform" method="post" action="${request.contextPath}/timetask/modifyTask.do">
+   <input value="$!{taskInf.taskId}" type="hidden" id="taskId" name="taskId"/>
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="100"><span>*</span>所属平台：</th>
+         <td width="410" class="td1"><input id="platName"  name="platName" /></td>
+         <td width="150" class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>任务说明：</th>
+         <td  class="td"><input value="$!{taskInf.taskDesc}" id="taskDesc" name="taskDesc" type="text" class="input2" style="width:390px" maxlength="128"></td>
+         <td class="td" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+        <tr>
+         <th ><span>*</span>触发地址：</th>
+         <td  class="td1"><input value="$!{taskInf.postUrl}" id="postUrl" name="postUrl" type="text" class="input2" style="width:390px" maxlength="128"></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th ><span>*</span>是否开启：</th>
+         <td  class="td">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	            <input type="radio" id="state_open" name="state" value="2" checked="checked" />
+				开启&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" id="state_close" name="state" value="4" />
+				关闭
+
+		</td>
+         <td class="td" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <td class="td1" colspan="2">
+         	<fieldset>
+				<legend>定时周期</legend>
+				<span style="font-weight:600;color:#000000">
+				<input type="radio" id="ruleType_cyc" name="ruleType" value="cyc" onclick="selectRuleType();" checked="checked" />
+				周期性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	            <input type="radio" id="ruleType_space" name="ruleType" value="space" onclick="selectRuleType();"/>
+				定间隔&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" id="ruleType_onlyone" name="ruleType" value="onlyone" onclick="selectRuleType();"/>
+				仅一次
+				<hr/>
+				<div id="cycDiv" style="height:50px; vertical-align:middle;">
+					<div>&nbsp;</div>
+					&nbsp;&nbsp;&nbsp;&nbsp;<span>*</span>每
+					<input id="cycType"  name="cycType" />
+		            <span id="weekSP" style="color:#000000">星期
+		            <input id="weeks"  name="weeks" />
+		            </span>
+		            <span id="cycTimeSP"  style="color:#000000">
+		            	最后一天
+		            </span>
+		            	<input value="$!{taskRule.cycTime}" type="text" id="cycTime" name="cycTime" onclick="setTime();" class="Wdate" style="width:135px" readonly="true" />
+		            	执行一次
+		            	<input value="" type="hidden" id="cycTimeDF" name="cycTimeDF"/>
+		            	<input value="" type="hidden" id="isLastDay" name="isLastDay"/>
+		            <span id="lastDaySP"  style="color:#000000">
+		           		 &nbsp;&nbsp;&nbsp;&nbsp; 
+		           		 <input value="" type="checkbox" id="isLastDayCB" name="isLastDayCB" onclick="setIsLastDay();" />
+		           		最后一天执行
+		            </span>
+				</div>
+				
+				<div id="spaceDiv" style="height:50px; vertical-align:middle;">
+					<div>&nbsp;</div>
+					&nbsp;&nbsp;&nbsp;&nbsp;<span>*</span>间隔：
+					<input value="$!{taskRule.spaceTime}" type="text" id="spaceTime" name="spaceTime" class="input3"  />
+					分钟
+				</div>
+				
+				<div id="onlyoneDiv" style="height:50px; vertical-align:middle;">
+					<div>&nbsp;</div>
+					&nbsp;&nbsp;&nbsp;&nbsp;<span>*</span>执行时间点：
+					<input value="$!{taskRule.runTime}" type="text" id="runTime" name="runTime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',el:'runTime'});" class="Wdate" style="width:160px" readonly="true" />
+				</div>
+				</span>
+			</fieldset>
+		 </td>
+		 <td class="td1" ><span id="cycError" class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       
+        <tr>
+         <td class="td1" colspan="2">
+         	<fieldset>
+				<legend>异常处理</legend>
+				
+				<span style="font-weight:600;color:#000000">
+				<div>
+				<div style="width:110px;float:left;">
+				<div>&nbsp;</div>
+				<input type="radio" id="isReTry_2" name="isReTry" value="2" onclick="setError();" checked="checked" />
+				异常重试
+				<div>&nbsp;</div>
+	            <input type="radio" id="isReTry_4" name="isReTry" value="4" onclick="setError();" />
+				忽略异常<div>&nbsp;</div></div>
+				<div id="isReTryDiv" style="width:320px;float:left;">
+				<table class="infowrite" cellspacing="0" cellpadding="0">
+					<tr>
+			         <th ><span>*</span>重试次数：</th>
+			         <td class="td" width=220px><input id="reTryTimes" name="reTryTimes" type="text" value="$!{taskInf.reTryTimes}" class="input3" />&nbsp;次</td>
+			       </tr>
+			        <tr>
+			         <th ><span>*</span>重试间隔：</th>
+			         <td class="td1"><input id="reTryInterval" name="reTryInterval" type="text" value="$!{taskInf.reTryInterval}" class="input3" />&nbsp;分钟</td>
+			       </tr>
+			        <tr>
+			         <th ><span>*</span>反馈超时：</th>
+			         <td class="td"><input id="retTimeout" name="retTimeout" value="$!{taskInf.retTimeout}" type="text" class="input3" />&nbsp;分钟</td>
+			       </tr>
+				</table></div></div>
+				</span>
+			</fieldset>
+		 </td>
+		 <td class="td1" ><span id="tryError" class="errorImg" ></span><span class="errorMsg"></span></td> 
+       </tr>
+        
+     </table>
+
+	 <div class="pop_btn">
+	   <input name="btn_modify" type="submit" class="popbtn"  value="修改" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_modify" />
+       <input name="btn_close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	</div>
+	 </form>
+  </div>
+</body>
+</html>

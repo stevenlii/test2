@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Audit">
+	<typeAlias alias="Audit" type="com.umpay.hfmng.model.Audit" />
+	<sql id="select_what">
+		select
+		id,tableName,ixdata,ixdata2,moddata,auditType,state,creator,modTime,modUser,
+		resultDesc,inTime,batchId
+		from umpay.t_hfaudit 
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="ixData" prepend=" and ">
+				ixData = #ixData#
+			</isNotEmpty>
+			<isNotEmpty property="state" prepend=" and ">
+				state = #state#
+			</isNotEmpty>
+			<isNotEmpty property="auditType" prepend=" and ">
+				auditType = #auditType#
+			</isNotEmpty>
+			<isNotEmpty property="creator" prepend=" and ">
+				creator = #creator#
+			</isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" and ">
+				modUser = #modUser#
+			</isNotEmpty>
+			<isNotEmpty property="ixData2" prepend=" and ">
+				ixData2 = #ixData2#
+			</isNotEmpty>
+			<isNotEmpty property="batchId" prepend=" and ">
+				batchId = #batchId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<sql id="key_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="id" prepend=" and ">
+				id=#id#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<statement id="Get" resultClass="Audit">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="getOneObj" resultClass="Audit">
+		<include refid="select_what" />
+		<include refid="where_find" />
+		order by intime desc 
+		fetch first 1 rows only
+	</statement>
+
+	<statement id="Find" resultClass="Audit">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_hfaudit
+		<include refid="where_find" />
+	</statement>
+	<statement id="Insert" resultClass="Audit">
+		insert into umpay.t_hfaudit(id,state
+
+		<isNotEmpty property="tableName" prepend=" , "> tableName
+		</isNotEmpty>
+		<isNotEmpty property="ixData" prepend=" , "> ixData </isNotEmpty>
+		<isNotEmpty property="modData" prepend=" , "> modData
+		</isNotEmpty>
+		<isNotEmpty property="auditType" prepend=" , "> auditType
+		</isNotEmpty>
+		<isNotEmpty property="creator" prepend=" , "> creator
+		</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> modUser
+		</isNotEmpty>
+		<isNotEmpty property="resultDesc" prepend=" , "> resultDesc
+		</isNotEmpty>
+		<isNotEmpty property="ixData2" prepend=" , "> ixData2
+		</isNotEmpty>
+		<isNotEmpty property="batchId" prepend=" , "> batchId
+		</isNotEmpty>
+		<isNotEmpty	property="inTime" prepend=" , "> inTime 
+		</isNotEmpty>
+		<isNotEmpty	property="modTime" prepend=" , "> modTime 
+		</isNotEmpty>
+		<isNotEmpty	property="desc" prepend=" , "> desc 
+		</isNotEmpty>
+		) values(#id#, 0
+		<isNotEmpty property="tableName" prepend=" , "> #tableName#
+		</isNotEmpty>
+		<isNotEmpty property="ixData" prepend=" , "> #ixData#
+		</isNotEmpty>
+		<isNotEmpty property="modData" prepend=" , "> #modData#
+		</isNotEmpty>
+		<isNotEmpty property="auditType" prepend=" , "> #auditType#
+		</isNotEmpty>
+		<isNotEmpty property="creator" prepend=" , "> #creator#
+		</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> #modUser#
+		</isNotEmpty>
+		<isNotEmpty property="resultDesc" prepend=" , "> #resultDesc#
+		</isNotEmpty>
+		<isNotEmpty property="ixData2" prepend=" , "> #ixData2#
+		</isNotEmpty>
+		<isNotEmpty property="batchId" prepend=" , "> #batchId#
+		</isNotEmpty>
+		<isNotEmpty	property="inTime" prepend=" , "> #inTime# 
+		</isNotEmpty>
+		<isNotEmpty	property="modTime" prepend=" , "> #modTime# 
+		</isNotEmpty>
+		<isNotEmpty	property="desc" prepend=" , "> #desc# 
+		</isNotEmpty>
+		)
+
+	</statement>
+	<statement id="updateState" resultClass="Integer">
+		update umpay.t_hfaudit set state=#state# ,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="modUser" prepend=" , "> modUser=#modUser#
+		</isNotEmpty>
+		<isNotEmpty property="resultDesc" prepend=" , ">
+			resultDesc=#resultDesc# </isNotEmpty>
+		where id=#id#
+	</statement>
+	<!-- 只用于批量审核页面的审核 -->
+	<statement id="batchUpdateState" resultClass="Integer">
+		update umpay.t_hfaudit set state=#state# ,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		<isNotEmpty property="resultDesc" prepend=" , "> resultDesc=#resultDesc# </isNotEmpty>
+		where batchId=#batchId#
+	</statement>
+	
+	<statement id="checkFromAudit" resultClass="Audit">
+		select * from umpay.t_hfaudit where state=0
+		<isNotEmpty property="tableName" prepend=" and ">
+			tableName=#tableName#
+			</isNotEmpty>
+		<isNotEmpty property="ixData" prepend=" and ">
+			ixData like '$ixData$-%'
+			</isNotEmpty>
+		<isNotEmpty property="modData" prepend=" and ">
+			modData like '%"merName":"$merName$"%'
+			</isNotEmpty>
+	</statement>
+	<statement id="checkAudit" resultClass="Audit">
+		select * from umpay.t_hfaudit where state=0
+		<isNotEmpty property="tableName" prepend=" and ">
+			tableName=#tableName# 
+			</isNotEmpty>
+		<isNotEmpty property="ixData" prepend=" and ">
+			ixData like '$ixData$%'
+		</isNotEmpty>
+	</statement>
+	<!-- 精确查找未审核的数据-->
+	<statement id="checkExactlyFromAudit" resultClass="Audit">
+		select * from umpay.t_hfaudit where state=0
+		<isNotEmpty property="tableName" prepend=" and ">
+			tableName=#tableName#
+			</isNotEmpty>
+		<isNotEmpty property="ixData" prepend=" and ">
+			ixData=#ixData#
+			</isNotEmpty>
+		<isNotEmpty property="ixData2" prepend=" and ">
+			ixData2=#ixData2#
+			</isNotEmpty>
+	</statement>
+	<!-- 修改商户时验证商户名称唯一性 -->
+	<statement id="checkMerName" resultClass="Audit">
+		select * from umpay.t_hfaudit where state=0 and ixData!=#ixData#
+		<isNotEmpty property="tableName" prepend=" and ">
+			tableName=#tableName# 
+			</isNotEmpty>
+		<isNotEmpty property="modData" prepend=" and ">
+			modData like '%"merName":"$merName$"%'
+			</isNotEmpty>
+	</statement>
+	<!-- 删除 	 where 条件  tableName='UMPAY.T_GOODS_BANK'  131015 zhao-->
+	<statement id="GetBatchId" resultClass="Audit">
+		select * from
+		umpay.t_hfaudit where 
+		batchId=#batchId# 
+	</statement>
+	<statement id="checkMerGrade" resultClass="Audit">
+		select ixData,ixData2 from umpay.t_hfaudit 
+		where tableName='UMPAY.T_MER_GRADE' and ixData=#ixData# and ixData2=#ixData2# and state=0
+	</statement>
+	<!-- 修改渠道信息时验证渠道名称唯一性， ixData记录渠道编号，ixData2记录审核中的渠道名称（如果该渠道的名称有修改的话）-->
+	<statement id="checkModChnlName" resultClass="Audit">
+		select * from umpay.t_hfaudit where state=0 and ixData!=#ixData#
+		<isNotEmpty property="tableName" prepend=" and ">
+			tableName=#tableName# 
+			</isNotEmpty>
+		<isNotEmpty property="ixData2" prepend=" and ">
+			ixData2=#ixData2#
+			</isNotEmpty>
+			
+	</statement>
+	<statement id="checkDataAdd" resultClass="Audit">
+		select ixData from umpay.t_hfaudit 
+		where (state=0 or state=2)
+		<isNotEmpty property="tableName" prepend=" and ">
+			tableName=#tableName# 
+			</isNotEmpty>
+		<isNotEmpty property="ixData" prepend=" and ">
+			ixData=#ixData#
+			</isNotEmpty>
+	</statement>
+	
+</sqlMap>

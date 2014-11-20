@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head> 
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/mercnf.js"></script>
+<script>
+jQuery(document).ready(function() {
+  jQuery("#container").width(jQuery(window).width());
+  $.validator.addMethod("exist", function(value) {
+    return checkMerCnf(value);
+  }, "此商户配置已存在");
+  jQuery("#dataform").validate({
+    onkeyup: false,
+    rules : {
+      "merId": {required : true,exist : true,maxlength : 8},
+      "merGer": {required : true},
+      "version": {required : true},
+      "notifyMode": {required : true},
+      "notifyTimes": {required : true,number : true,max : 32767,min : 0},
+      "expireTime": {required : true,number : true},
+      "spCardPay": {required : true},
+      "retMethod": {required : true},
+      "notifyMethod": {required : true},
+      "defBankType": {required : true},
+      "pageId": {maxlength : 8},
+      "styleLevel": {required : true,number : true,max : 99,min : 1},
+      "defGateId": {maxlength : 8}
+    },
+    messages : {
+      "merId": {required : "请输入商户号",maxlength : "商户号最多8位"},
+      "merGer": {required : "请选择合并模式"},
+      "version": {required : "请选择版本"},
+      "notifyMode": {required : "请选择通知模式"},
+      "notifyTimes": {required : "请输入通知次数",number:"只能输入数字",max : "通知次数最大为32767",min : "通知次数最小为0"},
+      "expireTime": {required : "请输入过期时长",number:"只能输入数字",maxlength : "过期时长最多13位"},
+      "spCardPay": {required : "请选择是否支持兑换券"},
+      "retMethod" : {required : "请选择前台通知方式"},
+      "notifyMethod": {required : "请选择后台通知方式"},
+      "defBankType": {required : "请选择默认支付方式"},
+      "pageId": {maxlength : "页面模板ID最多8位"},
+      "styleLevel": {required : "请输入页面模板优先级",number:"只能输入数字",max : "最大为99",min : "最小为1"},
+      "defGateId": {maxlength : "默认网银最多8位"}
+    },
+    errorPlacement : function(error, element) { 
+      if(error.html()){
+        $(element).parents().map(function(){
+          if(this.tagName.toLowerCase()=='td'){
+            var attentionElement = $(this).next().children().eq(0);
+            attentionElement.css('display','block');
+            attentionElement.next().html(error);
+            attentionElement.next().css('display','block');
+          }
+        });
+      }
+    },
+    showErrors: function(errorMap, errorList) {
+      if(errorList && errorList.length > 0){
+        $.each(errorList,function(index,obj){
+          var msg = this.message;
+          $(obj.element).parents().map(function(){
+          if(this.tagName.toLowerCase()=='td'){
+            var attentionElement = $(this).next().children().eq(0);
+            attentionElement.show();
+            attentionElement.next().html(msg);
+          }
+        });
+        });
+      }else{
+        $(this.currentElements).parents().map(function(){
+          if(this.tagName.toLowerCase()=='td'){
+            $(this).next().children().eq(0).hide();
+            $(this).next().children().eq(1).hide();
+          }
+        });
+      }
+      this.defaultShowErrors();
+    }, 
+    submitHandler : function(){
+      jQuery(this).submit();
+        return false;
+    }
+  });
+  //初始化商户列表
+  $('#merId').omCombo({
+    dataSource : '$request.contextPath/option/merlist.do',
+    width:'150px',
+    listMaxHeight:150,
+    emptyText:'请选择..',
+    forceSelection : true
+  });
+    //版本
+  $('#version').omCombo({
+    dataSource : [{"value":"3.0","text":"3.0"},{"value":"2.0","text":"2.0"},{"value":"1.0","text":"1.0"}],
+    width:'85px',
+    emptyText:'请选择..',
+    forceSelection : true
+  });
+
+  //默认支付方式   
+  $('#defBankType').omCombo({
+    dataSource : [{"value":"1","text":"手机银行卡"},{"value":"2","text":"网银"},{"value":"4","text":"积分"},{"value":"5","text":"嗖付"},{"value":"6","text":" 话费"}],
+    width:'85px',
+    emptyText:'请选择 ',
+    forceSelection : true
+  });
+
+  jQuery('#dataform').submit(function() {
+    if (!jQuery("#dataform").valid()){
+     return false;
+    }
+    jQuery(this).omAjaxSubmit({
+      success:function(res){
+        var msg = "";
+        var type = "";
+        if(res !='1') {
+          type = 'error';
+          var msg = '操作失败';
+          if(res != '0'){
+          	msg = res;
+          }
+        }else{
+          type = 'success';
+          msg = '操作成功';
+          closeDialog(); 
+        }
+        window.parent.$.omMessageBox.alert({
+          type : type,
+          title : '操作提示',
+          content : msg
+        });
+      }
+    }); 
+    return false; 
+  });
+});
+      
+//关闭窗口方法
+function closeDialog(){
+  window.parent.fillBackAndCloseDialog("#dialog"); 
+}
+</script>  
+</head>
+<body>
+  <div id="container">
+    <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/mercnf/save.do">
+    <table width="100%" >
+      <tr>
+        <td>
+          <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+            <tr>
+              <th width="30%" align="left"><span>*</span>商户：</th>
+              <td class="td"><input name="merId" type="text" maxlength="8" class="input2" /></td>
+              <td width="35%" class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>合并模式：</th>
+              <td class="td1">
+                <input type='radio' name='merGer' value='1'/>合并
+                <input type='radio' name='merGer' value='0'/>不合并
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg" ></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>版本：</th>
+              <td class="td"><input id="version" name='version' class="select1" /></td>
+              <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>通知模式：</th>
+              <td class="td1">
+                <input type='radio' name='notifyMode' value='11'/>仅前台成功后通知<br/>
+                <input type='radio' name='notifyMode' value='12'/>仅前台成功或失败后通知<br/>
+                <input type='radio' name='notifyMode' value='21'/>仅后台成功后通知<br/>
+                <input type='radio' name='notifyMode' value='22'/>仅后台成功或失败后通知<br/>
+                <input type='radio' name='notifyMode' value='31'/>前后台成功后通知<br/>
+                <input type='radio' name='notifyMode' value='32'/>前后台成功或失败后均通知
+              </td>
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>通知次数：</th>
+              <td class="td"><input  name="notifyTimes"}" type="text" maxlength="5" class="input2"></td>
+              <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>过期时长(秒)：</th>
+              <td class="td1"><input  name="expireTime" type="text" value="86400" maxlength="13" class="input2"></td>
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>支持点卡兑换券：</th>
+              <td class="td">
+                <input type='radio' name='spCardPay' value="1"/>是
+                <input type='radio' name='spCardPay' value="0"/>否
+              </td>
+              <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>前台通知方式：</th>
+              <td class="td1">
+                <input type='radio' name='retMethod' value="0"/>GET
+                <input type='radio' name='retMethod' value="1"/>POST
+              </td>
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>后台通知方式：</th>
+              <td  class="td">
+                <input type='radio' name='notifyMethod' value="0"/>GET
+                <input type='radio' name='notifyMethod' value="1"/>POST
+              </td>
+              <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>默认支付方式：</th>
+              <td class="td1"><input id="defBankType" name="defBankType" class="select1" /></td>
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left">页面模板ID：</th>
+              <td class="td"><input name="pageId" type="text" maxlength="8" class="input2" /></td>
+              <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left"><span>*</span>页面模板优先级：</th>
+              <td class="td1"><input name="styleLevel" type="text" value="99" maxlength="2" class="input2" /></td>
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+              <th align="left">默认网银(默认工行)：</th>
+              <td class="td"><input name="defGateId" type="text" value="0400" maxlength="8" class="input2" /></td>
+              <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td height="15"></td>
+            </tr>
+            <tr>
+              <td align="center"><input name="submit" type="submit" value="确定" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+              <input id="add_button2" name="add_button2" type="reset"  value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+</body>
+</html>

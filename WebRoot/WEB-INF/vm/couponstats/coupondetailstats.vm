@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+	<script src="$request.contextPath/js/ui/js/om-numberfield.js"></script>
+	<script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/couponstats.js"></script>
+ 	<script type="text/javascript">
+
+        jQuery(document).ready(function() {
+        	jQuery( "#dialog-modal").omDialog({
+    			autoOpen: false,
+    			height: 80,
+				resizable: false,
+    			modal: true
+    		});
+          	jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/couponstats/couponDetailStats.do?queryKey=stats.couponDetailStats",
+                width:'100%',
+                height : 434,
+                limit : 15,
+				errorMsg : '取数据出错',
+				loadingMsg : '正在加载数据, 请稍后...',
+				emptyMsg : '没有数据',
+                autoFit : true,
+                colModel : [ 
+					 {header : '兑换日期', name : 'EDATE',width : 80, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.EDATE + "'>" + rowData.EDATE + "</a>";
+						}
+					 },
+    				 {header : '兑换券编号', name : 'COUPONID',width : 60, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.COUPONID + "'>" + rowData.COUPONID + "</a>";
+						}}, 
+                     {header : '兑换券名称', name : 'COUPONNAME',width : 150, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.COUPONNAME + "'>" + rowData.COUPONNAME + "</a>";
+						}},
+					 {header : '商户编号', name : 'MERID',width : 60, align : 'center'}, 
+                     {header : '商户名称', name : 'MERNAME',width : 150, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.MERNAME + "'>" + rowData.MERNAME + "</a>";
+						}},
+					 {header : '商品编号', name : 'GOODSID',width : 60, align : 'center'}, 
+                     {header : '商品名称', name : 'GOODSNAME',width : 150, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.GOODSNAME + "'>" + rowData.GOODSNAME + "</a>";
+						}},
+                     {header : '手机号', name : 'PAIDMOBILEID', width : 80, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.PAIDMOBILEID + "'>" + rowData.PAIDMOBILEID + "</a>";
+						}},
+                     {header : '金额 (元)', name : 'TOTAL', width : 80, align : 'right',
+							 renderer:
+							 		function(value, rowData, rowIndex) {
+            							 var val = rowData.TOTAL + "";
+            							 var index = val.indexOf(".");
+            							 if(index > 0){
+            							 	var sub = val.substring(index + 1);
+            								if(sub.length < 2){
+            									return val + "0&nbsp;&nbsp;";
+            								}
+            							 	return val + "&nbsp;&nbsp;";
+            							 }
+            							 return rowData.TOTAL + ".00&nbsp;&nbsp;";
+            		                }
+	                 }
+                ]
+            });
+              $('#phone').omNumberField({
+			  	 allowDecimals : false,
+				 allowNegative : false,
+				 onBlur: function(value, event){
+				 	if(value.length > 11){
+						value = value.substring(0, 10);
+						$('#phone').val(value);
+					}
+				 }
+			  });
+			 $('#type').omCombo({
+                dataSource: '$request.contextPath/option/couponinflist.do',
+	            width: '150px',
+	            emptyText: '全部',
+	            forceSelection: true,
+	            filterStrategy : 'anywhere',
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+			$('#mertype').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+	            width: '150px',
+	            emptyText: '全部',
+	            onValueChange: function(target, newValue, oldValue, event) {
+					var merId = $('#mertype').omCombo('value');
+	                // 连级更新商品列表
+	                $('#goodstype').omCombo('setData', []);
+					$('#goodstype').omCombo({
+	                    dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+						forceSelection: true
+	                });
+	            },
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+			$('#goodstype').omCombo({
+                dataSource: [],
+	            width: '155px',
+	            emptyText: '全部',
+				forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+			$('#startDate').omCalendar({
+				dateFormat:'yy-mm-dd',
+				maxDate: new Date(),
+				onSelect : function(date,event) {
+					var d = new Date(date);
+					d.setDate(d.getDate()-1);
+					$('#endDate').omCalendar({minDate : d});
+				}
+			});
+			$('#endDate').omCalendar({
+				dateFormat:'yy-mm-dd',
+				maxDate: new Date(),
+				onSelect : function(date,event) {
+					$('#startDate').omCalendar({maxDate : date});
+				}
+			});
+       });
+	function setFormat(type){
+		$('#startDate').val('');
+		$('#endDate').val('');
+		if(type == 1){
+			$('#startDate').omCalendar("option", "dateFormat", "yy-mm");
+			$('#endDate').omCalendar("option", "dateFormat", "yy-mm");
+		}else{
+			$('#startDate').omCalendar("option", "dateFormat", "yy-mm-dd");
+			$('#endDate').omCalendar("option", "dateFormat", "yy-mm-dd");
+		}
+	}
+</script>
+
+</head>
+<body>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search" style="height:80px;">
+   	  <table width="100%" border="0">
+	   <tr>
+	    <td>
+	      <form id="form" action="" method="post"> 
+	        <table border="0">
+			  <tr><td colspan="4">&nbsp;</td></tr>
+	          <tr height="30">
+	            <th width="10%">兑换劵：</th>
+	            <td><input id="type" name="type"/></td>
+	            <th width="10%">商户：</th>
+	            <td><input id="mertype" name="mertype"/></td>
+	            <th width="10%">商品：</th>
+	            <td><input id="goodstype" name="goodstype"/></td>
+	         </tr>
+	         <tr height="30">
+	            <th width="10%">手机号：</th>
+	            <td><input id="phone" name="phone" class="input2" type="text"/></td>
+	            <th width="12%">统计时间：</th>
+	            <td colspan="4">
+	            	<input id="startDate" style="width:129px" name="startDate"/>&nbsp;至&nbsp;
+	            	<input id="endDate" style="width:129px" name="endDate"/>
+				</td>
+	         </tr>
+	        </table>
+	         </form> 
+	       </td>
+	        <td >
+				<input id="query" title="查询" name="query" type="image" code="001"  src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="doQuery('couponDetailStats.do?queryKey=stats.couponDetailStats');"/>
+				<input code="002" type="image" value="导出" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="doExport('expDetailReport.do?queryKey=stats.couponDetailStats');"/>
+	        </td>
+	       </tr>
+        </table>
+	</div>    
+    </div>			      
+ <!--列表区-->
+  <div align="center">
+       <table id="grid" align="left"></table>
+  <div>
+  <div id="dialog-modal" title="提示窗口">
+    <p id="result"></p>
+  </div>
+</body>
+</html>

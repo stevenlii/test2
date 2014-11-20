@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="6 seconds">
+  <appender name="hfmngLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>log/hfmng.log</File>
+    <encoder>
+      <pattern>%d{yyyyMMddHHmmss} [%t] %-5p %c{0} - %m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>log/hfmng.log.%d{yyyyMMdd}</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+  
+  <appender name="operateLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>log/operate.log</File>
+    <encoder>
+      <pattern>%d{yyyyMMddHHmmss},%m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>log/operate.log.%d{yyyyMMdd}</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+  
+  <appender name="operateDaoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>log/operateDao.log</File>
+    <encoder>
+      <pattern>%d{yyyyMMddHHmmss},%m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>log/operateDao.log.%d{yyyyMMdd}</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+  
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender" target="SYSTEM_OUT">
+  
+    <encoder>
+      <pattern>%d{yyyyMMddHHmmss} [%t] %-5p %c{0} - %m%n</pattern>
+    </encoder>
+  </appender>
+ 
+  <logger name="hfmngLog" level="INFO">
+    <appender-ref ref="hfmngLog"/>
+  </logger>
+  <logger name="operateLog" level="INFO">
+    <appender-ref ref="operateLog"/>
+  </logger>
+  <logger name="operateDaoLog" level="INFO">
+    <appender-ref ref="operateDaoLog"/>
+  </logger>
+  
+  <logger name="com.umpay" level="debug"/>
+  <logger name="com.ibatis" level="debug"/>
+  <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="debug"/>
+  <logger name="com.ibatis.common.jdbc.ScriptRunner" level="debug"/>
+  <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="debug"/>
+  <logger name="java.sql.Connection" level="debug"/>
+  <logger name="java.sql.Statement" level="debug"/>
+  <logger name="java.sql.PreparedStatement" level="debug"/>
+
+  <root level="INFO">
+  <appender-ref ref="console" />
+    <appender-ref ref="hfmngLog"/>
+  </root>
+</configuration>

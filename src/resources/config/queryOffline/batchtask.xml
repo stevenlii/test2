@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="batchtask"  >
+	<sql id="allSegMbl"> 
+	<![CDATA[
+		select taskid,tasktype,creator,synstate,synresult,resultdesc,intime,modtime from umpay.T_SYNTASK 
+		where tasktype=6 
+         #if( $taskType && $taskType!='' ) 
+		   and  taskType= :taskType   
+		 #end 
+		 #if( $synState && $synState!='' ) 
+		   and synState = :synState   
+		 #end 
+		 #if( $synResult && $synResult!='' ) 
+		   and  synResult = :synResult   
+		 #end 
+		 order by intime desc
+	  ]]>
+	</sql>
+</mapper> 

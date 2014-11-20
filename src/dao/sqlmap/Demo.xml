@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="DemoInfo">
+	<typeAlias alias="DemoInfo" type="com.umpay.hfmng.model.DemoInfo" />
+	
+	<sql id="select_what">
+		select merId,exMerId,merName,merType,state,postal,
+		address,modUser,modTime,inTime,timeLtd,isSpecial,cusPhone 
+		from umpay.t_mer_inf
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="merId" prepend=" and ">
+				merId = #merId#
+			</isNotEmpty>
+			<isNotEmpty	property="merName" prepend=" and ">
+				merName = #merName#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="key_find">
+		where merId=#merId#
+	</sql>
+	
+	<statement id="Get" resultClass="DemoInfo" parameterClass="java.lang.String">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="DemoInfo" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_mer_inf
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update  umpay.t_mer_inf
+		<dynamic prepend="set">
+			<isNotEmpty	property="modUser" prepend=" , ">
+				modUser=#modUser#
+			</isNotEmpty>	
+			<isNotEmpty	property="postal" prepend=" , ">
+				postal=#postal#
+			</isNotEmpty>
+		</dynamic>
+        <include refid="key_find" />
+	</statement>
+</sqlMap>

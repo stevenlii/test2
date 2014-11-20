@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head> 
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/bankinf.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<style>
+	html{ height:100%;}
+	body{ height:100%; overflow: auto;}
+</style>
+  <script>
+   		var options = {
+                success : showResponse
+        };
+        
+  	 jQuery(document).ready(function() {
+  		jQuery("#container").width(jQuery(window).width());
+    
+  	     //获取支付服务商类型列表
+  	   $('#bankType').omCombo({
+           dataSource : '$request.contextPath/option/banktype.do',
+           width:'152px',
+           listMaxHeight:80,
+           emptyText:'请选择..' ,
+           forceSelection:true,
+           onSuccess:function(data, textStatus, event){
+  		   		if(data.length!=0){
+  		   			$('#bankType').omCombo('value','$!{bank.bankType.trim()}');
+  		   		}
+   			}
+       });
+  	    
+  	 	  jQuery("#dataform").validate({
+                rules : {
+		  	 		"bankName": {
+		              required : true,
+		              maxlength : 16
+		            },
+                    "bankType" : {
+                    	required : true
+                    }
+                },
+                messages : {
+                	"bankName" : {
+                      required : "请输入支付服务商名称" ,
+                      maxlength : "支付服务商名称最多16个字符"
+                    },
+                    "bankType"  : {
+                        required : "请选择支付类型"
+                    }
+                },
+                
+              errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                }, 
+                
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	 jQuery('#dataform').submit(function() {
+  	 	  	if (!jQuery("#dataform").valid()) 
+                 return false;
+	  	 	var bankName=jQuery('#bankName').val();
+	   		var bankType=jQuery('#bankType').val();
+	   		if("$!{bank.bankName}" == bankName && "$!{bank.bankType.trim()}" == bankType){
+	   			window.parent.$.omMessageBox.alert({
+	                content:'没有修改，不需提交'
+	            });
+	   			return false;
+	   		}
+            jQuery(this).omAjaxSubmit({async:  false,success:function(res){
+            	if(res = 1){
+          		  closeDialog(); 
+          		  window.parent.shuaxin();
+          	  }else{
+          		  window.parent.showSimpleTip(res);
+          	  }
+	               }
+	             });
+	             return false; 
+              });
+  	 	 
+  	        });
+  	 function checkData(){
+  		var bankName=jQuery('#bankName').val();
+  		var bankType=jQuery('#bankType').val();
+  		if("$!{bank.bankName}" == bankName && "$!{bank.bankType}" == bankType){
+  			alert("no");
+  		}
+  	 }
+  	 function showResponse(responseText, statusText) {
+        var result = eval("("+responseText+")");
+          if(result.code=='0'){
+          	window.parent.fillBackAndCloseDialog(result.msg);
+          }
+        }
+        
+    //关闭窗口方法
+    function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }
+    
+  </script>  
+  </head>
+  <body>
+<div id="container">
+     <form id ="dataform" method="post" name="dataform" id="dataform" action="${request.contextPath}/bankinf/update.do">
+      <input type="hidden" name="mer.id" value="$mer.id">
+      <table width="100%" >
+      <tr><td>
+        <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+          <tr>
+                <th width="35%" align="left"><span>*</span>支付服务商编号：</th>
+                <td class="td"><input name="bank" value="$!{bank.bankId.trim()}" type="text" readonly="true" disabled="disabled" class="input2"></td>
+                <input type="hidden" name="bankId"  value="$!{bank.bankId.trim()}" type="text"  /> 
+                <td width="42%" class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+          <tr>
+                <th width="18%" align="left"><span>*</span>支付服务商名称：</th>
+                <td class="td1"><input id="bankName" name="bankName" value="$!{bank.bankName}" type="text"  maxlength="16" class="input2"></td>
+                <td width="40%" class="td1"> <span class="errorImg"></span><span class="errorMsg" ></span></td>
+          </tr>
+         <tr>
+                <th width="18%" align="left"><span>*</span>支付服务商类型：</th>
+                <td class="td"><input id="bankType" name="bankType" class="select1"/></td>
+                 <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+          </table>
+          </td></tr><tr><td>
+          <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="15"></td>
+              </tr>
+              <tr>
+                <td align="center"><input name="submit" type="submit" value="修改" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+                <input id="add_button2" name="add_button2" type="reset"  value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+              </tr>
+            </table>
+            </td></tr>
+            <table>
+      </form>
+</div>
+</body>
+</html>

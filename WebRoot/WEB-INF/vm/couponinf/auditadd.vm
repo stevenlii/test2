@@ -1,0 +1,70 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/couponinf.js"></script>
+<script>
+//关闭窗口方法
+function closeDialog() {
+    window.parent.fillBackAndCloseDialog("#dialog");
+}
+</script>
+</head>
+<body>
+<div>
+<!-- 审核详情页面 -->
+<form id ="dataform-add" method="post" name="dataform-add">
+	<table class="infowrite" cellspacing="0" cellpadding="0">
+		<tr >
+         <th width="30%">兑换券编号：</th>
+         <td  class="td">$!{auditCouponInf.couponId}</td>
+       </tr>
+       <tr >
+         <th>兑换券类型：</th>
+         <td class="td1">$!{auditCouponInf.couponType}</td>
+       </tr>
+       <tr >
+         <th>兑换券名称：</th>
+         <td class="td">$!{auditCouponInf.couponName}</td>
+       </tr>
+       <tr>
+         <th>兑换券启用状态：</th>
+         <td class="td1" >$!{auditCouponInf.stateName}</td>
+       </tr>
+       <tr>
+         <th>兑换券说明：</th>
+         <td class="td">$!{auditCouponInf.remark}</td>
+       </tr>
+	   <tr>
+         <th>待审核类型：</th>
+         <td class="td1"><span>新增</span></td>
+       </tr>
+	</table>
+	<div class="pop_btn_sh">
+       <input type="button" value="通过" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goPass('$auditId','${auditCouponInf.couponId}')" id="btn_pass" />
+       <input type="button" value="拒绝" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goNotPass('$auditId','${auditCouponInf.couponId}')" id="btn_nopass" />
+       <input type="button" value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog(0)" />
+    </div>
+    <table class="infowrite" cellspacing="0" cellpadding="0">
+		<tr>
+         <th width="30%">审核意见：</th>
+         <td class="td"><textarea id="resultDesc" name="resultDesc" rows="3" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%"></textarea></td>
+       </tr>
+	</table>
+	
+</form>
+</div>
+</body>
+</html>

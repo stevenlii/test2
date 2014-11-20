@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/secmer.js"></script>
+  <script>
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  	     
+  		var zNodes1="${zNodes}";
+  		var zNodes=eval(zNodes1);
+  		$.fn.zTree.init($("#treeDemo"), setting, zNodes.sort(function (a, b) { return a["id"] > b["id"] ? 1 : -1 }));
+  		onCheck();
+  		 
+  	 	 jQuery("#dataform").validate({
+  	 		 	onkeyup: false,
+                rules : {
+                    "subMerName": {
+                        required : true,
+                        maxlength : 16
+                    },
+                   "operator": {
+                        required : true
+                   }
+                },
+                messages : {
+                    "subMerName": {
+                        required : "请输入商户名称",
+                        maxlength : "商户名称最多16个字"
+                    },
+                    "operator": {
+                    	required : "请选择运营负责人"  
+                    }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){
+  	 	 		 return false;
+  	 	 	 }
+              jQuery(this).omAjaxSubmit({success:function(res){
+            	  		window.parent.showSimpleTip(res);
+                   		if(res =='1') {
+            			   closeDialog();
+            			   window.parent.shuaxin();
+            		    }
+               		}
+	             
+               }); 
+        	   
+              return false; 
+            });
+  	 	 
+  	     });       
+       
+  </script>  
+  </head>
+  <body>
+<div id="container">
+          <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/secmer/updateSecMerInf.do">
+          <input type="hidden" name="subMerId" value="$!{mer.subMerId}">
+          <table width="100%" >
+          <tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+              <tr>
+                <th width="25%"><span>*</span>二级商户号：</th>
+                <td width="40%" class="td">$!{mer.subMerId}</td>
+                <td width="35%" class="td"></td>
+              </tr>
+              <tr>
+                <th><span>*</span>二级商户名称：</th>
+                <td class="td1"><input name="subMerName" type="text" value="$!{mer.subMerName}" maxlength="17" class="input2" /></td>
+                <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+              </tr>
+            <tr>
+                <th width="18%"><span>*</span>运营负责人：</th>
+                <td class="td">
+	                <input id="showOperator" type="text" readonly class="input2" onclick="showMenu();" />
+	            	<input type="hidden" id="operator" name="operator" />
+                </td>
+                <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            </table>
+            </td></tr><tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0">
+                 <tr>
+                    <td height="15"></td></tr>
+                 <tr>
+                    <td align="center"><input id="add_button1" type="submit" value="确定" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+                    <input id="add_button2" type="button" value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog()"/>
+                  </tr>
+             </table>
+             </td></tr>
+             <table>
+          </form>
+                  
+</div>
+<div id="menuContent" class="list_zTree">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:140px; height:100px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

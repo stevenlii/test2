@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MerBusiConf">
+	<typeAlias alias="MerBusiConf" type="com.umpay.hfmng.model.MerBusiConf" />
+	<typeAlias alias="Audit" type="com.umpay.hfmng.model.Audit" />
+	<sql id="select_what">
+	 SELECT MER_ID MERID,BIZ_TYPE BIZTYPE,STATE,ADD_USER_ID CREATOR,MOD_USER_ID MODUSER,
+	 UPDT_TIME MODTIME,IN_TIME INTIME,MOD_LOCK MODLOCK from UMPAY.T_MERBUSI_CONF where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="merId" prepend=" and ">MER_ID = #merId#</isNotEmpty>
+		<isNotEmpty	property="bizType" prepend=" and ">BIZ_TYPE = #bizType#</isNotEmpty>
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="merId" prepend=" and ">MER_ID = #merId#</isNotEmpty>
+		<isNotEmpty	property="bizType" prepend=" and ">BIZ_TYPE = #bizType#</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="MerBusiConf" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="MerBusiConf" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from UMPAY.T_MERBUSI_CONF
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Insert" resultClass="MerBusiConf">
+		insert into UMPAY.T_MERBUSI_CONF(MER_ID,BIZ_TYPE,state
+				<isNotEmpty	property="creator" prepend=" , "> ADD_USER_ID </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> MOD_USER_ID </isNotEmpty>
+			) values(#merId#,#bizType#,2
+				<isNotEmpty	property="creator" prepend=" , "> #creator# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_MERBUSI_CONF set mod_lock=0,UPDT_TIME=CURRENT TIMESTAMP 
+			<isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> MOD_USER_ID=#modUser# </isNotEmpty>
+		 where MER_ID=#merId# and BIZ_TYPE=#bizType#
+	</statement>
+	
+	<statement id="updateLock" resultClass="integer">
+	   update UMPAY.T_MERBUSI_CONF set MOD_LOCK=#modLock# where MER_ID=#merId# and BIZ_TYPE=#bizType# 
+	</statement>
+	<!-- 查找待审核的商户支付类型 -->
+	<statement id="checkDataAdd" resultClass="Audit">
+		select ixData,ixData2 from umpay.t_hfaudit 
+		where state=0 and tableName='UMPAY.T_MERBUSI_CONF'
+		<isNotEmpty property="merId" prepend=" and ">ixData=#merId#</isNotEmpty>
+		<isNotEmpty property="bizType" prepend=" and ">ixData2=#bizType#</isNotEmpty>
+	</statement>
+</sqlMap>

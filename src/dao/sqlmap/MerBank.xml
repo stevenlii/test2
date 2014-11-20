@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MerBank">
+	<typeAlias alias="MerBank" type="com.umpay.hfmng.model.MerBank" />
+	<typeAlias alias="bankInfo" type="com.umpay.hfmng.model.BankInfo" />
+	<sql id="select_what">
+	 select * from umpay.t_mer_bank mer 
+	 where 1=1  
+	</sql>
+	
+	<sql id="key_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			mer.merId = #merId#
+		</isNotEmpty>	
+		<isNotEmpty	property="bankId" prepend=" and ">
+			mer.bankId = #bankId#
+		</isNotEmpty>		
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			mer.merId = #merId#
+		</isNotEmpty>
+	</sql>
+	
+	<statement id="Get" resultClass="MerBank" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="MerBank" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="FindHN" resultClass="MerBank" >
+		 select mer.merId,mer.bankId,inf.merName,mer.bankmerid,mer.state,mer.bankposid 
+		 from umpay.t_mer_bank mer, umpay.t_hfmer_exp exp, umpay.t_mer_inf inf 
+		 where mer.merId=exp.merId and mer.merId=inf.merId 
+		 and mer.bankId='XE371000' order by mer.merId
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_goods_inf
+		<include refid="where_find" />
+	</statement>
+	<statement id="updateMerBankLock" resultClass="integer">
+	   update umpay.t_mer_bank set modLock=#modLock# where merId=#merId# and bankId=#bankId#
+	</statement>
+	<statement id="insertMerBank" resultClass="MerBank">
+		insert into umpay.t_mer_bank(merId, bankId, modLock
+				<isNotEmpty	property="state" prepend=" , "> state </isNotEmpty>
+				<isNotEmpty	property="bankMerId" prepend=" , "> bankMerId </isNotEmpty>
+				<isNotEmpty	property="bankPosId" prepend=" , "> bankPosId </isNotEmpty>
+			) values(#merId#, #bankId#, 0
+				<isNotEmpty	property="state" prepend=" , "> #state# </isNotEmpty>
+				<isNotEmpty	property="bankMerId" prepend=" , "> #bankMerId# </isNotEmpty>
+				<isNotEmpty	property="bankPosId" prepend=" , "> #bankPosId# </isNotEmpty>
+			)
+	</statement>
+	<statement id="updateMerBank" resultClass="MerBank">
+		update umpay.t_mer_bank set modLock=0,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+			<isNotEmpty	property="bankMerId" prepend=" , "> bankMerId=#bankMerId# </isNotEmpty>
+			<isNotEmpty	property="bankPosId" prepend=" , "> bankPosId=#bankPosId# </isNotEmpty>
+		 where merId=#merId# and bankId=#bankId#
+	</statement>
+	
+	<statement id="getMerBankInfo" resultClass="bankInfo">
+		select distinct b.bankid, b.bankname, b.banktype,b.state
+		from umpay.t_mer_bank a, umpay.t_bank_inf b
+		where a.bankid = b.bankid
+		<isNotEmpty property="merId" prepend=" and ">
+			a.merId = #merId#
+		</isNotEmpty>
+	</statement>
+</sqlMap>

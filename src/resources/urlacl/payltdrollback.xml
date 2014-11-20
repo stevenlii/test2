@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 限额回滚 -->
+<Options>
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/payltdrollback/auditPass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/payltdrollback/auditNotPass.do</url>
+	</Option>
+</Options>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ChnlGoods">
+	<typeAlias alias="ChnlGoods" type="com.umpay.hfmng.model.ChnlGoods" />
+	<sql id="select_what">
+	 select * from umpay.t_hf_chnl_goods where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="channelId" prepend=" and ">
+			channelId = #channelId#
+		</isNotEmpty>
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="goodsId" prepend=" and ">
+			goodsId = #goodsId#
+		</isNotEmpty>	
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="channelId" prepend=" and ">
+			channelId = #channelId#
+		</isNotEmpty>
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="ChnlGoods" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	<statement id="Find" resultClass="ChnlGoods" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_hf_chnl_goods
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="updateModLock" resultClass="integer">
+	   update umpay.t_hf_chnl_goods set modLock=#modLock# 
+	    where channelId=#channelId# and merId=#merId# and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="Insert" resultClass="ChnlGoods">
+		insert into umpay.t_hf_chnl_goods(channelId, merId, goodsId 
+				<isNotEmpty	property="service_user" prepend=" , "> service_user </isNotEmpty>
+			) values(#channelId#, #merId#, #goodsId# 
+				<isNotEmpty	property="service_user" prepend=" , "> #service_user# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update umpay.t_hf_chnl_goods set modLock=0 
+			<isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+			<isNotEmpty	property="service_user" prepend=" , "> service_user=#service_user# </isNotEmpty>
+		 where channelId=#channelId# and merId=#merId# and goodsId=#goodsId#
+	</statement>
+	
+</sqlMap>

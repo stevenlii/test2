@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/proxyorder.js"></script>
+<script type="text/javascript">
+
+  var url="$request.contextPath/proxyorder/query.do?queryKey=proxyorder.all";
+  var setting = {
+		data: {simpleData: {enable: true}},
+		callback: {onClick: backfill}
+  };
+  
+    jQuery(document).ready(function() {
+    	jQuery("#search_div").width(jQuery(window).width()-20);
+    	
+		var zNodes1="${zNodes}";
+		var zNodes=eval(zNodes1);
+		$.fn.zTree.init($("#categoryTree"), setting, zNodes);
+		
+		    var optStr="${opts}";
+				var opts=optStr.split(',');
+		    jQuery('[code]').each(function () {
+		        var code=$(this).attr("code");
+		        for(var i=0;i<opts.length;i++){
+				   if(code==opts[i]){
+					   $(this).css('display','inline');
+						}
+		    		};
+				});
+	
+      jQuery('#grid').omGrid({
+            dataSource : url,
+            width:'100%',
+            height : 455,
+            limit : 15,
+            singleSelect : false,
+            rowClasses : function(rowIndex,rowData){
+				if(rowData.MODLOCK==1){
+					return "lock";
+				}else{
+					return "checkbox";
+				}
+			},
+            colModel : [ {header : '交易时间', name : 'ORDERDATE',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+            			{header : '交易流水号', name : 'RPID',width : 90, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+            			{header : '订单号', name : 'ORDERID',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+            			{header : '手机号码', name : 'MOBILEID',width : 55, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+            			{header : '一级商户号', name : 'MERID',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+            			{header : '二级商户号', name : 'SUBMERID',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+            			{header : '二级商户名称', name : 'SUBMERNAME',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}},
+                         {header : '商品号', name : 'GOODSID', width : 25, align : 'left',renderer:function(value , rowData , rowIndex){
+                         	return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                          {header : '商品名称', name : 'GOODSNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                        	  return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                          {header : '金额（分）', name : 'AMOUNT',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                        	  return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                          {header : '支付类型', name : 'BUSINESSTYPE',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                        	  return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                         {header : '订单状态', name : 'ORDERSTATE',width : 35,align : 'left',renderer:function(value , rowData , rowIndex){
+                        	  var name="";
+                        	  if(value==0)
+                        		  name="下单";
+                        	  else if(value==2)
+                        		  name="支付成功";
+                        	  else if(value==3)
+                        		  name="支付失败";
+                        	  return "<a title='"+name+"'>"+name+"</a>";
+                         } }
+                        ],
+            autoFit:true
+        });
+        
+        $("#dialog").omDialog({
+            autoOpen: false
+         });
+        
+       	//状态       0-订单初始化，第一次查订单表的状态， 1-正在充值中，表示正在去soa充值的状态， 2-充值成功，3-业务服务器返回充值失败，
+        //4-业务服务器请求前置时超时， 5-冲值时发起的签权操作超时错误，6-补发初始化， 7-补发充值中， 8-重发初始化， 9-重发充值中
+    	$('#orderState').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"0","text":"下单"},{"value":"2","text":"支付成功"},{"value":"3","text":"支付失败"}],
+            width:'60px',
+            emptyText:'全部 ',
+            forceSelection : true
+        });
+        
+        //获取支付类型列表
+        $('#businessType').omCombo({
+               dataSource : '$request.contextPath/option/businessTypeList.do',
+                width:'120px',
+                emptyText:'全部 ' ,
+                listMaxHeight:150,
+                onSuccess:function(data, textStatus, event){
+	      	     var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	      	     data.unshift(tmp);
+                } ,
+                forceSelection : true   ,
+                lazyLoad : true
+        });
+    });
+    
+   
+</script>
+
+</head>
+<body>
+
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+      <table border="0" width="100%">
+        <tr>
+        <td align="left">
+ 	     <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expProxyOrder();"/></td>
+		<td align="right"></td>
+         </tr>
+        </table>
+     </div>
+  
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="90%" border="0">
+       <tr>
+        <td  align="left" >
+        <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr>
+            <th width="8%" height="30">订单编号：</th>
+              <td width="10%"><input id="orderId" name="orderId" type="text" class="input1" style="width:60px"/></td>
+           <th width="8%">商户号：</th>
+             <td width="10%"><input id="merId" name="merId" type="text" class="input1" style="width:60px"  /></td>
+           <th>订单状态：</th>
+             <td><input id="orderState" name="orderState" class="select1"/></td>
+           <th>支付类型：</th>
+            <td><input id="businessType" name="businessType" class="select1"/></td> 
+           <th width="10%">交易时间：</th>
+  	         <td ><input type="text" id="from" name="from" onfocus="WdatePicker({startDate:'%y-%M-%d 00:00:00',dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:150px"/></td>
+          </tr>
+          <tr>
+             <th width="10%">二级商户号：</th>
+              <td width="10%"><input id="subMerId" name="subMerId" type="text" class="input1" style="width:60px"/></td>
+             <th width="10%">商品号：</th>
+              <td width="10%"><input id="goodsId" name="goodsId" type="text" class="input1" style="width:60px"/></td>
+             <th width="8%" height="30">手机号：</th>
+              <td width="10%"><input id="mobileId" name="mobileId" type="text" class="input1" style="width:60px"/></td>
+             <th width="10%">商品分类：</th>
+              <td width="13%">
+                 <span class="om-combo om-widget om-state-default" style="width: 120px;">
+                   <input type="hidden" id="category" value="" type="text" />
+                   <input type="text" id="goodsCategory" readonly value="全部" onclick="showMenu(''); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 99px;"><span onclick="showMenu(''); return false;" class="om-combo-trigger ioi_trigger"></span>
+                 </span>
+             </td>
+              <th >至：</th>
+			    <td><input type="text" id="to" name="to" onfocus="WdatePicker({startDate:'%y-%M-%d 23:59:59',dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:150px"/></td>
+         </tr>
+        </table>
+         </form> 
+       </td>
+         <td align="left"><input id="query" title="查询" name="submit" type="image" style="display:none" code="001" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+   </div>  
+   
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+ <div id="menuContent" class="list_zTree">
+	<ul id="categoryTree" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

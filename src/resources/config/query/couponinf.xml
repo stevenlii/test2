@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="couponinf">
+	<sql id="all">
+	<![CDATA[
+		select *
+		  from (select auditId,
+		               ixData,
+		               ixData2,
+		               modData,
+		               auditType,
+		               auditState,
+		               resultDesc,
+		               couponId,
+		               auditUser,
+		               value(state, 0) as state,
+		               modTime,
+		               couponName,
+		               price,
+		               couponType,
+		               submitUser,
+		               to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime,
+		               remark
+		          from (select id         as auditId,
+		                       ixData,
+		                       ixData2,
+		                       modData,
+		                       auditType,
+		                       state      as auditState,
+		                       resultDesc
+		                  from umpay.T_HFAUDIT
+		                 where id in (select max(id) as auditId
+		                                from umpay.T_HFAUDIT
+		                               where tableName = 'UMPAY.T_COUPON_INF'
+		                               group by ixData)) a
+		          full join umpay.T_COUPON_INF b
+		            on a.ixData = b.couponId) c
+		 where 1 = 1
+		   #if( $couponId && $couponId!='' ) 
+		       and ixData = :couponId
+		   #end
+		   #if( $state && $state!='' ) 
+		       and state = :state
+		   #end
+		   #if( $auditState && $auditState!='' ) 
+		       and auditState = :auditState
+		   #end
+		 order by ixData desc
+	]]>
+	</sql>
+	
+	<sql id="couponinfolog">
+	<![CDATA[
+		select couponId,
+		       couponName,
+               operdata,
+               opertype,
+               moduser,
+               intime
+          from (select ixdata1 as couponId,
+                       ixdata5 as couponName,
+                       operdata,
+                       opertype,
+                       moduser,
+                       to_char(intime,'yyyy-MM-dd hh24:mi:ss') intime
+                    from umpay.T_COUPON_OPLOG
+                    where businessobject='umpay.T_COUPON_INF'
+                   ) a
+     	where 1 = 1
+	       #if( $couponId && $couponId!='' ) 
+	           and couponId = :couponId
+	       #end
+	       #if( $optdate && $optdate!='' ) 
+	           and posstr(intime,:optdate)>0
+	       #end
+	       #if( $moduser && $moduser!='' ) 
+	           and moduser = :moduser
+	       #end
+	       #if( $logopttype && $logopttype!='' ) 
+	           and opertype = :logopttype
+	       #end
+	     order by intime desc
+	]]>
+	</sql>
+</mapper> 

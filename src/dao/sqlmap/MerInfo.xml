@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MerInfo">
+	<typeAlias alias="MerInfo" type="com.umpay.hfmng.model.MerInfo" />
+
+	<sql id="select_what">
+		select *
+		  from (select t.*,
+		               coalesce(b.company_desc, '') as companyDesc,
+		               coalesce(b.busi_desc, '') as busiDesc,
+		               coalesce(b.mer_web, '') as merWeb,
+		               coalesce(b.sale_channel, '') as saleChannel,
+		               coalesce(b.reg_capital, -9999) as regCapital,
+		               coalesce(b.reg_tiem, '') as regTime,
+		               coalesce(b.src_mer, '') as srcMer,
+		               coalesce(b.year_profit, -9999) as yearProfit,
+		               coalesce(b.user_scale, -9999) as userScale,
+		               coalesce(b.support, -9999) as support,
+		               coalesce(b.shared_rate, '') as sharedRate
+		          from (select t.merId,
+		                       t.exMerId,
+		                       t.merName,
+		                       t.merType,
+		                       t.state,
+		                       t.postal,
+		                       t.address,
+		                       t.modUser,
+		                       t.modTime,
+		                       t.inTime,
+		                       t.timeLtd,
+		                       t.isSpecial,
+		                       t.cusPhone,
+		                       p.busi_attr busiType,
+		                       p.addWay,
+		                       p.interType,
+		                       p.chnlCheck,
+		                       p.fileDL,
+		                       p.operator,
+		                       p.category,
+		                       p.companyName
+		                  from umpay.T_MER_INF t, umpay.T_HFMER_EXP p
+		                 where t.merId = p.merId) t
+		          left join umpay.T_HFMER_EXP_ATTR b
+		            on t.merId = b.mer_id) t
+		 where 1 = 1
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="merId" prepend=" and ">
+				t.merId = #merId#
+			</isNotEmpty>
+			<isNotEmpty property="merName" prepend=" and ">
+				t.merName = #merName#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<sql id="key_find">
+		<dynamic prepend=" and ">
+			t.merId=#merId#
+		</dynamic>
+	</sql>
+
+	<statement id="Get" resultClass="MerInfo">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+
+	<statement id="Find" resultClass="MerInfo">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_mer_inf t left join umpay.t_hfmer_exp p on t.merId = p.merId
+		<include refid="where_find" />
+	</statement>
+	<statement id="updateMerLock" resultClass="integer">
+		update umpay.t_hfmer_exp set modLock=#modLock#,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		where merId=#merId#
+	</statement>
+
+	<statement id="setMerLock" resultClass="integer">
+		update umpay.t_hfmer_exp set modLock=0 where merId=#ixData#
+	</statement>
+
+	<statement id="insertMerExp" resultClass="MerInfo">
+		insert into umpay.t_hfmer_exp(merId, addWay, modLock
+		<isNotEmpty property="busiType" prepend=" , "> busi_attr </isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> modUser </isNotEmpty>
+		<isNotEmpty property="interType" prepend=" , "> interType </isNotEmpty>
+		<isNotEmpty property="chnlCheck" prepend=" , "> chnlCheck </isNotEmpty>
+		<isNotEmpty property="fileDL" prepend=" , "> fileDL </isNotEmpty>
+		<isNotEmpty property="category" prepend=" , "> category </isNotEmpty>
+		<isNotEmpty property="companyName" prepend=" , "> companyName </isNotEmpty>
+		) values(#merId#, 0, 0
+		<isNotEmpty property="busiType" prepend=" , "> #busiType# </isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+		<isNotEmpty property="interType" prepend=" , "> #interType# </isNotEmpty>
+		<isNotEmpty property="chnlCheck" prepend=" , "> #chnlCheck# </isNotEmpty>
+		<isNotEmpty property="fileDL" prepend=" , "> #fileDL# </isNotEmpty>
+		<isNotEmpty property="category" prepend=" , "> #category# </isNotEmpty>
+		<isNotEmpty property="companyName" prepend=" , "> #companyName# </isNotEmpty>
+		)
+	</statement>
+
+	<!-- 新增数据到T_HFMER_EXP_ATTR表（为满足商户商品报备平台化功能） -->
+	<statement id="insertMerExpAttr" resultClass="MerInfo">
+		insert into umpay.T_HFMER_EXP_ATTR
+		  (MER_ID,
+		   COMPANY_DESC,
+		   BUSI_DESC,
+		   MER_WEB,
+		   SALE_CHANNEL,
+		   REG_CAPITAL,
+		   REG_TIEM,
+		   SRC_MER,
+		   YEAR_PROFIT,
+		   USER_SCALE,
+		   SUPPORT,
+		   SHARED_RATE)
+		values
+		  (#merId#,
+		   #companyDesc#,
+		   #busiDesc#,
+		   #merWeb#,
+		   #saleChannel#,
+		   #regCapital#,
+		   #regTime#,
+		   #srcMer#,
+		   #yearProfit#,
+		   #userScale#,
+		   #support#,
+		   #sharedRate#)
+	</statement>
+	
+	<!-- 更新表T_HFMER_EXP_ATTR（为满足商户商品报备平台化功能） -->
+	<statement id="updateMerExpAttr" resultClass="MerInfo">
+		update umpay.T_HFMER_EXP_ATTR set updt_time=CURRENT TIMESTAMP
+		<isNotEmpty property="companyDesc" prepend=" , "> company_desc=#companyDesc# </isNotEmpty>
+		<isNotEmpty property="busiDesc" prepend=" , "> busi_desc=#busiDesc# </isNotEmpty>
+		<isNotEmpty property="merWeb" prepend=" , "> mer_web=#merWeb# </isNotEmpty>
+		<isNotEmpty property="saleChannel" prepend=" , "> sale_channel=#saleChannel#</isNotEmpty>
+		<isNotEmpty property="regCapital" prepend=" , "> reg_capital=#regCapital# </isNotEmpty>
+		<isNotEmpty property="regTime" prepend=" , "> reg_tiem=#regTime# </isNotEmpty>
+		<isNotEmpty property="srcMer" prepend=" , "> src_mer=#srcMer# </isNotEmpty>
+		<isNotEmpty property="yearProfit" prepend=" , "> year_profit=#yearProfit# </isNotEmpty>
+		<isNotEmpty property="userScale" prepend=" , "> user_scale=#userScale# </isNotEmpty>
+		<isNotEmpty property="support" prepend=" , "> support=#support# </isNotEmpty>
+		<isNotEmpty property="sharedRate" prepend=" , "> shared_rate=#sharedRate# </isNotEmpty>
+		where mer_id=#merId#
+	</statement>
+	
+	<statement id="insertMerInf" resultClass="MerInfo">
+		insert into umpay.t_mer_inf(merId, state, merName
+		<isNotEmpty property="merType" prepend=" , "> merType </isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> modUser </isNotEmpty>
+		) values(#merId#, 2, #merName#
+		<isNotEmpty property="merType" prepend=" , "> #merType# </isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+		)
+	</statement>
+
+	<statement id="updateMerExp" resultClass="MerInfo">
+		update umpay.t_hfmer_exp set modLock=0,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="busiType" prepend=" , "> busi_attr=#busiType# </isNotEmpty>
+		<isNotEmpty property="interType" prepend=" , "> interType=#interType# </isNotEmpty>
+		<isNotEmpty property="chnlCheck" prepend=" , "> chnlCheck=#chnlCheck# </isNotEmpty>
+		<isNotEmpty property="fileDL" prepend=" , "> fileDL=#fileDL#</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		<isNotEmpty property="category" prepend=" , "> category=#category# </isNotEmpty>
+		<isNotEmpty property="companyName" prepend=" , "> companyName=#companyName# </isNotEmpty>
+		where merId=#merId#
+	</statement>
+	<statement id="isOrNotAble" resultClass="MerInfo">
+		update umpay.t_mer_inf set state=#state#,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		where merId=#merId#
+	</statement>
+
+	<statement id="getMerInfo" resultClass="MerInfo">
+		select t.merId,t.exMerId,t.merName,t.merType,t.state,t.postal,
+		t.address,t.modUser,t.modTime,t.inTime,t.timeLtd,t.isSpecial,t.cusPhone ,
+		p.busi_attr
+		busiType,p.addWay,p.interType,p.chnlCheck,p.fileDL,p.operator,p.category,p.companyName
+		from umpay.t_mer_inf t ,
+		umpay.t_hfmer_exp p where t.merId = p.merId order by t.merId
+	</statement>
+	<statement id="getChannelMerInfo" resultClass="MerInfo">
+		select t.merId,t.merName,t.state from umpay.t_mer_inf t where
+		t.merid in(
+		select merid from umpay.T_HF_CHNL_GOODS where channelid=#channelid#
+		)
+	</statement>
+	<statement id="updateMerInfo" resultClass="integer">
+		update umpay.t_mer_inf set merId=#merId#,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="merName" prepend=" , ">
+			merName=#merName#
+		</isNotEmpty>
+		<isNotEmpty property="merType" prepend=" , ">
+			merType=#merType#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , ">
+			state=#state#
+		</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , ">
+			modUser=#modUser#
+		</isNotEmpty>
+		where merId=#merId#
+	</statement>
+	<statement id="checkFromMers" resultClass="MerInfo">
+		select merId,merName from umpay.t_mer_inf where 1=1
+		<isNotEmpty property="merId" prepend=" and ">
+			merId=#merId#
+		</isNotEmpty>
+		<isNotEmpty property="merName" prepend=" and ">
+			merName=#merName#
+		</isNotEmpty>
+	</statement>
+	<!-- 修改商户时验证商户名称唯一性 -->
+	<statement id="checkMerName" resultClass="MerInfo">
+		select merName from umpay.t_mer_inf where merId!=#merId#
+		<isNotEmpty property="merName" prepend=" and ">
+			merName=#merName#
+		</isNotEmpty>
+	</statement>
+	<!-- 从主表查询商户信息 -->
+	<statement id="loadMerInf" resultClass="MerInfo">
+		select
+		merId,exMerId,merName,merType,state,postal,address,modUser from
+		UMPAY.t_mer_inf where merId=#merId#
+	</statement>
+	<!-- 从扩展表查询商户信息 -->
+	<statement id="loadMerExp" resultClass="MerInfo">
+		select merId from UMPAY.t_hfmer_exp where merId=#merId#
+	</statement>
+
+	<statement id="allMers" resultClass="MerInfo">
+		select
+		distinct(trim(merinf.merid)) as merid
+		from umpay.t_mer_inf
+		merinf,umpay.t_goods_inf goodsinf,umpay.t_hfmer_exp
+		merexp
+		where
+		merinf.merid=goodsinf.merid and
+		merinf.merid=merexp.merid and
+		merexp.fileDL = 1
+		and merinf.state=2
+		order by merid with ur
+	</statement>
+	<statement id="selectAll" resultClass="MerInfo">
+		select t.merid, t.mername from umpay.t_mer_inf t 
+	</statement>
+	<statement id="filtrationMerByName" resultClass="MerInfo">
+		select t.merid, t.mername from umpay.t_mer_inf t where
+		t.merName like '%$merName$%'
+	</statement>
+</sqlMap>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="GoodsFeeCode">
+	<typeAlias alias="GoodsFeeCode" type="com.umpay.hfmng.model.FeeCode" />
+
+
+
+	<!-- 添加商品银行配置信息 zhaojunbao begin -->
+	<statement id="Insert" >
+		insert into umpay.t_goods_serviceid(merId,goodsId, serviceId
+				<isNotEmpty	property="priority" prepend=" , "> priority </isNotEmpty>
+				<isNotEmpty	property="state" prepend=" , "> state </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+				<isNotEmpty	property="modTime" prepend=" , "> modTime </isNotEmpty>
+			) values(#merId#, #goodsId#, #serviceId#
+				<isNotEmpty	property="priority" prepend=" , "> #priority# </isNotEmpty>
+				<isNotEmpty	property="state" prepend=" , "> #state# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+				<isNotEmpty	property="modTime" prepend=" , "> #modTime# </isNotEmpty>
+			)
+	</statement>
+	<!-- end -->
+
+   <!-- 获取已经配置的商品计费代码信息 zhao   begin -->
+   <sql id="getFeeCode_select">
+		select merId,goodsId, serviceid, priority,state,moduser,modtime,intime from umpay.T_GOODS_SERVICEID   
+	</sql>
+	
+	<sql id="key_f">
+		<dynamic prepend=" where  ">
+			<isNotEmpty	property="merId" prepend=" and ">
+				merId = #merId#
+			</isNotEmpty>
+			<isNotEmpty	property="goodsId" prepend=" and ">
+				goodsId = #goodsId#
+			</isNotEmpty>
+			<isNotEmpty	property="serviceId" prepend=" and ">
+				serviceId = #serviceId#
+			</isNotEmpty>
+			<isNotEmpty	property="state" prepend=" and ">
+				state = #state#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+   
+   <statement id="GetFeeCode" resultClass="FeeCode" >
+		<include refid="getFeeCode_select" />
+		<include refid="key_f" />
+	</statement>
+   <!-- end -->
+   <!-- 更新商品跟计费代码的配置操作  begin -->
+   <statement id="updateGoodsFeeCode" resultClass="integer">
+	   update umpay.t_goods_serviceid set  modTime=CURRENT TIMESTAMP
+	   <isNotEmpty	property="priority" prepend=" , "> priority=#priority# </isNotEmpty>
+	   <isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+	   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where merId=#merId# and goodsId=#goodsId# and serviceId=#serviceId#
+ 	</statement>
+	<!-- end -->
+</sqlMap>

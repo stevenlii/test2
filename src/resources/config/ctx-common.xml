@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+            http://www.springframework.org/schema/context  
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+            http://www.springframework.org/schema/tx  
+            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd  
+            http://www.springframework.org/schema/jdbc  
+            http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+
+	<!--messageSource -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:messages</value>
+			</list>
+		</property>
+		<property name="cacheSeconds">
+			<value>10</value>
+		</property>
+	</bean>
+	<!--system config -->
+	<bean id="sysConfSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:sysconf</value>
+			</list>
+		</property>
+		<property name="cacheSeconds">
+			<value>10</value>
+		</property>
+	</bean>
+	<bean id="messageService" class="com.umpay.hfmng.service.impl.MessageServiceImpl">
+		<constructor-arg ref="messageSource" />
+		<constructor-arg ref="sysConfSource" />
+	</bean>
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:jdbc.properties</value>
+			<!-- <value>classpath:proxool.properties</value> -->
+		</property>
+	</bean>
+
+	<!-- cache -->
+	<bean id="cacheManager"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation">
+			<value>classpath:ehcache.xml</value>
+		</property>
+	</bean>
+
+	<bean id="CouponInfCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>CouponInfCache</value>
+		</property>
+	</bean>
+	<bean id="ChannelInfoCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>ChannelInfoCache</value>
+		</property>
+	</bean>
+	<bean id="MerInfoCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>MerInfoCache</value>
+		</property>
+	</bean>
+	<bean id="GoodsTypeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>GoodsTypeCache</value>
+		</property>
+	</bean>
+	<bean id="BankInfoCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>BankInfoCache</value>
+		</property>
+	</bean>
+	
+	<bean id="XeBankInfoCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>XeBankInfoCache</value>
+		</property>
+	</bean>
+
+	<bean id="GoodsInfoCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>GoodsInfoCache</value>
+		</property>
+	</bean>
+	<bean id="UserInfoCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>UserInfoCache</value>
+		</property>
+	</bean>
+	<bean id="OperCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>OperCache</value>
+		</property>
+	</bean>
+	<bean id="UrlAclCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>UrlAclCache</value>
+		</property>
+	</bean>
+	<bean id="UserRoleCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>UserRoleCache</value>
+		</property>
+	</bean>
+	<bean id="ChnlInfCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>ChnlInfCache</value>
+		</property>
+	</bean>
+	<bean id="SecMerInfCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>SecMerInfCache</value>
+		</property>
+	</bean>
+	<bean id="GoodsCategoryCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>GoodsCategoryCache</value>
+		</property>
+	</bean>
+	<bean id="ParaCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>ParaCache</value>
+		</property>
+	</bean>
+	<bean id="MerOperCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref local="cacheManager" />
+		</property>
+		<property name="cacheName">
+			<value>MerOperCache</value>
+		</property>
+	</bean>
+	<bean id="cacheMap" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="CouponInfCache" value-ref="CouponInfCache" />
+				<entry key="MerInfoCache" value-ref="MerInfoCache" />
+				<entry key="BankInfoCache" value-ref="BankInfoCache" />
+				<entry key="XeBankInfoCache" value-ref="XeBankInfoCache" />
+				<entry key="GoodsInfoCache" value-ref="GoodsInfoCache" />
+				<entry key="UserInfoCache" value-ref="UserInfoCache" />
+				<entry key="OperCache" value-ref="OperCache" />
+				<entry key="UrlAclCache" value-ref="UrlAclCache" />
+				<entry key="GoodsTypeCache" value-ref="GoodsTypeCache" />
+				<entry key="UserRoleCache" value-ref="UserRoleCache" />
+				<entry key="ChannelInfoCache" value-ref="ChannelInfoCache" />
+				<entry key="ChnlInfCache" value-ref="ChnlInfCache" />
+				<entry key="SecMerInfCache" value-ref="SecMerInfCache" />
+				<entry key="GoodsCategoryCache" value-ref="GoodsCategoryCache" />
+				<entry key="ParaCache" value-ref="ParaCache" />
+				<entry key="MerOperCache" value-ref="MerOperCache" />
+			</map>
+		</constructor-arg>
+	</bean>
+	<!-- <bean id="merInfoDao" class="com.umpay.hfmng.dao.impl.MerInfoDaoImpl"> 
+		</bean> -->
+	<bean id="HfCache" class="com.umpay.hfmng.cache.HfCache">
+		<property name="cacheMp" ref="cacheMap" />
+		<!-- <property name="merInfoDao" ref="merInfoDao"/> -->
+		<property name="messageService" ref="messageService" />
+	</bean>
+
+	<!-- 数据源配置,使用应用内的C3P0数据库连接池 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.driver}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="autoCommitOnClose" value="true" />
+		<property name="checkoutTimeout" value="10000" /><!-- 10s -->
+		<property name="initialPoolSize" value="1" />
+		<property name="minPoolSize" value="1" />
+		<property name="maxPoolSize" value="2" />
+		<property name="acquireIncrement" value="1" />
+		<property name="idleConnectionTestPeriod" value="60" /><!-- 60s -->
+		<property name="preferredTestQuery" value="values(current timestamp)" />
+	</bean>
+	<!-- 事务管理器配置,单数据源事务 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:sqlmap-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="dao" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+	
+	<!-- 离线库的连接池、sqlMapClient和dao -->
+	<bean id="dataSourceOffline" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${offline.jdbc.driver}" />
+		<property name="jdbcUrl" value="${offline.jdbc.url}" />
+		<property name="user" value="${offline.jdbc.username}" />
+		<property name="password" value="${offline.jdbc.password}" />
+		<property name="autoCommitOnClose" value="true" />
+		<property name="checkoutTimeout" value="10000" /><!-- 10s -->
+		<property name="initialPoolSize" value="1" />
+		<property name="minPoolSize" value="1" />
+		<property name="maxPoolSize" value="2" />
+		<property name="acquireIncrement" value="1" />
+		<property name="idleConnectionTestPeriod" value="60" /><!-- 60s -->
+		<property name="preferredTestQuery" value="values(current timestamp)" />
+	</bean>
+	<bean id="sqlMapClient_Offline" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:sqlmap-config-offline.xml" />
+		<property name="dataSource" ref="dataSourceOffline" />
+	</bean>
+	<bean id="offlineDao" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="sqlMapClient_Offline" />
+	</bean>
+	
+	<!-- 使用annotation定义事务 <tx:annotation-driven transaction-manager="transactionManager" 
+		/> -->
+	<!-- 支持上传文件 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!--resolveLazily属性启用是为了推迟文件解析，以便在action中捕获文件大小异常 -->
+		<property name="resolveLazily" value="true" />
+		<!--最大为10M 即10*1024*1024bytes -->
+		<property name="maxUploadSize" value="10485760" />
+	</bean>
+	
+	<!-- 资源层和业务层的链接控制器 -->
+	<bean id="httpClientControler" class="com.umpay.hfmng.common.HttpClientControler" destroy-method="destory">
+   		<constructor-arg index="0"><value>20</value></constructor-arg>
+        <constructor-arg index="1"><value>30000</value></constructor-arg>
+    </bean>
+
+</beans>

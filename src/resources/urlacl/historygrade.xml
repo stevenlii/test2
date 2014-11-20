@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 评分等级下载 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/mergrade/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/mergrade/exportMerGrade.do</url>
+	</Option>
+</Options>

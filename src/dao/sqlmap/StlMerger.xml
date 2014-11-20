@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StlMerger">
+	
+	<parameterMap id="callMerset"
+		class="java.util.HashMap">
+		<parameter property="count" javaType="int"
+			jdbcType="INTEGER" mode="OUT" />
+	</parameterMap>
+	<procedure id="procCallMerset"
+		parameterMap="callMerset">
+		<![CDATA[        
+        {CALL UMPAY.PROC_COUPON_MERSET_0526(?)}
+    	]]>
+	</procedure>
+	
+	<parameterMap id="callMersetMerger"
+		class="java.util.HashMap">
+		<parameter property="billtype" javaType="int"
+			jdbcType="INTEGER" mode="IN" />
+		<parameter property="finishsign" javaType="string"
+			jdbcType="VARCHAR" mode="IN" />
+		<parameter property="count" javaType="int"
+			jdbcType="INTEGER" mode="OUT" />
+	</parameterMap>
+	<procedure id="procCallMersetMerger"
+		parameterMap="callMersetMerger">
+		<![CDATA[        
+        {CALL UMPAY.PROC_COUPON_MERSET_MERGER_0526(?,?,?)}
+    	]]>
+	</procedure>
+</sqlMap>

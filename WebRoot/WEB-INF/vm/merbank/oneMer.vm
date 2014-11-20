@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/busi/merbank.js"></script>
+<script>
+jQuery(document).ready(function() {
+	jQuery("#container").width(jQuery(window).width());
+	
+	jQuery('#merId').omCombo({
+        dataSource : '$request.contextPath/option/meridlist.do',
+        width:'100px',
+        listMaxHeight:210,
+        forceSelection : true,
+        emptyText:'请选择..',
+        onValueChange:function(target,newValue,oldValue,event){ 
+			getMerName(newValue);
+	 	} 
+    }); 
+    
+     var zNodes1="${zNodes}";		
+	 var zNodes=eval(zNodes1);
+	 tree=$.fn.zTree.init($("#tree"), setting, zNodes);
+	 setCheck();
+	     
+     jQuery("#dataform").validate({
+         rules : {
+             "merId" : {
+             	required : true
+             }
+         },
+         messages : {
+             "merId"  : {
+                 required : "请选择商户号"
+             }
+         },
+         errorPlacement : function(error, element) { 
+             if(error.html()){
+                 $(element).parents().map(function(){
+                     if(this.tagName.toLowerCase()=='td'){
+                         var attentionElement = $(this).next().children().eq(0);
+                         attentionElement.css('display','block');
+ 	                    attentionElement.next().html(error);
+ 	                    attentionElement.next().css('display','block');
+                     }
+                 });
+             }
+	        },
+	        showErrors: function(errorMap, errorList) {
+             if(errorList && errorList.length > 0){
+                 $.each(errorList,function(index,obj){
+                     var msg = this.message;
+                     $(obj.element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.show();
+	    	                    attentionElement.next().html(msg);
+	                        }
+	                    });
+                 });
+             }else{
+                 $(this.currentElements).parents().map(function(){
+                     if(this.tagName.toLowerCase()=='td'){
+                         $(this).next().children().eq(0).hide();
+                         $(this).next().children().eq(1).hide();
+                     }
+                 });
+             }
+             this.defaultShowErrors();
+         },          
+         submitHandler : function(){
+				jQuery(this).submit();
+             return false;
+         }
+     });
+});
+
+</script>
+</head>
+<body>
+<!--商户银行配置页面-->
+<div id="container">
+<form id ="dataform" method="post" name="dataform">
+   <div style="width:380px;">
+     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr>
+         <td><table cellpadding="0" cellspacing="0" class="infowrite">
+           <tr>
+             <th><span>*</span>商户号：</th>
+             <td class="td">
+               <input id="merId" name="merId" class="select1"/>
+               </td>
+               <td class="td" width="140px"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+           <tr>
+             <th><span>*</span>商户名称：</th>
+             <td class="td1" colspan="2"><label id="merName"></label></td>
+            </tr>
+           <tr>
+             <th><span>*</span>支付银行：</th>
+             <td class="td" colspan="2">
+             	<input id="bankId" name="bankId" type="hidden">
+		         <div style="width:100%;height:240px;text-align:left;overflow:auto;">
+				      <ul id="tree" class="ztree"></ul>
+			       </div>
+             </td>
+            </tr>
+            <tr>
+             <th>开通默认小额银行:</th>
+             <td class="td1" colspan="2"><input type="checkbox" name="xeBank" value="$!{merBankId}" id="xeBank" onclick="autoCheck(this)"/>打勾选择所有默认开通的小额银行</td>
+            </tr>
+           <tr>
+           	<th>默认小额银行<br>配置列表：</th>
+             <td class="td" colspan="2">
+             	 #foreach( $name in ${merBankName})
+             	 	$!{name}&nbsp;&nbsp;
+             	 #end
+             </td>
+            </tr>
+     </table>
+     </td>
+     </tr>
+     </table>
+     <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="确定" onclick="oneMer()"/>
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="取消" onclick="closeDialog()"/>
+	 </div>
+   </div>
+ </form>
+ </div>
+ </body>
+</html>

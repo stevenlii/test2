@@ -1,0 +1,81 @@
+<link rel="stylesheet" href="${request.contextPath}/profile${currProfile.path}/css/common.css" type="text/css">
+<style type="text/css">
+
+       label.error{
+
+        background: #fff6bf url(${request.contextPath}/images/alert.png) center no-repeat;
+
+		background-position: 5px 50%;
+
+		text-align: left;
+
+		padding: 2px 20px 2px 25px;
+
+		border: 1px solid #ffd324;
+
+		display: none;
+
+		width: 150px;
+
+		margin-left: 10px;
+
+       }
+
+    </style>
+<script src="$request.contextPath/js/ui/jquery-1.6.3.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+  <script>
+   		var options = {
+                success : showResponse
+        };
+  	 jQuery(document).ready(function() {
+  	 	 jQuery('#dataform').submit(function() {
+                jQuery(this).omAjaxSubmit(options);
+                return false; 
+            });
+            
+             jQuery('#ok').bind('click', function(e) {
+             	jQuery('#state').val("2");
+                jQuery('#dataform').submit();
+            });
+             jQuery('#fail').bind('click', function(e) {
+             	jQuery('#state').val("4");
+                jQuery('#dataform').submit();
+            });
+  	 });
+  	 function showResponse(responseText, statusText) {
+        var result = eval("("+responseText+")");
+          if(result.code=='0'){
+          	window.parent.fillBackAndCloseDialog(result.msg);
+          }
+        }
+        
+  </script>  
+<div id="container">
+                  <form id ="dataform" method="post" name="dataform" id="dataform" action="${request.contextPath}/mer/audit.action">
+                  <input type="hidden" name="ids" value="$ids">
+                   <input type="hidden" id="state" name="state">
+                    <table width="100%" cellpadding="0" cellspacing="0" class="list">
+                       <tr>
+                            <td>商户编号</td><td>商户名称</td>
+                      </tr>
+                    #foreach($mer in $mers)
+                      <tr>
+                            <td>${mer.merId}</td><td>${mer.merName}</td>
+                      </tr>
+                     #end
+                        </table>
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td height="15"><textarea name="content"></textarea></td>
+                          </tr>
+                          <tr>
+                            <td align="center"><input id="ok" name="ok" type="button"   value="通过"  class="btn2char"/>
+                            <input id="fail" name="submit" type="button"   value="不通过" class="btn2char"/>
+                          </tr>
+                        </table>
+                  </form>
+</div>

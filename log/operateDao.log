@@ -1,0 +1,16 @@
+20141119111501,admin,{/hfMngBusi/option/banklist.do},BankDao.getBankInfos,{},146
+20141119113313,admin,{/hfMngBusi/goodsaudit/query.do},EntityDao.findBy,{null},343
+20141119113313,admin,{/hfMngBusi/goodsinf/index.do},EntityDao.findBy,{null},7317
+20141119113316,admin,{/hfMngBusi/option/couponmerinflist.do},MerInfoDao.getMerInfos,{},1560
+20141119113327,admin,{/hfMngBusi/option/banklist.do},BankDao.getBankInfos,{},156
+20141119113337,admin,{/hfMngBusi/payltdrollback/auditQuery.do},GoodsInfoDao.getGoodsInfos,{},187
+20141119113501,admin,{/hfMngBusi/upservice/index.do},EntityDao.findBy,{null},188
+20141119113502,admin,{/hfMngBusi/option/merlist.do},MerInfoDao.getMerInfos,{},328
+20141119113503,admin,{/hfMngBusi/payltdrollback/auditQuery.do},GoodsInfoDao.getGoodsInfos,{},156
+20141119113505,admin,{/hfMngBusi/option/xebanklist.do},BankDao.getBankInfos,{},78
+20141119122553,admin,{/hfMngBusi/option/banklist.do},BankDao.getBankInfos,{},214
+20141119122557,admin,{/hfMngBusi/merbank/query.do},EntityDao.findBy,{HfMerOper[merId:9996;operator:null;state:null;creator:null;modUser:null;inTime:null;modTime:null]},81
+20141119122607,admin,{/hfMngBusi/option/merlist.do},MerInfoDao.getMerInfos,{},251
+20141119122609,admin,{/hfMngBusi/upgoodsbank/query.do},GoodsInfoDao.getGoodsInfos,{},156
+20141119153136,admin,{/hfMngBusi/option/banklist.do},BankDao.getBankInfos,{},202
+20141119153137,admin,{/hfMngBusi/merbank/query.do},EntityDao.findBy,{HfMerOper[merId:9996;operator:null;state:null;creator:null;modUser:null;inTime:null;modTime:null]},72

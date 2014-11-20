@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/busi/chnlInf.js"></script>
+  <script>
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  		 
+  	   $.validator.addMethod("exist", function(value) {
+ 	        return checkChnlId(value);
+ 	    }, "已存在或正在审核中");
+  	   $.validator.addMethod("checkName", function(value) {
+	        return checkChnlName(value);
+	    }, "已存在或正在审核中");
+  	 
+  	 	 jQuery("#dataform").validate({
+  	 		 	onkeyup: false,
+                rules : {
+                    "channelId" : {
+                    	 required : true,
+                    	 digits : true,
+                    	 maxlength : 6,
+                    	 exist : true
+                    },
+                    "channelName": {
+                        required : true,
+                        maxlength : 32,
+                        checkName : true
+                    },
+                    "service_user": {
+                        required : true
+                    },
+                    "contact": {
+                	    maxlength : 16
+                    },
+                    "linkTel": {
+                    	maxlength : 16
+                    },
+                    "email": {
+                        email : true,
+                        maxlength : 32
+                    }
+  	 	 		},
+                messages : {
+                    "channelId"  : {
+                        required : "请输入渠道编号",
+                        digits  : "请填写数字",
+                        maxlength : "不能多于6位"
+                    },
+                    "channelName": {
+                        required : "请输入渠道名称",
+                        maxlength : "最多32个字符"
+                    },
+                    "service_user": {
+                        required : "请选择运营负责人"
+                    },
+                    "contact": {
+                        maxlength : "最多16个字符"
+                    },
+                    "linkTel": {
+                         maxlength : "最多16个字符"
+                    },
+                     "email": {
+                    	 email : "格式不正确",
+                         maxlength : "最多32个字符"
+                    }
+                },
+                
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){
+  	 	 		 return false;
+  	 	 	 }
+              jQuery(this).omAjaxSubmit({success:function(res){
+        	  			var msg = "";
+        	  			var ty = "";
+                   		if(res !='1') {
+                   			ty = 'error';
+            		  		var msg = '操作失败';
+            		  		if(res != '0'){
+            		  			msg = res;
+            		  		}
+            		   }else{
+            			   ty = 'success';
+            			   msg = '操作成功，已提交审核';
+            			   closeDialog(); 
+            		   }
+                   		window.parent.$.omMessageBox.alert({
+                   			type : ty,
+                   			title : '操作提示',
+                   			content : msg
+                   		});
+               		}
+	             
+               }); 
+        	   
+              return false; 
+            });
+  	 	 
+	  	 	 //获取运营负责人列表
+	   	 	jQuery('#service_user').omCombo({
+	            dataSource : '$request.contextPath/option/operatorlist3.do',
+	            width:'75px',
+	            listMaxHeight:120,
+	            emptyText:'请选择..' ,
+	            valueField : 'id',
+	            inputField : 'name',
+	            optionField : function(data, index) {return data.name;},
+	            onSuccess:function(data, textStatus, event){},
+	      	    filterStrategy : function(value, data) {
+	      			var initials=data.initials+"";
+	      			var list=initials.split(",");
+	      			for(var i=0;i<list.length;i++){
+	      				if(list[i].indexOf(value) == 0)
+	      					return true;
+	      			}
+	                  return false;
+	            },
+	            filterDelay : 100,
+	      	    forceSelection : true
+	        });
+	  	 	 
+  	     });       
+     
+   //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+   } 
+       
+  </script>  
+  </head>
+  <body>
+<div id="container">
+          <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/chnlinf/save.do">
+          <table width="100%" >
+          <tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+              <tr>
+                <th width="32%" align="left"><span>*</span>渠道编号：</th>
+                <td  class="td"><input id="channelId" name="channelId" type="text" size="20" maxlength="6" class="input2" /></td>
+                <td width="40%" class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+              </tr>
+              <tr>
+                <th align="left"><span>*</span>渠道名称：</th>
+                <td class="td1"><input  name="channelName" type="text"  size="20" maxlength="13" class="input2" /></td>
+                <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+              </tr>
+            <tr>
+                <th width="18%" align="left"><span>*</span>运营负责人：</th>
+                <td class="td"><input id="service_user" name="service_user" class="select1" /></td>
+                <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+                <th width="18%" align="left">联系人：</th>
+                <td class="td1"><input  name="contact" type="text" size="20" maxlength="16" class="input2" /></td>
+                <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+	            <th width="18%" align="left">联系电话：</th>
+	            <td class="td"><input  name="linkTel" type="text" size="20" maxlength="16" class="input2" /></td>
+	            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+	            <th width="18%" align="left">电子邮件：</th>
+	            <td class="td1"><input  name="email" type="text" size="20" maxlength="32" class="input2" /></td>
+	            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	        </tr>
+            </table>
+            </td></tr><tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0">
+                 <tr><td height="15"></td></tr>
+                 <tr>
+                    <td align="center"><input id="add_button1" name="submit" type="submit" value="添加" class="popbtn"onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+                    <input id="add_button2" name="add_button2" type="reset"  value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+                  </tr>
+             </table>
+             </td></tr>
+             <table>
+          </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StlPayBack">
+	<typeAlias alias="PayBack" type="com.umpay.hfmng.model.StlPayBack" />
+	
+	<sql id="select_what">
+		select t.paybackid,t.undodate,t.mobileid,t.bankname,t.provname,t.refundamount,t.mertype,mername,accid,goodsid,goodsname,withdrawreason,desc,isuse
+		       from umpay.T_COUPON_PAYBACK t  where 1=1
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="undodate" prepend=" and ">
+				t.undodate = #undodate#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="key_find">
+	   <dynamic prepend=" and ">
+		  t.paybackid=#paybackid#
+	   </dynamic>
+	</sql>
+	
+	<statement id="Get" resultClass="PayBack" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="PayBack" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.T_COUPON_PAYBACK  t 
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="insert" >
+		insert into umpay.T_COUPON_PAYBACK(paybackid
+				<isNotEmpty	property="stlmonth" prepend=" , "> stlmonth </isNotEmpty>
+				<isNotEmpty	property="undodate" prepend=" , "> undodate </isNotEmpty>
+				<isNotEmpty	property="mobileid" prepend=" , "> mobileid </isNotEmpty>
+				<isNotEmpty	property="bankname" prepend=" , "> bankname </isNotEmpty>
+				<isNotEmpty	property="provname" prepend=" , "> provname </isNotEmpty>
+				<isNotEmpty	property="refundamount" prepend=" , "> refundamount </isNotEmpty>
+				<isNotEmpty	property="mertype" prepend=" , "> mertype </isNotEmpty>
+				<isNotEmpty	property="mername" prepend=" , "> mername </isNotEmpty>
+				<isNotEmpty	property="accid" prepend=" , "> accid </isNotEmpty>
+				<isNotEmpty	property="goodsid" prepend=" , "> goodsid </isNotEmpty>
+				<isNotEmpty	property="goodsname" prepend=" , "> goodsname </isNotEmpty>
+				<isNotEmpty	property="withdrawreason" prepend=" , "> withdrawreason </isNotEmpty>
+				<isNotEmpty	property="desc" prepend=" , "> desc </isNotEmpty>
+				<isNotEmpty	property="isuse" prepend=" , "> isuse </isNotEmpty>
+			) values(#paybackid#
+				<isNotEmpty	property="stlmonth" prepend=" , "> #stlmonth# </isNotEmpty>
+				<isNotEmpty	property="undodate" prepend=" , "> #undodate# </isNotEmpty>
+				<isNotEmpty	property="mobileid" prepend=" , "> #mobileid# </isNotEmpty>
+				<isNotEmpty	property="bankname" prepend=" , "> #bankname# </isNotEmpty>
+				<isNotEmpty	property="provname" prepend=" , "> #provname# </isNotEmpty>
+				<isNotEmpty	property="refundamount" prepend=" , "> #refundamount# </isNotEmpty>
+				<isNotEmpty	property="mertype" prepend=" , "> #mertype# </isNotEmpty>
+				<isNotEmpty	property="mername" prepend=" , "> #mername# </isNotEmpty>
+				<isNotEmpty	property="accid" prepend=" , "> #accid# </isNotEmpty>
+				<isNotEmpty	property="goodsid" prepend=" , "> #goodsid# </isNotEmpty>
+				<isNotEmpty	property="goodsname" prepend=" , "> #goodsname# </isNotEmpty>
+				<isNotEmpty	property="withdrawreason" prepend=" , "> #withdrawreason# </isNotEmpty>
+				<isNotEmpty	property="desc" prepend=" , "> #desc# </isNotEmpty>
+				<isNotEmpty	property="isuse" prepend=" , "> #isuse# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="getMaxStlMonth" resultClass="string">
+		select max(stlmonth) from umpay.T_COUPON_PAYBACK
+	</statement>
+</sqlMap>

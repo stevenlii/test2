@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="HFTask">
+	<typeAlias alias="HFTask" type="com.umpay.hfmng.model.HFTask" />
+
+	<sql id="select_what">
+		select
+		taskId,nextRunTime,taskRule,taskRuleDesc,state,platName,taskDesc,postUrl,isReTry,reTryTimes,reTryInterval,retTimeout,modUser,modTime,inTime
+		from umpay.T_HFTASK
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where "> 1=1
+			<isNotEmpty property="taskId" prepend=" and ">
+				taskId=#taskId#
+			</isNotEmpty>
+			<isNotEmpty property="nextRunTime" prepend=" and ">
+				nextRunTime=#nextRunTime#
+			</isNotEmpty>
+			<isNotEmpty property="taskRule" prepend=" and ">
+				taskRule=#taskRule#
+			</isNotEmpty>
+			<isNotEmpty property="taskRuleDesc" prepend=" and ">
+				taskRuleDesc=#taskRuleDesc#
+			</isNotEmpty>
+			<isNotEqual property="state" prepend=" and " compareValue="-1">
+				state= #state#
+			</isNotEqual>
+			<isNotEmpty property="platName" prepend=" and ">
+				platName=#platName#
+			</isNotEmpty>
+			<isNotEmpty property="taskDesc" prepend=" and ">
+				taskDesc=#taskDesc#
+			</isNotEmpty>
+			<isNotEmpty property="postUrl" prepend=" and ">
+				postUrl = #postUrl#
+			</isNotEmpty>
+			<isNotEqual property="isReTry" prepend=" and " compareValue="-1">
+				isReTry = #isReTry#
+			</isNotEqual>
+			<isNotEqual property="reTryTimes" prepend=" and "
+				compareValue="-1">
+				reTryTimes=#reTryTimes#
+			</isNotEqual>
+			<isNotEqual property="reTryInterval" prepend=" and "
+				compareValue="-1">
+				reTryInterval=#reTryInterval#
+			</isNotEqual>
+			<isNotEqual property="retTimeout" prepend=" and "
+				compareValue="-1">
+				retTimeout=#retTimeout#
+			</isNotEqual>
+			<isNotEmpty property="modUser" prepend=" and ">
+				modUser=#modUser#
+			</isNotEmpty>
+			<isNotEmpty property="modTime" prepend=" and ">
+				modTime = #modTime#
+			</isNotEmpty>
+			<isNotEmpty property="inTime" prepend=" and ">
+				inTime = #inTime#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	<sql id="key_find">
+		where taskId=#taskId#
+	</sql>
+
+	<statement id="Get" resultClass="HFTask">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	<statement id="Find" resultClass="HFTask">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.T_HFTASK
+		<include refid="where_find" />
+	</statement>
+
+	<sql id="Insert_column">
+		<isNotEmpty property="taskId">
+			taskId
+		</isNotEmpty>
+		<isNotEmpty property="nextRunTime" prepend=" , ">
+			nextRunTime
+		</isNotEmpty>
+		<isNotEmpty property="taskRule" prepend=" , ">
+			taskRule
+		</isNotEmpty>
+		<isNotEmpty property="taskRuleDesc" prepend=" , ">
+			taskRuleDesc
+		</isNotEmpty>
+		<isNotEqual property="state" prepend=" , " compareValue="-1">
+			state
+		</isNotEqual>
+		<isNotEmpty property="platName" prepend=" , ">
+			platName
+		</isNotEmpty>
+		<isNotEmpty property="taskDesc" prepend=" , ">
+			taskDesc
+		</isNotEmpty>
+		<isNotEmpty property="postUrl" prepend=" , ">
+			postUrl
+		</isNotEmpty>
+		<isNotEqual property="isReTry" prepend=" , " compareValue="-1">
+			isReTry
+		</isNotEqual>
+		<isNotEqual property="reTryTimes" prepend=" , " compareValue="-1">
+			reTryTimes
+		</isNotEqual>
+		<isNotEqual property="reTryInterval" prepend=" , " compareValue="-1">
+			reTryInterval
+		</isNotEqual>
+		<isNotEqual property="retTimeout" prepend=" , "
+			compareValue="-1">
+			retTimeout
+		</isNotEqual>
+		<isNotEmpty property="modUser" prepend=" , ">
+			modUser
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			inTime
+		</isNotEmpty>
+	</sql>
+
+	<sql id="Insert_value">
+		<isNotEmpty property="taskId">
+			#taskId#
+		</isNotEmpty>
+		<isNotEmpty property="nextRunTime" prepend=" , ">
+			#nextRunTime#
+		</isNotEmpty>
+		<isNotEmpty property="taskRule" prepend=" , ">
+			#taskRule#
+		</isNotEmpty>
+		<isNotEmpty property="taskRuleDesc" prepend=" , ">
+			#taskRuleDesc#
+		</isNotEmpty>
+		<isNotEqual property="state" prepend=" , " compareValue="-1">
+			#state#
+		</isNotEqual>
+		<isNotEmpty property="platName" prepend=" , ">
+			#platName#
+		</isNotEmpty>
+		<isNotEmpty property="taskDesc" prepend=" , ">
+			#taskDesc#
+		</isNotEmpty>
+		<isNotEmpty property="postUrl" prepend=" , ">
+			#postUrl#
+		</isNotEmpty>
+		<isNotEqual property="isReTry" prepend=" , " compareValue="-1">
+			#isReTry#
+		</isNotEqual>
+		<isNotEqual property="reTryTimes" prepend=" , " compareValue="-1">
+			#reTryTimes#
+		</isNotEqual>
+		<isNotEqual property="reTryInterval" prepend=" , " compareValue="-1">
+			#reTryInterval#
+		</isNotEqual>
+		<isNotEqual property="retTimeout" prepend=" , "
+			compareValue="-1">
+			#retTimeout#
+		</isNotEqual>
+		<isNotEmpty property="modUser" prepend=" , ">
+			#modUser#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			#inTime#
+		</isNotEmpty>
+	</sql>
+
+	<insert id="Insert" parameterClass="HFTask">
+		insert into umpay.T_HFTASK(
+		<include refid="Insert_column" />
+		)
+		values (
+		<include refid="Insert_value" />
+		)
+	</insert>
+
+	<delete id="Delete">
+		delete from umpay.T_HFTASK
+		<include refid="key_find" />
+	</delete>
+
+	<update id="Update" parameterClass="HFTask">
+		update umpay.T_HFTASK
+		<dynamic prepend="set">
+			<isNotEmpty property="taskId" prepend=" , ">
+				taskId = #taskId#
+			</isNotEmpty>
+			<isNotEmpty property="nextRunTime" prepend=" , ">
+				nextRunTime=#nextRunTime#
+			</isNotEmpty>
+			<isNotEmpty property="taskRule" prepend=" , ">
+				taskRule=#taskRule#
+			</isNotEmpty>
+			<isNotEmpty property="taskRuleDesc" prepend=" , ">
+				taskRuleDesc=#taskRuleDesc#
+			</isNotEmpty>
+			<isNotEqual property="state" prepend=" , " compareValue="-1">
+				state = #state#
+			</isNotEqual>
+			<isNotEmpty property="platName" prepend=" , ">
+				platName=#platName#
+			</isNotEmpty>
+			<isNotEmpty property="taskDesc" prepend=" , ">
+				taskDesc=#taskDesc#
+			</isNotEmpty>
+			<isNotEmpty property="postUrl" prepend=" , ">
+				postUrl=#postUrl#
+			</isNotEmpty>
+			<isNotEqual property="isReTry" prepend=" , " compareValue="-1">
+				isReTry=#isReTry#
+			</isNotEqual>
+			<isNotEqual property="reTryTimes" prepend=" , "
+				compareValue="-1">
+				reTryTimes=#reTryTimes#
+			</isNotEqual>
+			<isNotEqual property="reTryInterval" prepend=" , "
+				compareValue="-1">
+				reTryInterval=#reTryInterval#
+			</isNotEqual>
+			<isNotEqual property="retTimeout" prepend=" , "
+				compareValue="-1">
+				retTimeout=#retTimeout#
+			</isNotEqual>
+			<isNotEmpty property="modUser" prepend=" , ">
+				modUser=#modUser#
+			</isNotEmpty>
+			<isNotEmpty property="modTime" prepend=" , ">
+				modTime=#modTime#
+			</isNotEmpty>
+			<isNotEmpty property="inTime" prepend=" , ">
+				inTime = #inTime#
+			</isNotEmpty>
+		</dynamic>
+		<include refid="key_find" />
+	</update>
+	
+	<statement id="getTaskList" resultClass="HFTask">
+		select taskId ,taskDesc from umpay.T_HFTASK order by modTime desc
+	</statement>
+	
+	<statement id="loadTaskList" resultClass="HFTask">
+		<![CDATA[
+		select taskId,nextRunTime,taskRule,taskRuleDesc,state,taskDesc,postUrl,isReTry,reTryTimes,reTryInterval,retTimeout
+		from umpay.T_HFTASK 
+		where nextRunTime<current timestamp + 31 MINUTES  and state = 2 order by nextRunTime
+ 		]]>
+	</statement>
+</sqlMap>

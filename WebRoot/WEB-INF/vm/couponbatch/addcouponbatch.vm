@@ -1,0 +1,302 @@
+﻿
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-fileupload.js"></script>
+<script src="$request.contextPath/js/busi/couponbatch.js"></script>
+
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 110px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+		
+		$.validator.addMethod("Check4",
+        function() {
+			var useStartDate = $('#useStartDate').val();
+			var useEndDate = $('#useEndDate').val();
+			if ( useStartDate >= useEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		$.validator.addMethod("Check5",
+        function() {
+			var sellStartDate = $('#sellStartDate').val();
+			var sellEndDate = $('#sellEndDate').val();
+			if ( sellStartDate >= sellEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		// 判断[兑换码销售有效期]截止时间必须小于等于[兑换码使用有效期]截止时间
+		$.validator.addMethod("Check6",
+        function() {
+			var useEndDate = $('#useEndDate').val();
+			var sellEndDate = $('#sellEndDate').val();
+			if ( sellEndDate > useEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		// 判断[兑换码销售有效期]开始时间必须小于等于[兑换码使用有效期]开始时间
+		$.validator.addMethod("Check7",
+        function() {
+			var useStartDate = $('#useStartDate').val();
+			var sellStartDate = $('#sellStartDate').val();
+			if ( sellStartDate > useStartDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+	 	
+  	 	jQuery(document).ready(function() {
+			
+			
+			$('#file_upload').omFileUpload({
+				action: '',
+                swf: '$request.contextPath/js/ui/js/om-fileupload.swf',
+				fileExt: '*.xls;*.xlsx',
+				fileDesc: 'Microsoft Excel',
+				buttonText: '选择Excel文件',
+				onSelect: function(ID, fileObj, event){
+					// 设置已选择文件标记
+					$('#isSelected').attr('value', '1');
+				},
+				onComplete: function(ID, fileObj, response, data, event){
+					// 设置按钮可用
+					$("#btn_add").removeAttr('disabled');
+					// 设置未选择文件标记
+					$('#isSelected').removeAttr('value');
+					var json = eval("data=" + response);
+					if(json.msg == '1'){
+						window.parent.$.omMessageBox.alert({
+        		    		type:'success',
+        		            title : '操作提示',
+        		            content : json.successContent
+        		        });
+             			closeDialog();
+						window.parent.shuaxin();
+             		}else if(json.msg == '0'){
+             			window.parent.showSimpleTip1(json.msg);
+             		}else{
+             			window.parent.$.omMessageBox.alert({
+        		    		type:'error',
+        		            title : '操作提示',
+        		            content : json.msg
+        		        });
+             		}
+				},
+				onError:function(ID, fileObj, errorObj, event){
+					// 设置按钮可用
+					$("#btn_add").removeAttr('disabled');
+					// 设置未选择文件标记
+					$('#isSelected').removeAttr('value');
+					window.parent.showSimpleTip1('0');
+				}
+            });
+				
+			jQuery("#dataform").validate({
+                rules: {
+                    "isSelected": {
+						required: true
+                    },
+					"useStartDate": {
+						required: true,
+						Check4: true,
+						Check7: true
+                    },
+					"useEndDate": {
+						required: true,
+						Check4: true,
+						Check6: true
+                    },
+					"sellStartDate": {
+						required: true,
+						Check5: true,
+						Check7: true
+                    },
+					"sellEndDate": {
+						required: true,
+						Check5: true,
+						Check6: true
+                    }
+                },
+                messages: {
+                    "isSelected": {
+                        required: "请选择兑换码文件"
+                    },
+					"useStartDate": {
+                        required: "请选择有效期",
+						Check4: "开始时间应小于结束时间",
+						Check7: "销售开始应小于等于使用开始"
+                    },
+					"useEndDate": {
+                        required: "请选择有效期",
+						Check4: "开始时间应小于结束时间",
+						Check6: "销售截止应小于等于使用截止"
+                    },
+					"sellStartDate": {
+                        required: "请选择销售期",
+						Check5: "开始时间应小于结束时间",
+						Check7: "销售开始应小于等于使用开始"
+                    },
+					"sellEndDate": {
+                        required: "请选择销售期",
+						Check5: "开始时间应小于结束时间",
+						Check6: "销售截止应小于等于使用截止"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList, function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			
+			// 设置按钮不可用，防止重复提交
+			$("#btn_add").attr("disabled", "disabled");
+			
+			// 获取参数
+			var useStartDate = $('#useStartDate').val();
+			var useEndDate = $('#useEndDate').val();
+			var sellStartDate = $('#sellStartDate').val();
+			var sellEndDate = $('#sellEndDate').val();
+			var paras = $('#paras').val();
+			paras = paras.replace('PARA_USD', useStartDate).replace('PARA_UED', useEndDate);
+			paras = paras.replace('PARA_SSD', sellStartDate).replace('PARA_SED', sellEndDate);
+			// 设置上传请求ACTION
+			$('#file_upload').omFileUpload({action: '/hfMngBusi/couponbatch/importbatch.do?paras=' + paras});
+			// 真正开始上传文件并导入
+			$('#file_upload').omFileUpload('upload');
+			
+            return false;
+        });});
+		
+		//关闭窗口方法
+        function  closeDialog(){
+        	window.parent.fillBackAndCloseDialog("#subdialog");
+        }
+		
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr >
+         <th width="110"><span>*</span>兑换码文件：</th>
+         <td width="45%" class="td" >
+			<input id="file_upload" name="file_upload" type="file" value="请选择Excel文件"/>
+			<input id='isSelected' name="isSelected" type="hidden" />
+			<input id='paras' name="paras" type="hidden" value="{'ruleId':'$!{ruleId}','couponId':'$!{couponId}','merId':'$!{merId}','goodsId':'$!{goodsId}','useStartDate':'PARA_USD','useEndDate':'PARA_UED','sellStartDate':'PARA_SSD','sellEndDate':'PARA_SED'}"/>
+		 </td>
+		 <td  class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>兑换码有效期：</th>
+         <td width="45%" class="td1"><input type="text" id="useStartDate" name="useStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+     		   至 <input type="text" id="useEndDate" name="useEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th ><span>*</span>兑换券销售期：</th>
+         <td class="td"><input type="text" id="sellStartDate" name="sellStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+     		   至 <input type="text" id="sellEndDate" name="sellEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+     </table>
+	 <div class="pop_btn">
+		<input name="Submit" type="submit" class="popbtn"  value="导入" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+		<input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html> 

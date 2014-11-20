@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="report"  >
+	<sql id="queryBackupData"> 
+	<![CDATA[
+	
+	SELECT EXP.MERID,EXP.GOODSID,EXP.AMOUNT,INF.GOODSNAME,INF.SERVTYPE,EXP.CATEGORY AS GOODCATEGORY 
+		FROM UMPAY.T_HFGOODS_EXP EXP JOIN UMPAY.T_GOODS_INF INF 
+		ON EXP.MERID=INF.MERID AND EXP.GOODSID=INF.GOODSID WHERE 1=1 
+		 #if( $merId && $merId!='' ) 
+		   AND EXP.MERID LIKE '$merId%' 
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   AND EXP.GOODSID=:goodsId
+		 #end 
+	ORDER BY EXP.MERID,EXP.GOODSID
+	  ]]>
+	</sql>
+</mapper> 

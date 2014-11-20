@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 支付服务商管理 -->
+<Options>
+ <!-- 查询权限 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/bankinf/updateCache.do</url>
+	</Option>
+</Options>

@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>
+            	报备数据查询
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js">
+        </script>
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-mouse.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-draggable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-position.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-resizable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js">
+        </script>
+        <script type="text/javascript">
+        jQuery("#search_div").width(jQuery(window).width()-20);
+        
+            var smallSize = 40;
+            var nomalSize = 80;
+            var largeSize = 200;
+
+            var backupState = {
+                "0": "未报备",
+                "1": "提交",
+                "2": "通过",
+                "4": "不通过",
+                "5": "拒绝",
+                "6": "已报备",
+                "9": "预备"
+            };
+            //导出查询过的报备数据	
+            function exportData() {
+                var url = "$request.contextPath/report/export.do?queryKey=report.queryBackupData&merId=" + $("#merId_H").val() + "&goodsId=" + $("#goodsId_H").val();
+                //alert(url);
+                window.open(url);
+            }
+            //报备	
+            function backup() {
+            if($("#res").val()){
+                //alert("backupids = "+(""+$("#res").val()+""));
+                var paras = {
+                    "backupids": "" + $("#res").val() + ""
+                };
+                $.post("$request.contextPath/report/backupDate.do", paras,
+                function(data) {
+                    if (data) {
+                    	$.omMessageBox.alert({
+                            type: 'error',
+                            title: '操作提示',
+                            content: '报备失败，请核对后重新报备！'
+                        });
+                    } else {
+                    	$.omMessageBox.alert({
+                            type: 'success',
+                            title: '操作提示',
+                            content: '报备成功！'
+                        });
+                    }
+                    $("#res").val("");
+                    // $("input:checkbox").removeAttr("checked");
+                    $('#grid').omGrid('reload'); //刷新当前页数据
+                })
+              }else{
+              	$.omMessageBox.alert({
+              				type: 'error',
+              				title:'操作提示',
+                            content: '请选择待报备的数据'
+                        });
+              }
+            }
+
+            //查询按钮
+            function queryData() {
+                //将查询条件保存到隐藏栏供导出用
+                $("input[target]").each(function(i) {
+                    $(this).val($("#" + $(this).attr("target")).omCombo("value"));
+                });
+                //查询数据
+                var url = "$request.contextPath/report/queryData.do?queryKey=report.queryBackupData&merId=" + $("#merId").omCombo("value") + "&goodsId=" + $("#goodsId").omCombo("value");
+                //alert(url);
+                $('#grid').omGrid("setData", url);
+               	//清空勾选条件
+                $("#res").val("");
+            }
+            //渲染各渠道小额
+            function renderStatus(value, rowData, rowIndex) {
+                //value  backupid+"-"+status
+                //如果没有报备数据
+                if (!value) {
+                    return "--";
+                } else {
+                    var backupid = value.split("-")[0];
+                    var status = "" + value.split("-")[1];
+                    //只有未报备、不通过、拒绝三个状态有勾选框，其他都没有勾选框
+                    if (status == '1' || status == '2' || status == '6' || status == '9') {
+                        return backupState[status];
+                    } else {
+                        return "<input type='checkbox' onclick='checkdata(this,\"" + backupid + "\")' row='" + rowIndex + "' backupid='" + backupid + "'/>&nbsp;" + backupState[status];
+                    }
+                }
+            }
+            //不能一起绑定事件了，只能用这呆板的方法了。
+            //绑定整行选择的checkbox
+            function checkrow(obj, controlrow) {
+                //勾选上  同一行所有没有选上的都选上
+                if (obj.checked) {
+                    $("input[row=" + controlrow + "]:checkbox").each(function(index, element) {
+                        if (!$(this).attr("checked")) {
+                            $(this).attr("checked", "checked");
+                            $("#res").val($("#res").val() + "," + $(this).attr("backupid"));
+                        }
+                    });
+                    //去掉勾选 同一行所有选上了的都去掉
+                } else {
+                    $("input[row=" + controlrow + "]:checkbox").each(function(index, element) {
+                        if ($(this).attr("checked")) {
+                            $(this).removeAttr("checked");
+                            $("#res").val($("#res").val().replace(("," + $(this).attr("backupid")), ""));
+                        }
+                    });
+                }
+                //阻止冒泡
+                if (event.stopPropagation) { 
+					// this code is for Mozilla and Opera 
+					event.stopPropagation(); 
+				}else if (window.event) { 
+					// this code is for IE 
+					window.event.cancelBubble = true; 
+				}
+            }
+            //绑定单个选择的checkbox
+            function checkdata(obj, backupid) {
+                //alert(backupid);
+                //勾选上，记录backupid。
+                if (obj.checked) {
+                    $("#res").val($("#res").val() + "," + backupid);
+                    //去掉勾选，清除记录的backupid
+                } else {
+                    $("#res").val($("#res").val().replace("," + backupid, ""));
+                }
+            }
+
+            //绑定报备状态数据的勾选事件
+            function checkBackUpDate() {
+                $("input[backupid]").click(function() {
+                    if ($(this).attr("checked")) {
+                        $("#res").val($("#res").val() + "," + $(this).attr("backupid"));
+                    } else {
+                        $("#res").val($("#res").val().replace(("," + $(this).attr("backupid")), ""));
+                    }
+                    //阻止冒泡
+                    if (event.stopPropagation) { 
+						// this code is for Mozilla and Opera 
+						event.stopPropagation(); 
+					}else if (window.event) { 
+						// this code is for IE 
+						window.event.cancelBubble = true; 
+					}
+                });
+                $("input[controlrow]").click(function() {
+                    if ($(this).attr("checked")) {
+                        $("input[row=" + $(this).attr("controlrow") + "]").each(function(index, element) {
+                            if (!$(this).attr("checked")) {
+                                $(this).attr("checked", "checked");
+                                $("#res").val($("#res").val() + "," + $(this).attr("backupid"));
+                            }
+                        });
+                    } else {
+                        $("input[row=" + $(this).attr("controlrow") + "]").each(function(index, element) {
+                            if ($(this).attr("checked")) {
+                                $(this).removeAttr("checked");
+                                $("#res").val($("#res").val().replace(("," + $(this).attr("backupid")), ""));
+                            }
+                        });
+                    }
+                    //阻止冒泡
+                    if (event.stopPropagation) { 
+						// this code is for Mozilla and Opera 
+						event.stopPropagation(); 
+					}else if (window.event) { 
+						// this code is for IE 
+						window.event.cancelBubble = true; 
+					}
+                })
+            }
+
+            $(document).ready(function() {
+                //采用operamasks ui按钮样式
+                $("#query").omButton({});
+                $("#export").omButton({});
+                $("#backup").omButton({});
+                //初始化商户列表
+                $('#merId').omCombo({
+                    dataSource: '$request.contextPath/option/couponmerinflist.do',
+                    width: '155px',
+                    inputField : 'value',
+                    emptyText: '全部',
+                    listAutoWidth: true,
+                    onValueChange: function(target, newValue, oldValue, event) {
+                		var merId = $('#merId').val();
+                        // 连级更新商品列表
+                        $('#goodsId').omCombo('setData',"$request.contextPath/option/getcoupongoodsinflist.do?merId="+merId);
+                    },
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    }
+                });
+
+                //初始化商品列表
+                $('#goodsId').omCombo({
+                    dataSource: [],
+                    width: '155px',
+                    emptyText: '全部',
+                    forceSelection: true,
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    }
+                });
+
+                //初始化查询表格
+                //表格控件有BUG， 没有办法在他整个表格出来后去给所有控件绑定事件。onSuccess事件是后他取数据完成时，没有一个页面加载完成的事件! 
+                $('#grid').omGrid({
+                    dataSource: "$request.contextPath/report/queryData.do?queryKey=report.queryBackupData",
+                    width: "100%",
+                    height: 440,
+                    limit: 15,
+                    showIndex: true,
+                    colModel: [{
+                        header: ' ',
+                        name: '',
+                        width: smallSize,
+                        align: 'center',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<input type='checkbox' onclick='checkrow(this," + rowIndex + ")' controlrow='" + rowIndex + "'/>";
+                        }
+                    },
+                    {
+                        header: '商户号',
+                        name: 'MERID',
+                        width: smallSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商户名称',
+                        name: 'MERNAME',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商户分类',
+                        name: 'MERCATEGORY',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '业务属性',
+                        name: 'BUSITYPE',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商品号',
+                        name: 'GOODSID',
+                        width: smallSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商品名称',
+                        name: 'GOODSNAME',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商品分类',
+                        name: 'GOODCATEGORY',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '服务类型',
+                        name: 'SERVTYPE',
+                        width: nomalSize,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            var servType = rowData.SERVTYPE;
+                            if (servType == 2) return "<a title='按次'>按次</a>";
+                            else if (servType == 3) return "<a title='包月'>包月</a>";
+                            else return servType;
+                        }
+                    },
+                    {
+                        header: '价格（分）',
+                        name: 'AMOUNT',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '公司介绍',
+                        name: 'COMPANY_DESC',
+                        width: largeSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商户网址',
+                        name: 'MER_WEB',
+                        width: largeSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '注册资本（万元）',
+                        name: 'REG_CAPITAL',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '公司成立时间',
+                        name: 'REG_TIEM',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '年收益（万元）',
+                        name: 'YEAR_PROFIT',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '用户数（人）',
+                        name: 'USER_SCALE',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '业务介绍',
+                        name: 'BUSI_DESC',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '运营支撑（人）',
+                        name: 'SUPPORT',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '自有渠道',
+                        name: 'SALE_CHANNEL',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商户来源',
+                        name: 'SRC_MER',
+                        width: nomalSize,
+                        align: 'left'
+                    },
+                    {
+                        header: '商户分成',
+                        name: 'SHARED_RATE',
+                        width: nomalSize,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                        	if(rowData.SHARED_RATE!=null){
+                        		return "<a title='" + rowData.SHARED_RATE + "'>" + rowData.SHARED_RATE + "</a>";
+                            }else{
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '北京小额',
+                        name: 'BEIJING',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '重庆小额',
+                        name: 'CHONGQING',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '福建小额',
+                        name: 'FUJIAN',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '甘肃小额',
+                        name: 'GANSU',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '广东小额',
+                        name: 'GUANGDONG',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '广西小额',
+                        name: 'GUANGXI',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '海南小额',
+                        name: 'HAINAN',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '河北小额',
+                        name: 'HEBEI',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '黑龙江小额',
+                        name: 'HEILONGJIANG',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '河南小额',
+                        name: 'HENAN',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '湖北小额',
+                        name: 'HUBEI',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '江苏小额',
+                        name: 'JIANGSU',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '江西小额',
+                        name: 'JIANGXI',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '吉林小额',
+                        name: 'JILIN',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '辽宁小额',
+                        name: 'LIAONING',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '内蒙古小额',
+                        name: 'NEIMENGGU',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '上海小额',
+                        name: 'SHANGHAI',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '陕西小额',
+                        name: 'SHANXI1',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '山西小额',
+                        name: 'SHANXI2',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '四川小额',
+                        name: 'SICHUAN',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '云南小额',
+                        name: 'YUNNAN',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    },
+                    {
+                        header: '浙江小额',
+                        name: 'ZHEJIANG',
+                        width: nomalSize,
+                        align: 'center',
+                        renderer: renderStatus
+                    }]
+                });
+
+            });
+        </script>
+    </head>
+    
+    <body>
+    <!--背景-->
+    <div class="list_btntool" style="height:1px;"></div>
+        <!--列表查询区-->
+        <div id="search_div">
+        <div class="list_search" style="height: 40px;">
+            <table width="100%" border="0">
+                <tr>
+                    <td>
+                        <form id="form" action="" method="post">
+                            <table width="100%" border="0">
+                                <tr height="50">
+                                    <th width="8%" height="30">
+                                        	商户号：
+                                    </th>
+                                    <td>
+                                        <input id="merId" name="merId" maxlength="32" class="input2" />
+                                        <input id="merId_H" name="merId" maxlength="32" type="hidden" target="merId"/>
+                                    </td>
+                                    <th width="8%">
+                                        	商品号：
+                                    </th>
+                                    <td>
+                                        <input id="goodsId" name="goodsId" class="input1" />
+                                        <input id="goodsId_H" name="merId" maxlength="32" type="hidden" target="goodsId"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                    <td rowspan="1">
+                        &nbsp;
+                        <input type="hidden" id="res" />
+                        <input id="query" name="query" type="Button" value="查询" onclick="queryData()"/>
+                        <input id="export" name="export" type="Button" value="导出" onclick="exportData()"/>
+                        <input id="backup" name="backup" type="Button" value="报备" onclick="backup()"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!--列表查询区-->
+    <div align="center">
+        <table align="left" id="grid">
+        </table>
+    </div>
+    </body>
+</html>

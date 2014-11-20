@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/chnlInf.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+ 	<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/chnlinf/query.do?queryKey=chnls.allChnls";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+
+			    var optStr="${opts}";
+					var opts=optStr.split(',');
+			    jQuery('[code]').each(function () {
+			        var code=$(this).attr("code");
+			        for(var i=0;i<opts.length;i++){
+					   if(code==opts[i]){
+						   $(this).css('display','inline');
+							}
+			    		};
+					});
+		
+          jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/merinf/query.do?queryKey=chnls.allChnls",
+                width:'100%',
+                height : 455,
+                limit : 15,
+                singleSelect : false,
+                rowClasses : function(rowIndex,rowData){
+					if(rowData.MODLOCK==1){
+						return "lock";
+					}else{
+						return "checkbox";
+					}
+				},
+                colModel : [ {header : '更新时间', name : 'MODTIME',width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+                				return "<a title='"+value+"'>"+value+"</a>";
+                			}},
+                            {header : '渠道编号', name : 'CHANNELID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                         	    return "<a title='"+value+"'>"+value+"</a>";
+                			  } },
+                             {header : '渠道名称', name : 'CHANNELNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	    return "<a title='"+value+"'>"+value+"</a>";
+                              } },
+                             {header : '运营负责人', name : 'SERVICE_USER',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                          	    return "<a title='"+value+"'>"+value+"</a>";
+                             } },
+                             {header : '状态', name : 'state',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	var name = "";
+                             	if(state==2){
+                             		name = "启用";
+                             	}else{ 
+                             		name = "禁用";
+	                            }
+	                          	return "<a title='"+name+"'>"+name+"</a>";
+                             }
+                             },
+                             {header : '操作', name:'oper',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+	                             	var state = rowData.STATE;
+	                             	var modLock=rowData.MODLOCK;
+	                             	var result="";
+	                             	if(optStr.indexOf("007")!=-1){//有修改权限
+	                             		if(modLock==0)
+	                             			result+=" <input  name='修改' title='修改' type='image' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='modify(&quot;"+rowData.CHANNELID+"&quot;)'/> ";
+	                             		else
+	                             			result+=" <input  name='修改' title='修改' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_modify1.png' /> ";
+	                             	}
+	                             	if(modLock==0){// 正常
+	                             		if(state==2){//启用状态
+	                             			if(optStr.indexOf("003")!=-1){//有禁用权限，返回修改、禁用、详情按钮
+	                             				result+="<input  name='禁用' title='禁用' type='image'  src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable(&quot;"+rowData.CHANNELID +"&quot;, "+ rowData.MODLOCK +" )'  /> ";  			                             				
+	                             			}
+	                             		}else{//禁用状态，不能修改
+	                             			if(optStr.indexOf("004")!=-1){//有启用权限，返回修改、启用、详情按钮
+	                             				result+="<input  name='启用' title='启用' type='image'  src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable(&quot;"+rowData.CHANNELID +"&quot;, "+ rowData.MODLOCK +" )'  /> ";
+	                             			}
+	                             		}
+	                             	}else{//锁定，无法启用或禁用
+	                             		if(state==2){//启用状态
+	                             			if(optStr.indexOf("003")!=-1){//有禁用权限，返回修改（不可用变灰）、禁用（不可用变灰）、详情按钮
+	                             				result+="<input  name='禁用' title='禁用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Disable1.png' onclick='singleDisable(&quot;"+rowData.CHANNELID +"&quot;, "+ rowData.MODLOCK +" )'  /> ";
+	                             			}
+	                             		}else{//禁用状态
+	                             			if(optStr.indexOf("004")!=-1){//有启用权限，返回修改（不可用变灰）、启用（不可用变灰）、详情按钮
+	                             				result+="<input  name='启用' title='启用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Enable1.png' onclick='singleEnable(&quot;"+rowData.CHANNELID +"&quot;, "+ rowData.MODLOCK +" )'  /> ";
+	                             			}
+	                             		}
+	                             	}
+                             		result+=" <input name='详情' title='详情' type='image' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetail(&quot;"+rowData.CHANNELID+"&quot;)' />";
+                             		if(optStr.indexOf("008")!=-1){
+                             			result+=" <input name='配置' title='配置' type='image' src='${request.contextPath}/profile/default/images/tool_configure.png' onclick='confChnl(&quot;"+rowData.CHANNELID+"&quot;)' />";
+                             		}
+                             		return result;	
+                             }}
+                            ],
+                            autoFit:true
+            });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+
+        //初始化运营负责人列表
+          jQuery('#service_user').omCombo({
+              dataSource : '$request.contextPath/option/operatorlist3.do',
+              width:'75px',
+              listMaxHeight:150,
+              emptyText:'全部 ' ,
+              valueField : 'id',
+              inputField : 'name',
+              optionField : function(data, index) {return data.name;},
+              onSuccess:function(data, textStatus, event){
+     	  			var tmp = $.parseJSON('{"id":"","name":"全部","initials":"qb"}');
+     	  			data.unshift(tmp);
+        		},
+        	  filterStrategy : function(value, data) {
+        			var initials=data.initials+"";
+        			var list=initials.split(",");
+        			for(var i=0;i<list.length;i++){
+        				if(list[i].indexOf(value) == 0)
+        					return true;
+        			}
+                    return false;
+              },
+              filterDelay : 100,
+        	  forceSelection : true
+          });
+    	//状态       
+      	  $('#state').omCombo({
+              dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+              width:'75px',
+              emptyText:'全部 ' ,
+              forceSelection : true
+          });
+      	  
+      	jQuery('#ipForm').submit(function() {
+            var merId = document.getElementById("oldMerId").value;
+            if(merId == ""){
+            	alert("请输入商户号！");
+            	return false;
+            }
+            jQuery(this).omAjaxSubmit({
+            		dataType : 'json',
+            		success:function(res){
+            			if(res.flag=='yes'){
+            				$.omMessageBox.alert({
+			    	        	type:'success',
+			    	            title : '操作提示',
+			    	            content : res.result
+			    	        });
+            				closeDialog("dialog-import");
+            				shuaxin();
+            			}else if(res.flag=='no'){
+            				$.omMessageBox.alert({
+            					type:'error',
+            					title : '操作提示',
+            					content : res.result
+            				});
+            			}
+                    }
+             });
+            
+             return false; 
+        });
+        
+       });
+        
+</script>
+
+</head>
+<body>
+
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+     
+      <table border="0" width="100%">
+        <tr>
+        <td align="left">
+             <input name="禁用" type="image" title='禁用' style="display:none" code="003" src="${request.contextPath}/profile/default/images/btn_Disable.png" onclick="batchstop();"/>
+             <input name="启用" type="image" title='启用' style="display:none" code="004" src="${request.contextPath}/profile/default/images/btn_Enable.png" onclick="batchstart();"/></td>
+		<td align="right">
+		     <input name="添加渠道" type="image" title='添加渠道' style="display:none" code="005" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="toAdd();"/>
+      	     <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expChnl();"/></td>
+         </tr>
+        </table>
+     </div>
+  
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="90%" border="0">
+       <tr>
+        <td  align="left" >
+          <!--查询块区 start--> 
+           <form id="form" method="post">
+            <table width="100%" border="0">
+              <tr>
+	             <th width="10%">渠道编号：</th>
+	             <td width="10%"><input id="channelId" name="channelId" type="text" class="input1" style="width:75px"/></td>
+		         <th width="10%">渠道名称：</th>
+		         <td width="10%"><input id="channelName" name="channelName" type="text" class="input1" style="width:75px"/></td>
+		         <th width="10%">提交时间：</th>
+	         	 <td ><input type="text" id="from" name="from" onfocus="WdatePicker({startDate:'%y-%M-%d 00:00:00',dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:150px"/></td>
+	         	 </tr>
+		       <tr>
+		         <th width="10%">渠道状态：</th>
+				 <td><input id="state" name="state" class="select1"></td>
+		         <th>运营负责人：</th>
+		         <td><input id="service_user" name="service_user" class="select1"/></td>
+		         <th >至：</th>
+			     <td><input type="text" id="to" name="to" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:150px"/></td>
+			   </tr>
+			</table>
+        </form> 
+       </td>
+         <td align="left"><input id="query" title="查询" name="submit" type="image" style="display:none" code="001" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+   </div>  
+   
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+</body>
+</html>

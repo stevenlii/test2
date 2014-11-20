@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/mergrade.js"></script>
+<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/mergrade/query.do?queryKey=mergrade.lastMonthGrade";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+			    var optStr="${opts}";
+					var opts=optStr.split(',');
+			    jQuery('[code]').each(function () {
+			        var code=$(this).attr("code");
+			        for(var i=0;i<opts.length;i++){
+			        	if(code==opts[i]){
+							   $(this).css('display','inline');						
+							}
+			    		};
+					});
+	
+          jQuery('#grid').omGrid({
+                dataSource : url,
+                width:'100%',
+                height : 455,
+                limit : 15,
+                singleSelect : false,
+                rowClasses : function(rowIndex,rowData){
+					if(rowData.MODLOCK==1){
+					return "lock";
+					}else{
+					return "checkbox";
+					}
+				},
+                autoFit : true,
+                colModel : [ {header : '商户名称', name : 'MERNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '商户号', name : 'MERID', width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '运营状态', name : 'OPERSTATE',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '交易额', name : 'TURNOVERINDEX',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '增产率', name : 'RISERATEINDEX', width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '虚假交易', name : 'FALSETRADEINDEX',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '客诉', name : 'COMPLAINTINDEX',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '系统稳定性', name : 'SYSSTABINDEX',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '配合力度', name : 'COOPERATEINDEX',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '违约', name : 'BREACHINDEX',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '重大投诉', name : 'UPGRADEINDEX',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '营销', name : 'MARKETINGINDEX',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '资源支持', name : 'SUPPORTINDEX',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '总分', name : 'TOTAL',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '运营负责人', name : 'OPERATOR',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '操作', name:'OPER',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                            	 var modLock = rowData.MODLOCK;
+                            	 var merId = rowData.MERID;
+                            	 var month = rowData.MONTH;
+	                         	 var result="<input name='详情' title='详情' type='image' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetail(&quot;"+merId+"&quot;,&quot;"+month+"&quot;)'/>";
+	                         	if(optStr.indexOf("003")!=-1){ //修改权限
+	                         		if(modLock==0){
+	                         			result+=" <input name='修改' title='修改' type='image' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='modify(&quot;"+merId+"&quot;,&quot;"+month+"&quot;)'/> ";
+	                         		}else{
+	                         			result+=" <input name='修改' title='修改' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_modify1.png'/> ";
+	                         		}
+	                         	}
+	                         	result+="<input name='修改记录' title='修改记录' type='image' src='${request.contextPath}/profile/default/images/tool_record.png' onclick='openModHistory(&quot;"+merId+"&quot;,&quot;"+month+"&quot;)'/>";
+	                     	    return result;	
+                             }}
+                            ]
+            });
+          
+            var dialog = $("#dialog-upload").omDialog({
+    			title:'导入评分信息',
+	            width: 420,
+                autoOpen : false,
+                modal : true,
+                resizable : false
+	        });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+            
+            jQuery('#ipForm').submit(function() {
+	            var file = document.getElementById("file").value;
+	            if(file == ""){
+	            	alert("请输入文件路径！");
+	            	return false;
+	            }
+	            closeDialog();
+	            jQuery(this).omAjaxSubmit({
+	            		dataType : 'json',
+	            		success:function(res){
+  	            			if(res.result=='yes'){
+	            				$.omMessageBox.alert({
+				    	        	type:'success',
+				    	            title : '操作提示',
+				    	            content : '操作成功！'
+				    	        }); 
+	            				shuaxin();
+	            			}else if(res.result=='no'){
+	            				shuaxin();
+	            				$.omMessageBox.confirm({
+	            	                title:'下载确认',
+	            	                content:'部分数据导入失败，是否要查看失败列表？',
+	            	                onClose:function(value){
+	            	                    if(value){
+	            	                    	window.location.href = "$request.contextPath/mergrade/downloadFailList.do?fileName="+res.fileName;
+	            	                    }
+	            	                }
+	            	            });
+	            			}else{
+	            				$.omMessageBox.alert({
+	            					type:'error',
+	            					title : '操作提示',
+	            					content : res.result
+	            				});           
+	            			}
+	                    },
+	                    error:function(){
+	                    	alert("error");
+	                    }
+	             });	             
+                 return false; 
+            });
+            
+          //获取运营负责人列表
+     	     $('#operator').omCombo({
+                   dataSource : '$request.contextPath/option/operatorlist2.do',
+                   width:'85px',
+                   emptyText:'全部 ' ,
+                   listMaxHeight:150,
+                   forceSelection : true ,
+                   onSuccess:function(data, textStatus, event){
+					      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+					      	  data.unshift(tmp);
+				   		}
+               });
+     	     
+     	    //运营状态 
+    	  	  $('#operState').omCombo({
+    	          dataSource : [{"value":"","text":"全部"},{"value":"0","text":"试运营"},{"value":"1","text":"正常"}],
+    	          width:'85px',
+    	          listMaxHeight:80,
+    	          emptyText:'全部 ' ,
+    	          forceSelection : true
+    	      });
+     	  	//总分范围 
+     	  	  $('#total').omCombo({
+     	          dataSource : [{"value":"","text":"全部"},{"value":"5","text":"90分及以上"},{"value":"4","text":"80-89分"}
+     	          		,{"value":"3","text":"70-79分"},{"value":"2","text":"60-69分"},{"value":"1","text":"60分以下"}],
+     	          width:'85px',
+     	          listMaxHeight:100,
+     	          emptyText:'全部 ' ,
+     	          forceSelection : true
+     	      });
+       });
+</script>
+
+</head>
+<body>
+
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+      <table border="0" width="100%">
+        <tr>
+		 <td align="right">
+ 			 <input name="导入" type="image" title='导入上月手工评分' style="display:none" code="004" src="${request.contextPath}/profile/default/images/btn_drsgpf.png" onclick="openUpload()"/>
+			 <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expLastMonth()"/>
+			 <input name="交易数据入库" type="image" title='交易数据入库' style="display:none" code="005" src="${request.contextPath}/profile/default/images/btn_jyrk.png" onclick="loadTradeGrade()"/>
+			 <input name="核减数据入库" type="image" title='核减数据入库' style="display:none" code="006" src="${request.contextPath}/profile/default/images/btn_hjrk.png" onclick="loadReduceDataGrade()"/>
+			 <input name="手工计算评分" type="image" title='手工计算评分' style="display:none" code="007" src="${request.contextPath}/profile/default/images/btn_sgpf.png" onclick="calculateGrade()"/>
+      	</td>
+       </tr>
+      </table>
+     </div>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search" align="left">
+      <table width="80%" border="0">
+        <tr>
+          <td align="left" >
+           <!--查询块区 start--> 
+	       <form id="form" action="" method="post">
+             <table width="100%" border="0">
+                 <tr>
+	                 <th width="10%" height="30">商户名称：</th>
+			         <td ><input id="merName" name="merName" type="text" class="input1" /></td>
+				     <th width="10%"> 商户号：</th>    
+				     <td ><input id="merId" name="merId" type="text" class="input1"/></td>
+				     <th width="10%">运营状态：</th>
+				     <td><input id="operState" name="operState" class="select1"/></td>
+			     </tr>
+			     <tr>
+				     <th >运营负责人：</th>
+				     <td><input id="operator" name="operator" class="select1"/></td>
+				     <th >总分：</th>
+				     <td><input id="total" name="total" class="select1"/></td>
+			     </tr>  
+			    </table>
+               </form>  
+			  </td>    
+			   <td align="left"><input id="query" title="查询" name="query" type="image" code="001" style="display:none"  src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query(0);"/>
+               </td>   
+			    </tr>
+             </table>  
+		</div>    
+    </div>			      
+ <!--列表区-->
+ <div>
+     <table id="grid" align="left"></table>
+ </div>
+    
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+ <div id="dialog-upload" style="display:none;">
+	 <form id="ipForm" method="post" action="$request.contextPath/mergrade/batchImport.do" enctype="multipart/form-data">
+	     <table style="width:390px;">
+	         <tr>
+	             <th width="78px"><span style="color:red;">*</span>文件路径：</th>
+	             <td><input id="file" name="file" type="file" style="width:295px;" class="input2" /></td>
+	         </tr>
+	     </table>
+	     <div align='center'>
+	         	<input name="Submit" type="submit" class="popbtn" value="提交" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	  			<input name="close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	  	</div>
+	 </form>
+ </div>
+</body>
+</html>

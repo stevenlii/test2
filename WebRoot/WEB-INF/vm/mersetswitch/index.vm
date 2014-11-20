@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script type="text/javascript">
+		var url = "$request.contextPath/mersetswitch/query.do?queryKey=mersetswitch.all";
+        $(document).ready(function() {
+          $('#grid').omGrid({
+                dataSource : "$request.contextPath/mersetswitch/query.do?queryKey=mersetswitch.all",
+                width:'100%',
+                height : 455,
+                limit : 15,
+                colModel : 
+				[ 
+					{header : '商户号', name : 'MERID',width : 100, align : 'left'}, 
+                    {header : '商户名称', name : 'MERNAME',width : 80, align : 'left'},
+                    {header : '配置时间', name : 'CONFIGTIME', width : 50, align : 'left'},
+                    {header : '开启状态', name : 'ISOPEN ',width : 60, align : 'left',renderer:
+						function(value , rowData , rowIndex){
+                         	var ISOPEN = rowData.ISOPEN;
+                         	var name = "";
+                         	if(ISOPEN==2){
+                         		name = "开启";
+                         	}else {
+                         		name = "关闭";
+                         	}
+                         	return name;
+						}
+					}
+                ],
+                autoFit:true
+            });
+            
+            $( "#dialog").omDialog({
+                autoOpen: false,
+				height: 440,
+				resizable: false,
+				width: 530
+             });
+       });
+	function config(){
+		$("#dialog").omDialog("option", "title", '商户账单配置');
+		$("#dialog").omDialog("option", "modal", true);
+		$("#dialog").omDialog('open');
+		var frameLoc = window.frames[0].location;
+		frameLoc.href = 'toconfig.do';
+		$("#dialog").omDialog({
+			onClose: function(event) {
+				window.frames[0].location.href = '../wait.htm';
+			}
+		});
+		return false;
+	}
+	 function getURL(url){
+		 var params = $("#form").serialize();
+		 url += "&"+ params;
+		 return url;
+	 }
+	 
+	 function doQuery(url){
+		 url = getURL(url);
+		 $('#grid').omGrid("setData", url);
+	 }
+	 function  reloadData(){
+	   $('#grid').omGrid('reload');
+   }
+</script>
+
+</head>
+<body>
+	<!--列表查询区-->
+ <div  id="search_div">
+	 <div class="list_search" style="height:40px;">
+     <table width="100%" border="0">
+	    <tr>
+	    	<td align="left">
+	    		<img title="配置商户账单" src="${request.contextPath}/profile/default/images/btn_shzd.PNG" onclick="config();" />
+	    	</td>
+	        <td  style="text-align:right;padding-top:5px">
+				<img title="查询" name="query" src="${request.contextPath}/profile/default/images/Search_bnt.png"
+	                    onclick="doQuery('query.do?queryKey=mersetswitch.all');" />
+	        </td>
+	    </tr>
+    </table>
+	</div>    
+    </div>		
+   <!--列表区-->
+   <table id="grid" align="left"></table>
+    
+	 <div id="dialog">
+		<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+	 </div>
+</body>
+</html>

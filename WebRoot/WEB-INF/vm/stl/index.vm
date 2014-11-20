@@ -1,0 +1,524 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/busi/stl.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+    .none_underline a{text-decoration:none;}
+	.none_underline a:hover{ text-decoration:underline;}
+    }
+</style>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+    	// 按钮权限控制
+        var optStr = "${opts}";
+        $('#stlCycle').omCombo({
+            //dataSource: [{text:'全部',value:''},{text:'M+2月底',value:'0'},{text:'M+1月底',value:'1'},{text:'M+1月7日',value:'2'},{text:'周结',value:'3'},{text:'日结',value:'4'}],
+            dataSource: '$request.contextPath/stl/listStlCycle.do',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true,
+            onValueChange:function(target,newValue,oldValue,event){ 
+            	var stlCycle = $("#stlCycle").val();
+            	var startDate = $("#startDate").val();
+				if(stlCycle=='1'||stlCycle=='2'||stlCycle=='5'){
+					if(startDate.length>7){
+						$("#startDate").attr("value","");
+            			$("#endDate").attr("value","");
+					}
+				}else if (stlCycle!=null && stlCycle != ''){
+					if(startDate.length != 10){
+						$("#startDate").attr("value","");
+            			$("#endDate").attr("value","");
+					}
+				}
+        	}
+        });
+        $('#settStatus').omCombo({
+            //dataSource: [{text:'全部',value:''},{text:'待运营确认',value:'0'},{text:'待商户确认',value:'1'},{text:'账单修改中',value:'11'},{text:'商户已确认',value:'2'},{text:'账单修改中',value:'21'},{text:'待运营确认',value:'22'},{text:'付款中',value:'3'},{text:'已付款',value:'4'}],
+            dataSource: '$request.contextPath/stl/listSettStatus.do',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true,
+            listAutoWidth : true
+        });
+        $('#state').omCombo({
+            //dataSource: [{text:'全部',value:''},{text:'待审核',value:'0'},{text:'审核未通过',value:'1'},{text:'审核通过',value:'2'}],
+            dataSource: '$request.contextPath/stl/listState.do',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true
+        });
+        jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/stl/query.do?queryKey=stl.all",
+            width: '100%',
+            height: 470,
+            limit: 15,
+            colModel: [
+            {
+                header: '操作',
+                name: 'operation',
+                width: 280,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+                    var result = "<span class='none_underline'><a href='#' onclick='queryDetail(\"" + rowData.BILLTYPE + "\",\""+ rowData.ACCID + "\",\""+ rowData.ACCNAME + "\",\"" + rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.GOODSID  +"\")'>查看</a>";
+                    if( optStr.indexOf("002") != -1 ){
+	                    if(rowData.SETTSTATUS=='0'||rowData.SETTSTATUS=='1'||rowData.SETTSTATUS=='11'||rowData.SETTSTATUS=='21'||rowData.SETTSTATUS=='22'){
+	                        result += "&nbsp;"+"<a href='#' onclick='toMod(\"" + rowData.BILLTYPE + "\",\""+ rowData.ACCID + "\",\""+ rowData.ACCNAME + "\",\"" + rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.GOODSID+ "\",\"" + rowData.SETTSTATUS + "\")'>修改</a>";
+	                     }
+                    }
+                    result +="&nbsp;<a href='#' onclick='nbsmDetail(\"" + '${request.contextPath}/nbsmpayback/nbsmindex.do' + "\",\""+ rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.MERID + "\")'>不均衡</a>"
+                    +"&nbsp;<a href='#' onclick='paybackDetail(\"" + '${request.contextPath}/nbsmpayback/paybackindex.do' + "\",\""+ rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.MERID + "\")'>退费</a>";
+                    if( optStr.indexOf("001") != -1 ){
+	                    if(rowData.STATE=='0'){
+	                        result +="&nbsp;<a href='#' onclick='auditDetail(\"" + rowData.BILLTYPE + "\",\""+ rowData.ACCID + "\",\""+ rowData.ACCNAME + "\",\"" + rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.GOODSID + "\")'>审核</a>";
+	                     }
+                    }
+                    if( optStr.indexOf("006") != -1 ){
+	                    if(rowData.IS_VALID=='2'){
+	                        result +="&nbsp;<a href='#' onclick='updateIsvalid(\"" + rowData.BILLTYPE + "\",\""+ rowData.ACCID + "\",\""+ rowData.ACCNAME + "\",\"" + rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.GOODSID + "\",\"" + 4 + "\")'>隐藏数据</a>";
+	                     }else if(rowData.IS_VALID=='4'){
+	                    	 result +="&nbsp;<a href='#' onclick='updateIsvalid(\"" + rowData.BILLTYPE + "\",\""+ rowData.ACCID + "\",\""+ rowData.ACCNAME + "\",\"" + rowData.STLCYCLE + "\",\"" + rowData.STLDATE + "\",\"" + rowData.GOODSID + "\",\"" + 2 + "\")'>取消隐藏</a>";
+		                 }
+                    }
+                    result += "</span>";
+                    return result;
+                }
+            },
+            {
+                header: '账单类型',
+                name: 'billtype',
+                width: 60,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					if(rowData.BILLTYPE == '1'){
+						return "<a title='全网'>全网</a>";
+					}else if(rowData.BILLTYPE == '2'){
+						return "<a title='省网'>省网</a>";
+					}else if(rowData.BILLTYPE == '3'){
+						return "<a title='小额'>小额</a>";
+					}else{
+						return "<a title='未知状态" + rowData.BILLTYPE + "'>未知状态" + rowData.BILLTYPE + "</a>";
+					}
+                }
+            },
+            {
+                header: '结算周期',
+                name: 'stldate',
+                width: 80,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.STLDATE + "'>" + rowData.STLDATE + "</a>";
+                }
+            },
+            {
+                header: '结算账期',
+                name: 'stlCycleName',
+                width: 60,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.stlCycleName + "'>" + rowData.stlCycleName + "</a>";
+                }
+            },
+            {
+                header: '商户号',
+                name: 'merid',
+                width: 80,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.MERID + "'>" + rowData.MERID + "</a>";
+                }
+            },
+            {
+                header: '商户名称',
+                name: 'accname',
+                width: 100,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+            		return "<a title='" + rowData.ACCNAME + "'>" + rowData.ACCNAME + "</a>";
+                }
+            },
+            {
+                header: '子商户号',
+                name: 'goodsid',
+                width: 80,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.GOODSID + "'>" + rowData.GOODSID + "</a>";
+                }
+            },
+            {
+                header: '成功交易笔数',
+                name: 'succnum',
+                width: 80,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.SUCCNUM + "'>" + rowData.SUCCNUM + "</a>";
+                }
+            },
+            {
+                header: '成功交易金额',
+                name: 'succamt',
+                width: 100,
+                align: 'right',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.SUCCAMT + "'>" + rowData.SUCCAMT + "</a>&nbsp;";
+                }
+            },
+            {
+                header: '核减金额',
+                name: 'muteamt',
+                width: 80,
+                align: 'right',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.MUTEAMT + "'>" + rowData.MUTEAMT + "</a>&nbsp;";
+                }
+            },
+            {
+                header: '不均衡金额',
+                name: 'nbsmamt',
+                width: 100,
+                align: 'right',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.NBSMAMT + "'>" + rowData.NBSMAMT + "</a>&nbsp;";
+                }
+            },
+            {
+                header: '退费金额',
+                name: 'paybackamt',
+                width: 80,
+                align: 'right',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.PAYBACKAMT + "'>" + rowData.PAYBACKAMT + "</a>&nbsp;";
+                }
+            },
+            {
+                header: '结算金额',
+                name: 'merstlpay',
+                width: 80,
+                align: 'right',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.MERSTLPAY + "'>" + rowData.MERSTLPAY + "</a>&nbsp;";
+                }
+            },
+
+            {
+                header: '结算状态',
+                name: 'settStatusName',
+                width: 90,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.settStatusName + "'>" + rowData.settStatusName + "</a>";
+                }
+            },
+            {
+                header: '审核状态',
+                name: 'stateName',
+                width: 90,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.stateName + "'>" + rowData.stateName + "</a>";
+                }
+            }
+            ],
+            autoFit: true
+        });
+
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+		
+		$('.errorImg').bind('mouseover',function(){
+        $(this).next().css('display','block');
+		}).bind('mouseout',function(){
+				$(this).next().css('display','none');
+		});
+		
+		jQuery('#dataform').submit(function() {
+			if (!jQuery("#dataform").valid()) 
+				return false;
+			jQuery(this).omAjaxSubmit({success:function(res){
+		      showSimpleTip(res);
+				close();
+			}
+			});
+			
+			return false; 
+		});
+	});
+
+
+
+  //查询方法
+  	function query() {
+  	    var startDate = jQuery('#startDate').val();
+  	    var endDate = jQuery('#endDate').val();
+  	    var stlCycle = jQuery('#stlCycle').val();
+  	    var settStatus = jQuery('#settStatus').val();
+  	    var state = jQuery('#state').val();
+  	    var accId = jQuery('#accId').val();
+  	    var key = "query.do?queryKey=stl.all";
+  	    if (startDate != "") {
+  	        key = key + '&startDate=' + encodeURI(startDate).replace("-", "").replace("-", "");
+  	    }
+  	    if (endDate != "") {
+  	        key = key + '&endDate=' + encodeURI(endDate).replace("-", "").replace("-", "");
+  	    }
+  	    if (stlCycle != "") {
+  	        key = key + '&stlCycle=' + encodeURI(stlCycle);
+  	    }
+  	    if (settStatus != "") {
+  	        key = key + '&settStatus=' + encodeURI(settStatus);
+  	    }
+  	    if (accId != "") {
+  	        key = key + '&accId=' + encodeURI(accId);
+  	    }
+  	    if (state != "") {
+  	        key = key + '&state=' + encodeURI(state);
+  	    }
+  	    //if (getByteLen(paraCode) > 16) {
+  	    //    alert('参数编号最大长度为中文8位，英文16位');
+  	    //    return;
+  	    //}
+  	    $('#grid').omGrid("setData", key);
+  	}
+    /*导出按钮触发*/
+    function exportUG(){
+    	var startDate = jQuery('#startDate').val();
+  	    var endDate = jQuery('#endDate').val();
+  	    var stlCycle = jQuery('#stlCycle').val();
+  	    var settStatus = jQuery('#settStatus').val();
+  	    var state = jQuery('#state').val();
+  	    var accId = jQuery('#accId').val();
+  	    var key = "export.do?queryKey=stl.all";
+  	    if (startDate != "") {
+  	        key = key + '&startDate=' + encodeURI(startDate).replace("-", "").replace("-", "");
+  	    }
+  	    if (endDate != "") {
+  	        key = key + '&endDate=' + encodeURI(endDate).replace("-", "").replace("-", "");
+  	    }
+  	    if (stlCycle != "") {
+  	        key = key + '&stlCycle=' + encodeURI(stlCycle);
+  	    }
+  	    if (settStatus != "") {
+  	        key = key + '&settStatus=' + encodeURI(settStatus);
+  	    }
+  	    if (accId != "") {
+  	        key = key + '&accId=' + encodeURI(accId);
+  	    }
+  	    if (state != "") {
+  	        key = key + '&state=' + encodeURI(state);
+  	    }
+    	document.location.href=key;
+    }
+</script>
+
+<script>
+    function queryDetail(billType,accId,accName,stlCycle,stlDate,goodsId){
+    	$("#dialog").omDialog("option","width",'1050');
+	    $("#dialog").omDialog("option","title",'账单详情');
+	    $("#dialog").omDialog("option","height",'600');
+	    $("#dialog").omDialog("option", "modal", true);
+	    $("#dialog").omDialog({onOpen : function(event) {
+		    $("#billType").val(billType);
+	        $("#accId_dialog").val(accId);
+	        $("#accName").val(accName);
+	        $("#stlCycle_dialog").val(stlCycle);
+	        $("#stlDate").val(stlDate);
+	        $("#goodsId").val(goodsId);
+		    $("#dialog_form").attr('action','queryDetail.do');
+		    $("#dialog_form").submit();
+		}});
+        $("#dialog").omDialog('open');
+    }
+    function toMod(billType,accId,accName,stlCycle,stlDate,goodsId ,settStatus){
+        $("#dialog").omDialog("option","width",'1050');
+	    $("#dialog").omDialog("option","title",'修改账单');
+	    $("#dialog").omDialog("option","height",'600');
+	    $("#dialog").omDialog("option", "modal", true);
+	    $("#dialog").omDialog({onOpen : function(event) {
+		    $("#billType").val(billType);
+	        $("#accId_dialog").val(accId);
+	        $("#accName").val(accName);
+	        $("#stlCycle_dialog").val(stlCycle);
+	        $("#stlDate").val(stlDate);
+	        $("#goodsId").val(goodsId);
+	        $("#settStatus_dialog").val(settStatus);
+		    $("#dialog_form").attr('action','toMod.do');
+		    $("#dialog_form").submit();
+		}});
+        $("#dialog").omDialog('open');
+    }
+    function auditDetail(billType,accId,accName,stlCycle,stlDate,goodsId ){
+        $("#dialog").omDialog("option","width",'1050');
+	    $("#dialog").omDialog("option","title",'审核账单');
+	    $("#dialog").omDialog("option","height",'600');
+	    $("#dialog").omDialog("option", "modal", true);
+	    $("#dialog").omDialog({onOpen : function(event) {
+		    $("#billType").val(billType);
+	        $("#accId_dialog").val(accId);
+	        $("#accName").val(accName);
+	        $("#stlCycle_dialog").val(stlCycle);
+	        $("#stlDate").val(stlDate);
+	        $("#goodsId").val(goodsId);
+		    $("#dialog_form").attr('action','auditDetail.do');
+		    $("#dialog_form").submit();
+		}});
+        $("#dialog").omDialog('open');
+    }
+    function updateIsvalid(billType,accId,accName,stlCycle,stlDate,goodsId,is_valid){
+        //var url = '${request.contextPath}/stl/updateIsvalid.do?billType='+billType+'&accId='+accId+'&accName='+accName+'&stlCycle='+stlCycle+'&goodsId='+goodsId+'&stlDate='+stlDate+'&is_valid='+is_valid;
+        var url = '${request.contextPath}/stl/updateIsvalid.do';
+		//alert(url);
+        $.ajax({
+        	  type: 'POST',
+        	  url: url,
+        	  data:{"billType":billType,"accId":accId,"accName":accName,"stlCycle":stlCycle,"stlDate":stlDate,"goodsId":goodsId,"is_valid":is_valid},
+        	  success: function(res) {
+				window.showSimpleTip(res);
+				if( res == '1' ){
+					window.shuaxin();
+				}else{
+					
+				}
+	       	 }
+        	});
+    }
+    function nbsmDetail(url, stlCycle, stlDate, goodsId) {
+        $("#dialog").omDialog("option","width",'860');
+	    $("#dialog").omDialog("option","title",'不均衡明细');
+	    $("#dialog").omDialog("option","height",'350');
+	    $("#dialog").omDialog("option", "modal", true);
+	    $("#dialog").omDialog({onOpen : function(event) {
+	        $("#stlCycle_dialog").val(stlCycle);
+	        $("#stlDate").val(stlDate);
+	        $("#goodsId").val(goodsId);
+		    $("#dialog_form").attr('action',url);
+		    $("#dialog_form").submit();
+		}});
+        $("#dialog").omDialog('open');
+    }
+    function paybackDetail(url, stlCycle, stlDate, goodsId) {
+ 		$("#dialog").omDialog("option","width",'860');
+ 	    $("#dialog").omDialog("option","title",'退费明细');
+ 	    $("#dialog").omDialog("option","height",'350');
+ 	    $("#dialog").omDialog("option", "modal", true);
+ 	    $("#dialog").omDialog({onOpen : function(event) {
+ 	        $("#stlCycle_dialog").val(stlCycle);
+ 	        $("#stlDate").val(stlDate);
+ 	        $("#goodsId").val(goodsId);
+ 		    $("#dialog_form").attr('action',url);
+ 		    $("#dialog_form").submit();
+ 		}});
+         $("#dialog").omDialog('open');
+    }
+    </script>
+</head>
+<body>
+   <!--列表查询区-->
+   <div class="list_search" style="height: 70px;">
+   <table width="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr height="30px">
+            <th width="5%" >结算账期：</th>
+              <td ><input id="stlCycle" name="stlcycle" type="text" class="input2"/></td>
+           <th width="5%">结算周期：</th>
+		     <td>
+		  	  <input id="startDate" name="startDate" readonly="readonly" onclick="clickTime();" class="input2"/>
+		  	 	至
+		  	  <input id="endDate" name="endDate" readonly="readonly" onclick="clickTime();" class="input2"/>
+             </td>
+               <th width="5%" >商户：</th>
+              <td ><input id="accId" name="accId" type="text" class="input2" /></td>
+         </tr>
+          <tr height="30px">
+          <th width="5%" >结算状态：</th>
+              <td ><input id="settStatus" name="settStatus" type="text" class="input2" /></td>
+          <th width="5%" >审核状态：</th>
+              <td ><input id="state" name="state" type="text" class="input2" /></td>
+         <th width="5%" ></th>
+              <td ></td>
+         </tr>
+        </table>
+         </form> 
+       </td>
+        <td>
+			<input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"/>
+			&nbsp;&nbsp;&nbsp;&nbsp;<input name="添加系统参数" type="image"  value="ee" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="exportUG()"/>
+        </td>
+       </tr>
+    </table>
+      </div>
+ <!--列表查询区-->
+
+  <div align="center">
+         <table  align="left" id="grid" ></table>
+     </div>
+    
+  
+ <div id="dialog">
+	<iframe id="dialog_iframe" name="dialog_iframe" frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+	<form id="dialog_form" name="dialog_form" method="POST" action="auditDetail.do" target="dialog_iframe">
+		<input type="hidden" id="billType" name="billType" value=""/>
+		<input type="hidden" id="accId_dialog" name="accId" value=""/>
+		<input type="hidden" id="accName" name="accName" value=""/>
+		<input type="hidden" id="stlCycle_dialog" name="stlCycle" value=""/>
+		<input type="hidden" id="stlDate" name="stlDate" value=""/>
+		<input type="hidden" id="goodsId" name="goodsId" value=""/>
+		<input type="hidden" id="settStatus_dialog" name="settStatus" value=""/>
+	</form>	
+ </div>
+
+</body>
+</html>

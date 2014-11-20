@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/proxygoods.js"></script>
+<script>
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  		 
+  	 	 jQuery("#dataform").validate({
+                rules : {
+                    "dayLimit" : {
+                    	 required : true,
+                    	 zhengshu : true
+                    },
+                    "alarmLimit": {
+                        required : true,
+                        zhengshu : true,
+                        isEqual1 : true,
+                        compareVal : true
+                    },
+                   "alarmTel": {
+                    	isEmpty : true,
+                    	mobile : true,
+                        maxlength : 254
+                   }
+                },
+                messages : {
+                    "dayLimit"  : {
+                        required : "请输入日销量",
+                    },
+                    "alarmLimit": {
+                        required : "请输入预警值"
+                    },
+                    "alarmTel": {
+                    	maxlength : "号码最多254个字"
+                    }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){
+  	 	 		 return false;
+  	 	 	 }
+              jQuery(this).omAjaxSubmit({success:function(res){
+            	  		window.parent.showSimpleTip(res);
+                   		if(res =='1') {
+            			   closeDialog();
+            			   window.parent.shuaxin();
+            		    }
+               		}
+	             
+               }); 
+        	   
+              return false; 
+            });
+  	 	 
+  	     });       
+       
+  </script>  
+  </head>
+  <body>
+<div id="container">
+          <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/proxygoods/update.do">
+          <input id="subMerId" name="subMerId" value="$!{proxyGoods.subMerId}" type="hidden">
+          <input id="goodsId" name="goodsId" value="$!{proxyGoods.goodsId}" type="hidden">
+          <input id="merId" name="merId" value="$!{goods.merId}" type="hidden">
+          <table width="100%" >
+          <tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+              <tr>
+                <th width="25%"><span>*</span>二级商户：</th>
+                <td width="40%" class="td1">$!{proxyGoods.subMerId}</td>
+                <td width="35%" class="td1"></td>
+              </tr>
+              <tr>
+                <th>二级商户名称：</th>
+                <td class="td">$!{subMerName}</div></td>
+                <td class="td"></td>
+              </tr>
+            <tr>
+                <th><span>*</span>代理商户：</th>
+                <td class="td1">$!{goods.merId}</td>
+                <td class="td1"></td>
+            </tr>
+            <tr>
+	            <th><span>*</span>代理商品：</th>
+	            <td class="td" colspan="2">$!{goods.goodsId}</td>
+	        </tr>
+	        <tr>
+	            <th><span>*</span>商品名称：</th>
+	            <td class="td1" colspan="2">$!{goods.goodsName}</td>
+	        </tr>
+	        <tr>
+	            <th><span>*</span>服务类型：</th>
+	            <td class="td" colspan="2">
+	            	#if($!{goods.servType}==2)
+	            		按次
+	            	#elseif($!{goods.servType}==3)
+	            		包月
+	            	#end
+	            </td>
+	        </tr>
+	        <tr>
+	            <th><span>*</span>商品日销量：</th>
+	            <td class="td1"><input id="dayLimit" name="dayLimit" value="$!{proxyGoods.dayLimit}" type="text" maxlength="7" class="input1" /></td>
+	            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+	            <th><span>*</span>预警数：</th>
+	            <td class="td"><input id="alarmLimit" name="alarmLimit" value="$!{proxyGoods.alarmLimit}" type="text" maxlength="7" class="input1" /></td>
+	            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	        </tr>
+	        <tr>
+	            <th>预警短信号码：</th>
+	            <td class="td1"><textarea id="alarmTel" name="alarmTel" rows="3" style="width:200px;">$!{proxyGoods.alarmTel}</textarea></td>
+	            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	        </tr>
+            </table>
+        </td></tr><tr><td>
+	        <table width="100%" cellpadding="0" cellspacing="0">
+	             <tr>
+	                <td height="15"></td></tr>
+	             <tr>
+	                <td align="center"><input id="add_button1" name="submit" type="submit" value="提交" class="popbtn"onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	                <input id="add_button2" name="add_button2" type="reset"  value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+	              </tr>
+	         </table>
+         </td></tr>
+         <table>
+      </form>
+</div>
+</body>
+</html>

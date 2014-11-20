@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="upservice"  >
+	<sql id="query"> 
+	<![CDATA[
+	
+		SELECT S.MERID,S.GOODSID,S.GATEID,S.MERPRIV,S.SERVICEID,S.SERVICENAME,S.SERVICEID1,S.SERVICENAME1,S.SERVICEID2,
+			S.SERVICENAME2,S.EXPAND,S.STATE,S.AMOUNT,S.FEE_TYPE feeType,S.BUSI_DESC busiType,S.MODUSER,S.MODTIME,G.CATEGORY
+		FROM UMPAY.T_UPSERVICE_INF S LEFT JOIN UMPAY.T_HFGOODS_EXP G ON S.MERID=G.MERID AND S.GOODSID=G.GOODSID
+		WHERE 1=1 
+		 #if( $merId && $merId!='' )
+		   AND S.MERID=:merId 
+		 #end
+		 #if( $goodsId && $goodsId!='' )
+		   AND S.GOODSID=:goodsId 
+		 #end
+		 #if( $gateId && $gateId!='' )
+		   AND S.GATEID=:gateId 
+		 #end
+		 #if( $category && $category!='' )
+		   AND G.CATEGORY LIKE '$category%' 
+		 #end
+		 #if( $serviceId && $serviceId!='' )
+		   AND (S.SERVICEID=:serviceId or S.SERVICEID1=:serviceId or S.SERVICEID2=:serviceId) 
+		 #end
+		 #if( $serviceName && $serviceName!='' )
+		   AND (S.SERVICENAME=:serviceName or S.SERVICENAME1=:serviceName or S.SERVICENAME2=:serviceName) 
+		 #end
+		 #if( $feeType && $feeType!='' )
+		   AND S.FEE_TYPE=:feeType 
+		 #end
+		 #if( $state && $state!='' )
+		   AND S.STATE=:state 
+		 #end
+		 ORDER BY S.MERID,S.GOODSID,S.GATEID,S.SERVICEID,S.SERVICEID1,S.SERVICEID2
+	  ]]>
+	</sql>
+</mapper> 

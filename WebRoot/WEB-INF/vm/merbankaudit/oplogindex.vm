@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css"/>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js?r=1"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/merbankoplog.js"></script>
+<script type="text/javascript">
+  var url="$request.contextPath/merbankoplog/query.do";
+  var exporturl="$request.contextPath/merbankoplog/export.do";
+    jQuery(document).ready(function() {
+      jQuery("#search_div").width(jQuery(window).width()-20);
+      jQuery('#grid').omGrid({
+            width:'100%',
+        	height : 455,
+            limit : 15,
+            singleSelect : false,
+            colModel : [ 
+            	{header : '修改类型', name : 'AUDITTYPE', align : 'left', width : 50,renderer:function(value , rowData , rowIndex){
+                 	var auditType = rowData.AUDITTYPE;
+                 	var name = "";
+                 	if (auditType=='1'){
+                 		name = "新增";
+                 	}else if (auditType=='3'){
+                 		name = "启用";
+                 	}else if (auditType=='4'){
+                 		name = "禁用";
+					}else{
+                 		name = "未知";
+				      }
+				   	return "<a title='"+name+"'>"+name+"</a>";
+                 }},
+                 {header : '商户号', name : 'MERID', align : 'left', width : 50,renderer:function(value , rowData , rowIndex){
+          				return "<a title='"+value+"'>"+value+"</a>";
+          	     }},
+                 {header : '商户名称', name : 'MERNAME', align : 'left', width : 90, renderer:function(value , rowData , rowIndex){
+		  				return "<a title='"+value+"'>"+value+"</a>";
+		  		 }},
+                 {header : '支付银行', name : 'BANKID', align : 'left', width : 100, renderer:function(value , rowData , rowIndex){
+                 	return rowData.BANKNAME+rowData.BANKID;
+                 }},
+                 {header : '提交人', name : 'CREATOR', align : 'left', width : 80,renderer:function(value , rowData , rowIndex){
+      				return "<a title='"+value+"'>"+value+"</a>";
+      			 }},
+                 {header : '提交时间', name : 'INTIME',align : 'left', width : 100,renderer:function(value , rowData , rowIndex){
+       				return "<a title='"+value+"'>"+value+"</a>";
+       			 }}
+              ],
+              autoFit : true
+        });
+        jQuery('#submitstart').omCalendar({
+			dateFormat:'yy-mm-dd',
+			maxDate: new Date(),
+			onSelect : function(date,event) {
+				var d = new Date(date);
+				d.setDate(d.getDate()-1);
+				jQuery('#submitend').omCalendar({minDate : d});
+			}
+		});
+		jQuery('#submitend').omCalendar({
+			dateFormat:'yy-mm-dd',
+			maxDate: new Date(),
+			onSelect : function(date,event) {
+				jQuery('#submitstart').omCalendar({maxDate : date});
+			}
+		});
+ 
+     	//获取提交人列表
+        jQuery('#creator').omCombo({
+               dataSource : '$request.contextPath/option/creatorlist.do',
+               width:'100px',
+               listMaxHeight:100,
+               emptyText:'全部 ' ,
+               listAutoWidth: true,
+               onSuccess:function(data, textStatus, event){
+      	  			var tmp = jQuery.parseJSON('{"value":"","text":"全部"}');
+      	  			data.unshift(tmp);
+         		},
+         		forceSelection : true,
+         		lazyLoad : true
+            });
+         jQuery('#merId').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+	            width: '100px',
+	            emptyText: '全部',
+	            forceSelection: true,
+	            listAutoWidth: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+        //初始化支付银行列表
+          jQuery('#bankId').omCombo({
+                dataSource : '$request.contextPath/option/xebanklist.do',
+                width:'100px',
+                listMaxHeight:100,
+                emptyText:'全部 ' ,
+                listAutoWidth: true,
+                onSuccess:function(data, textStatus, event){
+       	  			var tmp = jQuery.parseJSON('{"value":"","text":"全部"}');
+       	  			data.unshift(tmp);
+          		},
+          		forceSelection : true,
+         		lazyLoad : true
+           });
+   });
+</script>
+
+</head>
+<body>
+ <!--列表查询区-->
+ <div  id="search_div" style="padding-top:10px">
+ <div class="list_search">
+ 	<table width="100%" border="0">
+	   <tr>
+	    <td>
+	      <form id="form" action="" method="post"> 
+			<table width="100%" border="0">
+              <tr height="50">
+                <th width="4%">商户号：</th>
+		         <td width="8%"><input id="merId" name="merId" type="text" class="select1" /></td>
+		         <th width="6%">支付银行：</th>
+		         <td width="8%"><input id="bankId" name="bankId" class="select1"/></td>
+		         <th width="4%">提交人：</th>
+		         <td width="8%"><input id="creator" name="creator" class="select1" /> </td>
+		         <th width="6%">提交时间：</th>
+		         <td width="30%"><input id="submitstart" readonly="readonly" name="submitstart" class="input1"/>&nbsp;-&nbsp;<input id="submitend" name="submitend" readonly="readonly" class="input1"/></td>
+             </tr>
+            </table>
+	       </form> 
+	       </td>
+	        <td textalign="right"><input id="query" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"/></td>
+			 <td>
+	         <input type="image" value="导出" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="doexport();" /></td>
+	       </tr>
+        </table>
+    </div>
+   </div>
+   <!--列表区-->
+   <div align="center">
+       <table id="grid" align="left"></table>
+    </div>
+</body>
+</html>

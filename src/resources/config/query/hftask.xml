@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="hfTask">
+	<sql id="queryTaskInfo">
+	<![CDATA[
+		select
+		taskId,nextRunTime,taskRule,taskRuleDesc,state,platName,taskDesc,postUrl,isReTry,reTryTimes,reTryInterval,retTimeout,modUser
+		from umpay.T_HFTASK where 1 = 1
+			#if( $platName && $platName != '' ) 
+		    	 and platName = :platName
+		   	#end
+		   	#if( $taskDesc && $taskDesc != '' ) 
+		        and taskDesc like %$taskDesc%
+		   	#end
+		   	#if( $state && $state != -1 ) 
+		        and state = :state
+		   	#end
+		 order by modTime desc
+	]]>
+	</sql>
+	
+	<sql id="queryTaskMntInfo">
+	<![CDATA[
+		select 
+		taskRpid,taskId,state,sendType,errorTimes,to_char(planRunTime,'yyyy-mm-dd hh24:mi') as planRunTime,
+		to_char(taskRunTime,'yyyy-mm-dd hh24:mi') as taskRunTime,taskDesc,postUrl,isReTry,reTryTimes,modTime
+		from umpay.t_hftask_mnt
+		where 1=1
+			#if( $taskRpid && $taskRpid != '' ) 
+		    	 and taskRpid = :taskRpid
+		   	#end
+		   	#if( $taskId && $taskId != '' ) 
+		        and taskId = :taskId
+		   	#end
+		   	#if( $state && $state != -1 ) 
+		        and state = :state
+		   	#end
+		   	#if( $sendType && $sendType != -1 ) 
+		        and sendType = :sendType
+		   	#end
+		 order by modTime desc
+	]]>
+	</sql>
+	
+</mapper> 

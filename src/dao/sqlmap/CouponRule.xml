@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponRule">
+	<typeAlias alias="CouponRule" type="com.umpay.hfmng.model.CouponRule" />
+	<sql id="select_what">
+		select ruleId,
+		       auditUser,
+		       modTime,
+		       goodsSum,
+		       state,
+		       merId,
+		       goodsId,
+		       couponId,
+		       generateMethod,
+		       couponCodeType,
+		       saledSum,
+		       sellStartDate,
+		       sellEndDate,
+		       useStartDate,
+		       useEndDate,
+		       effType,
+		       effDays,
+		       price,
+		       submitUser,
+		       to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime,
+		       effWarnDays,
+		       switchAmt,
+		       alarmCount,
+		       alarmEmail,
+		       alarmMobile,
+		       ruletype,
+		       originalprice,
+		       export,
+		       consumetype,
+		       ismulti,
+		       istransfer
+		  from umpay.t_coupon_rule
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="couponId" prepend=" and ">
+				couponId = #couponId#
+			</isNotEmpty>
+			<isNotEmpty property="merId" prepend=" and ">
+				merId =	#merId#
+			</isNotEmpty>
+			<isNotEmpty property="goodsId" prepend=" and ">
+				goodsId = #goodsId#
+			</isNotEmpty>
+			<isNotEmpty property="state" prepend=" and ">
+				state = #state#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<sql id="key_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="ruleId" prepend=" and ">
+				ruleId=#ruleId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<statement id="get" resultClass="CouponRule">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+
+	<statement id="find" resultClass="CouponRule">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+
+	<statement id="find_count" resultClass="HashMap">
+		select count(*) as num from umpay.t_coupon_rule
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="insert" resultClass="CouponRule">
+		insert into umpay.t_coupon_rule
+		  (ruleId,
+		   modTime,
+		   goodSsum,
+		   state,
+		   merId,
+		   goodsId,
+		   couponId,
+		   generateMethod,
+		   couponcodeType,
+		   saledSum,
+		   effDays,
+		   inTime,
+		   effWarnDays,
+		   switchAmt,
+		   alarmCount,
+		   alarmEmail,
+		   alarmMobile
+		   <isNotEmpty property = "sellStartDate" prepend = " , " > sellStartDate </isNotEmpty>
+		   <isNotEmpty property = "sellEndDate" prepend = " , " > sellEndDate </isNotEmpty>
+		   <isNotEmpty property = "useStartDate" prepend = " , " > useStartDate </isNotEmpty>
+		   <isNotEmpty property = "useEndDate" prepend = " , " > useEndDate </isNotEmpty>
+		   <isNotEmpty property = "effType" prepend = " , " > effType </isNotEmpty>
+		   <isNotEmpty property = "submitUser" prepend = " , " > submitUser </isNotEmpty>
+		   <isNotEmpty property = "auditUser" prepend = " , " > auditUser </isNotEmpty>
+		   <isNotEmpty property = "price" prepend = " , " > price </isNotEmpty>
+		   <isNotEmpty property = "ruletype" prepend = " , " > ruletype </isNotEmpty>
+		   <isNotEmpty property = "originalprice" prepend = " , " > originalprice </isNotEmpty>
+		   <isNotEmpty property = "export" prepend = " , " > export </isNotEmpty>
+		   <isNotEmpty property = "consumetype" prepend = " , " > consumetype </isNotEmpty>
+		   <isNotEmpty property = "ismulti" prepend = " , " > ismulti </isNotEmpty>
+		   <isNotEmpty property = "istransfer" prepend = " , " > istransfer </isNotEmpty>)
+		values
+		  (#ruleId#,
+		   #modTime#,
+		   #goodsSum#,
+		   #state#,
+		   #merId#,
+		   #goodsId#,
+		   #couponId#,
+		   #generateMethod#,
+		   #couponCodeType#,
+		   #saledSum#,
+		   #effDays#,
+		   #inTime#,
+		   #effWarnDays#,
+		   #switchAmt#,
+		   #alarmCount#,
+		   #alarmEmail#,
+		   #alarmMobile#
+		   <isNotEmpty property = "sellStartDate" prepend = " , " > #sellStartDate# </isNotEmpty>
+		   <isNotEmpty property = "sellEndDate" prepend = " , " > #sellEndDate# </isNotEmpty>
+		   <isNotEmpty property = "useStartDate" prepend = " , " > #useStartDate# </isNotEmpty>
+		   <isNotEmpty property = "useEndDate" prepend = " , " > #useEndDate# </isNotEmpty>
+		   <isNotEmpty property = "effType" prepend = " , " > #effType# </isNotEmpty>
+		   <isNotEmpty property = "submitUser" prepend = " , " > #submitUser# </isNotEmpty>
+		   <isNotEmpty property = "auditUser" prepend = " , " > #auditUser# </isNotEmpty>
+		   <isNotEmpty property = "price" prepend = " , " > #price# </isNotEmpty>
+		   <isNotEmpty property = "ruletype" prepend = " , " > #ruletype# </isNotEmpty>
+		   <isNotEmpty property = "originalprice" prepend = " , " > #originalprice# </isNotEmpty>
+		   <isNotEmpty property = "export" prepend = " , " > #export# </isNotEmpty>
+		   <isNotEmpty property = "consumetype" prepend = " , " > #consumetype# </isNotEmpty>
+		   <isNotEmpty property = "ismulti" prepend = " , " > #ismulti# </isNotEmpty>
+		   <isNotEmpty property = "istransfer" prepend = " , " > #istransfer# </isNotEmpty>)
+	</statement>
+
+	<statement id="update" resultClass="integer">
+		update umpay.t_coupon_rule set ruleId=#ruleId#
+		<isNotEmpty property="goodsSum" prepend=" , ">
+			goodsSum=#goodsSum#
+			</isNotEmpty>
+		<isNotEmpty property="switchAmt" prepend=" , ">
+			switchAmt=#switchAmt#
+			</isNotEmpty>
+		<isNotEmpty property="alarmEmail" prepend=" , ">
+			alarmEmail=#alarmEmail#
+			</isNotEmpty>
+		<isNotEmpty property="alarmMobile" prepend=" , ">
+			alarmMobile=#alarmMobile#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , ">
+			state=#state#
+		</isNotEmpty>
+		<isNotEmpty property="effWarnDays" prepend=" , ">
+			effWarnDays=#effWarnDays#
+			</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , ">
+			useStartDate=#useStartDate#
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , ">
+			useEndDate=#useEndDate#
+			</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime=#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="submitUser" prepend=" , ">
+			submitUser=#submitUser#
+		</isNotEmpty>
+		<isNotEmpty property="saledSum" prepend=" , ">
+			saledSum=#saledSum#
+		</isNotEmpty>
+		<isNotEmpty property="export" prepend=" , ">
+			export=#export#
+		</isNotEmpty>
+		<isNotEmpty property = "consumetype" prepend = " , " > consumetype=#consumetype# </isNotEmpty>
+	    <isNotEmpty property = "ismulti" prepend = " , " > ismulti=#ismulti# </isNotEmpty>
+	    <isNotEmpty property = "istransfer" prepend = " , " > istransfer=#istransfer# </isNotEmpty>
+		where ruleId=#ruleId#
+	</statement>
+	
+	<statement id="updategoodssum" resultClass="integer">
+		update umpay.T_COUPON_RULE set ruleId=#ruleId#
+		<isNotEmpty property="goodsSum" prepend=" , ">
+			goodsSum=goodsSum+#goodsSum#
+			</isNotEmpty>
+		where ruleId=#ruleId#
+	</statement>
+	
+</sqlMap>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="stl">
+	<typeAlias alias="stl" type="com.umpay.hfmng.model.CouponMerSet" />
+	<statement id="getQW" resultClass="stl">
+SELECT
+	A.ACCID,
+	A.ACCNAME,
+	A.GOODSID,
+	BILLSUCCNUMM,
+	round(SUCCAMTM/100,2)     AS SUCCAMTM,
+	BILLSUCCAMTM/100          AS BILLSUCCAMTM,
+    round(BAD_BILL/100,2)  as BAD_BILL ,
+    round(UMP_INCOME/100,2)  as UMP_INCOME ,
+	CASE 
+		WHEN CMCCAMOUNT=0 
+		THEN 0 
+		ELSE round((MERSTLPAY /CMCCAMOUNT)*100,2) 
+	END ext3,
+	round(MERSTLAMT/100,2)    AS MERSTLAMT,
+	NBSMNUM,
+	round(NBSMAMT/100,2)      AS NBSMAMT,
+    PAYBACKNUM as PAYBACKNUM,
+	round(PAYBACKAMT/100,2)   AS PAYBACKAMT,
+    round(BALANCE_AMOUNT/100,2)   AS BALANCE_AMOUNT,
+	STLDATE,
+	round(CMCCSTLRATES*100,2) AS CMCCSTLRATES,
+	round(UMPSTLRATEM*100,2)  AS UMPSTLRATEM,
+	SETTSTATUS,
+	STATE,
+	merid,
+	stlcycle
+	  FROM UMPAY.T_COUPON_MERSET A
+	 WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.STLDATE = #stlDate#
+	   AND A.GOODSID = #goodsId#
+	   AND A.BILLTYPE = 1
+	   AND A.ISUSE = 2
+	   AND A.IS_SHOW = 2
+	   <isNotEmpty property="state" prepend=" and ">
+		A.state = #state#
+		</isNotEmpty>
+	</statement>
+	<statement id="getSW" resultClass="stl">
+	   select A.ACCID,
+       A.ACCNAME,
+       A.GOODSID,
+       BILLSUCCNUMM + SUCCNUMS as SUCCNUMS,
+       ROUND((BILLSUCCAMTM + SUCCAMTS)/100,2) as SUCCAMTS,
+       ROUND(MUTEAMT/100,2) as MUTEAMT,
+       ROUND(((CASE
+               WHEN (A.BILLSUCCAMTM + A.SUCCAMTS) = 0 THEN
+                0
+               ELSE
+                A.MERSTLPAY / (A.BILLSUCCAMTM + A.SUCCAMTS)
+             END) * 100),
+             2) as ext1,
+       NBSMNUM,
+       ROUND(NBSMAMT/100,2) as NBSMAMT,
+       ROUND(PAYBACKAMT/100,2) as PAYBACKAMT,
+       ROUND(MERSTLPAY/100,2) as MERSTLPAY,
+       STLDATE,
+       SETTSTATUS,
+       STATE,
+       merid,
+	   stlcycle
+	  FROM UMPAY.T_COUPON_MERSET A
+	  WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.STLDATE = #stlDate#
+	   AND A.GOODSID = #goodsId#
+	   AND A.BILLTYPE = 2
+	   AND A.ISUSE = 2 
+	   AND A.IS_SHOW = 2
+	   <isNotEmpty property="state" prepend=" and ">
+		A.state = #state#
+		</isNotEmpty>
+	</statement>
+	<statement id="getXE" resultClass="stl">
+	   select A.ACCID,
+       A.ACCNAME,
+       A.GOODSID,
+       CASE WHEN STLCYCLE=5 THEN ROUND((BILLSUCCAMTM + MUTEAMT)/100,2) ELSE 0 END as MUTEAMT,
+       CASE WHEN STLCYCLE=5 THEN ROUND(BILLSUCCAMTM/100,2) ELSE 0 END as BILLSUCCAMTM,
+       round((CASE
+         WHEN A.BILLSUCCAMTM = 0 THEN
+          0
+         ELSE
+          ((A.MERSTLPAY + A.NBSMAMT + A.PAYBACKAMT) / A.BILLSUCCAMTM)
+       END) * 100,2) as ext1,
+       NBSMNUM,
+       ROUND(NBSMAMT/100,2) as NBSMAMT,
+       ROUND(PAYBACKAMT/100,2) as PAYBACKAMT,
+       ROUND(MERSTLPAY/100,2) as MERSTLPAY,
+       STLDATE,
+       SETTSTATUS,
+       STATE,
+       merid,
+	   stlcycle
+	  FROM UMPAY.T_COUPON_MERSET A
+	 WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.STLDATE = #stlDate#
+	   AND A.GOODSID = #goodsId#
+	   AND A.BILLTYPE = 3
+	   AND A.ISUSE = 2
+	   AND A.IS_SHOW = 2
+	    <isNotEmpty property="state" prepend=" and ">
+		A.state = #state#
+		</isNotEmpty>
+	</statement>
+	<statement id="changeBillSettStatus" resultClass="stl">
+		update  UMPAY.T_COUPON_MERSET A SET A.SETTSTATUS=#settStatus#
+		 WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.GOODSID = #goodsId#
+	   AND A.STLDATE = #stlDate#
+	   AND A.BILLTYPE = #billType#
+	   AND A.ISUSE = 2
+	</statement>
+	
+	<statement id="updateStatus" resultClass="stl">
+		update UMPAY.T_COUPON_MERSET A SET A.SETTSTATUS=#settStatus#,MODTIME=CURRENT TIMESTAMP
+		<isNotEmpty property="state" prepend=" , "> a.state=#state#
+		</isNotEmpty>
+		 WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.STLDATE = #stlDate#
+	   AND A.GOODSID = #goodsId#
+	   AND A.BILLTYPE = #billType#
+	   AND A.ISUSE = 2
+	</statement>
+	
+	<statement id="updateIsvalid" resultClass="stl">
+		update UMPAY.T_COUPON_MERSET A SET A.is_valid=#is_valid#,MODTIME=CURRENT TIMESTAMP
+		 WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.STLDATE = #stlDate#
+	   AND A.GOODSID = #goodsId#
+	   AND A.BILLTYPE = #billType#
+	   AND A.ISUSE = 2
+	</statement>
+	
+	<statement id="update" resultClass="stl">
+		update  UMPAY.T_COUPON_MERSET a SET a.settStatus=#settStatus#,MODTIME=CURRENT TIMESTAMP
+		<isNotEmpty property="state" prepend=" , "> state=#state#
+		</isNotEmpty>
+		<isNotEmpty property="billSuccAmtm" prepend=" , "> billSuccAmtm=#billSuccAmtm#
+		</isNotEmpty>
+		<isNotEmpty property="billSuccNumm" prepend=" , "> billSuccNumm=#billSuccNumm#
+		</isNotEmpty>
+		<isNotEmpty property="cmccAmount" prepend=" , "> cmccAmount=#cmccAmount#
+		</isNotEmpty>
+		<isNotEmpty property="merStlAmt" prepend=" , "> merStlAmt=#merStlAmt#
+		</isNotEmpty>
+		<isNotEmpty property="merStlPay" prepend=" , "> merStlPay=#merStlPay#
+		</isNotEmpty>
+		<isNotEmpty property="moNum" prepend=" , "> moNum=#moNum#
+		</isNotEmpty>
+		<isNotEmpty property="mtNum" prepend=" , "> mtNum=#mtNum#
+		</isNotEmpty>
+		<isNotEmpty property="muteAmt" prepend=" , "> muteAmt=#muteAmt#
+		</isNotEmpty>
+		<isNotEmpty property="muteNum" prepend=" , "> muteNum=#muteNum#
+		</isNotEmpty>
+		<isNotEmpty property="nbsmAmt" prepend=" , "> nbsmAmt=#nbsmAmt#
+		</isNotEmpty>
+		<isNotEmpty property="nbsmNum" prepend=" , "> nbsmNum=#nbsmNum#
+		</isNotEmpty>
+		<isNotEmpty property="paybackAmt" prepend=" , "> paybackAmt=#paybackAmt#
+		</isNotEmpty>
+		<isNotEmpty property="paybackNum" prepend=" , "> paybackNum=#paybackNum#
+		</isNotEmpty>
+		<isNotEmpty property="shamAmt" prepend=" , "> shamAmt=#shamAmt#
+		</isNotEmpty>
+		<isNotEmpty property="shamNum" prepend=" , "> shamNum=#shamNum#
+		</isNotEmpty>
+		<isNotEmpty property="succAmtm" prepend=" , "> succAmtm=#succAmtm#
+		</isNotEmpty>
+		<isNotEmpty property="succAmts" prepend=" , "> succAmts=#succAmts#
+		</isNotEmpty>
+		<isNotEmpty property="succNumm" prepend=" , "> succNumm=#succNumm#
+		</isNotEmpty>
+		<isNotEmpty property="succNums" prepend=" , "> succNums=#succNums#
+		</isNotEmpty>
+		<isNotEmpty property="bad_bill" prepend=" , "> bad_bill=#bad_bill#
+		</isNotEmpty>
+		<isNotEmpty property="ump_income" prepend=" , "> ump_income=#ump_income#
+		</isNotEmpty>
+		<isNotEmpty property="balance_amount" prepend=" , "> balance_amount=#balance_amount#
+		</isNotEmpty>
+		 WHERE A.ACCID = #accId#
+	   AND A.STLCYCLE = #stlCycle#
+	   AND A.STLDATE = #stlDate#
+	   AND A.GOODSID = #goodsId#
+	   <isNotEmpty property="localFlag" prepend=" and ">
+		localFlag = #localFlag#
+		</isNotEmpty>
+	   AND A.BILLTYPE = #billType#
+	   AND A.ISUSE = 2
+	   AND A.STATE = 0
+	</statement>
+	
+	<statement id="updateStlStatus2payed" resultClass="integer">
+		<![CDATA[
+	   		UPDATE UMPAY.T_COUPON_MERSET SET SETTSTATUS = 4,MODTIME=CURRENT TIMESTAMP WHERE SETTSTATUS = 3 AND MODTIME <= #targetDate# AND ISUSE=2
+	    ]]>
+	</statement>
+	<statement id="updateStlStatus2paying" resultClass="integer">
+		<![CDATA[
+	   		UPDATE UMPAY.T_COUPON_MERSET A SET SETTSTATUS=3,MODTIME=CURRENT TIMESTAMP WHERE
+			  SETTSTATUS=2 AND ISUSE=2 
+			  AND EXISTS (SELECT 1 FROM
+			  	UMPAY.T_HS_COSTANALYZE B WHERE B.MERID=A.ACCID AND B.STLMONTH=A.STLDATE AND B.LOCALFLAG = A.LOCALFLAG 
+			  	AND B.TRANSTYPE = DECODE(A.BILLTYPE,1,'MV','XE') AND B.PAYFLAG=1 AND A.ISUSE=2)
+	    ]]>
+	</statement>
+</sqlMap>	

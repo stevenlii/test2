@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MerCnf">
+	<typeAlias alias="MerCnf" type="com.umpay.hfmng.model.MerCnf" />
+	
+	<sql id="select_what">
+		select mc.merId,mi.merName,mc.merGer,mc.version,mc.notifyMode,mc.notifyTimes,mc.expireTime,
+		mc.modUser,mc.spCardPay,mc.defBankType,mc.notifyMethod,mc.retMethod,mc.certName,mc.pageId,
+		mc.styleLevel,mc.defGateId,mc.modTime,mc.inTime
+		from umpay.t_mer_cnf mc
+		left join umpay.t_mer_inf mi on mi.merId=mc.merId
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="merId" prepend=" and ">mc.merId = #merId#</isNotEmpty>
+			<isNotEmpty	property="merName" prepend=" and ">mi.merName = #merName#</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="key_find">
+		 where mc.merId=#merId#
+	</sql>
+	
+	<statement id="Get" resultClass="MerCnf" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="MerCnf" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_mer_cnf mc inner join umpay.t_mer_inf mi on mi.merId=mc.merId
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="insertMerCnf" resultClass="MerCnf">
+		insert into umpay.t_mer_cnf(merId,merCert
+				<isNotEmpty	property="merGer" prepend=" , "> merGer </isNotEmpty>
+				<isNotEmpty	property="version" prepend=" , "> version </isNotEmpty>
+				<isNotEmpty	property="notifyMode" prepend=" , "> notifyMode </isNotEmpty>
+				<isNotEmpty	property="notifyTimes" prepend=" , "> notifyTimes </isNotEmpty>
+				<isNotEmpty	property="expireTime" prepend=" , "> expireTime </isNotEmpty>
+				<isNotEmpty	property="spCardPay" prepend=" , "> spCardPay </isNotEmpty>
+				<isNotEmpty	property="retMethod" prepend=" , "> retMethod </isNotEmpty>
+				<isNotEmpty	property="notifyMethod" prepend=" , "> notifyMethod </isNotEmpty>
+				<isNotEmpty	property="defBankType" prepend=" , "> defBankType </isNotEmpty>
+				<isNotEmpty	property="pageId" prepend=" , "> pageId </isNotEmpty>
+				<isNotEmpty	property="styleLevel" prepend=" , "> styleLevel </isNotEmpty>
+				<isNotEmpty	property="defGateId" prepend=" , "> defGateId </isNotEmpty>
+			) values(#merId#,#merCert#
+				<isNotEmpty	property="merGer" prepend=" , "> #merGer# </isNotEmpty>
+				<isNotEmpty	property="version" prepend=" , "> #version# </isNotEmpty>
+				<isNotEmpty	property="notifyMode" prepend=" , "> #notifyMode# </isNotEmpty>
+				<isNotEmpty	property="notifyTimes" prepend=" , "> #notifyTimes# </isNotEmpty>
+				<isNotEmpty	property="expireTime" prepend=" , "> #expireTime# </isNotEmpty>
+				<isNotEmpty	property="spCardPay" prepend=" , "> #spCardPay# </isNotEmpty>
+				<isNotEmpty	property="retMethod" prepend=" , "> #retMethod# </isNotEmpty>
+				<isNotEmpty	property="notifyMethod" prepend=" , "> #notifyMethod# </isNotEmpty>
+				<isNotEmpty	property="defBankType" prepend=" , "> #defBankType# </isNotEmpty>
+				<isNotEmpty	property="pageId" prepend=" , "> #pageId# </isNotEmpty>
+				<isNotEmpty	property="styleLevel" prepend=" , "> #styleLevel# </isNotEmpty>
+				<isNotEmpty	property="defGateId" prepend=" , "> #defGateId# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer" >
+		update  umpay.t_mer_cnf set modUser=#modUser#,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="merGer" prepend=" , ">merGer=#merGer#</isNotEmpty>
+			<isNotEmpty	property="version" prepend=" , ">version=#version#</isNotEmpty>
+			<isNotEmpty	property="notifyMode" prepend=" , ">notifyMode=#notifyMode#</isNotEmpty>
+			<isNotEmpty	property="expireTime" prepend=" , ">expireTime=#expireTime#</isNotEmpty>
+			<isNotEmpty	property="spCardPay" prepend=" , ">spCardPay=#spCardPay#</isNotEmpty>
+			<isNotEmpty	property="retMethod" prepend=" , ">retMethod=#retMethod#</isNotEmpty>
+			<isNotEmpty	property="notifyMethod" prepend=" , ">notifyMethod=#notifyMethod#</isNotEmpty>
+			<isNotEmpty	property="defBankType" prepend=" , ">defBankType=#defBankType#</isNotEmpty>
+			<isNotNull	property="pageId" prepend=" , ">pageId=#pageId#</isNotNull>
+			<isNotEmpty	property="styleLevel" prepend=" , ">styleLevel=#styleLevel#</isNotEmpty>
+			<isNotEmpty	property="defGateId" prepend=" , ">defGateId=#defGateId#</isNotEmpty>
+         where merId=#merId#  
+	</statement>
+	<statement id="updateCert" resultClass="integer">
+		update umpay.t_mer_cnf set certName=#certName#,merCert=#merCert#,modUser=#modUser#,modTime=CURRENT TIMESTAMP 
+		where merId=#merId# 
+	</statement>
+</sqlMap>

@@ -1,0 +1,20 @@
+.errorMsg {
+	background-position: 5px 50%;
+
+	text-align: left;
+	padding: 2px 2px 2px 5px;
+	border: 0px solid red;
+	width: 130px;
+	margin-top: -18px;
+	margin-left: 18px;
+	position: absolute;
+	border-radius: 4px;
+	display:none ;
+}
+.errorImg{
+    background: url("../images/invalid.png") no-repeat scroll 0 0 transparent;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    vertical-align: inherit;
+}

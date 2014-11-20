@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="couponcode">
+	<sql id="all">
+	<![CDATA[
+		select couponCode,
+		       merId,
+		       ci.channelname || '（' || rtrim(ci.channelid) || '）' as channel,
+		       goodsId,
+		       couponId,
+		       generateMethod,
+		       to_char(exchangeTime, 'yyyy-mm-dd hh24:mi:ss') as exchangeTime,
+		       state,
+		       couponCodeType,
+		       a.ruleId,
+		       batchid,
+		       price/100.0 as price,
+		       paidMobileId,
+		       a.orderId,
+		       to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime
+		  from umpay.T_COUPON_CODE a
+		  left join (select ruleId, generateMethod from umpay.T_COUPON_RULE) b 
+		    on a.ruleId = b.ruleId
+		  left join (select CHANNELID, CHANNELNAME from UMPAY.T_HF_CHNL_INF) ci  
+		    on a.channelid = ci.channelid 
+		 where 1= 1
+		 #if( $couponCode && $couponCode!='' )
+		 	and  couponCode = :couponCode
+		 #end
+		 #if( $paidMobileId && $paidMobileId!='' )
+		 	and  paidMobileId = :paidMobileId
+		 #end
+		 #if( $state && $state!='' )
+		 	and  state = :state
+		 #end
+		 #if( $couponId && $couponId!='' )
+		 	and  couponId = :couponId
+		 #end
+		 #if( $merId && $merId!='' )
+		 	and  merId = :merId
+		 #end
+		 #if( $goodsId && $goodsId!='' )
+		 	and  goodsId = :goodsId
+		 #end
+		 #if( $channelId && $channelId!='' )
+		 	and  a.channelid = :channelId
+		 #end
+		 order by inTime desc
+	]]>
+	</sql>
+
+</mapper> 

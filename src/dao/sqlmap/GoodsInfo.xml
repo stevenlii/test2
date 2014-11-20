@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="GoodsInfo">
+	<typeAlias alias="GoodsInfo" type="com.umpay.hfmng.model.GoodsInfo" />
+	<sql id="select_what">
+	
+	 select tgi.merid,tgi.goodsid,tgi.goodsname ,tgi.goodstype,tgi.servtype,tgi.pricemode,
+       tgi.pushinf,tgi.mtnum,tgi.cusphone,tgi.goodsdesc,tgi.state,tgi.intime,tgi.modtime,tgi.moduser,
+       tge.busiType,tge.addWay,tge.category,tge.amount
+        from umpay.t_goods_inf  tgi ,umpay.t_hfgoods_exp tge 
+	 where tgi.merId=tge.merId 
+		 and tgi.goodsId=tge.goodsId 
+			
+	
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="merId" prepend=" and ">
+				tgi.merId  = #merId#
+			</isNotEmpty>
+			<isNotEmpty	property="merName" prepend=" and ">
+				merName = #merName#
+			</isNotEmpty>
+			<isNotEmpty	property="goodsId" prepend=" and ">
+				goodsId = #goodsId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="key_find">
+		<dynamic prepend=" and  ">
+			<isNotEmpty	property="merId" prepend=" and ">
+				tgi.merId = #merId#
+			</isNotEmpty>			
+			<isNotEmpty	property="goodsId" prepend=" and ">
+				tgi.goodsId = #goodsId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<statement id="Get" resultClass="GoodsInfo" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="GetMon" resultClass="GoodsInfo" >
+		select merid,goodsid,servmonth,conmode,interval,depagenttype,depbank,depserv
+		 from umpay.t_mon_goods  
+		<dynamic prepend=" where  ">
+			<isNotEmpty	property="merId" prepend=" and ">
+				merId = #merId#
+			</isNotEmpty>			
+			<isNotEmpty	property="goodsId" prepend=" and ">
+				goodsId = #goodsId#
+			</isNotEmpty>
+			</dynamic>
+	</statement>
+	<statement id="Find" resultClass="GoodsInfo" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_goods_inf
+		<include refid="where_find" />
+	</statement>
+	<statement id="updateGoodsLock" resultClass="integer">
+	   update umpay.t_hfgoods_exp set modLock=#modLock#,modTime=CURRENT TIMESTAMP 
+	   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where merId=#merId# and goodsId=#goodsId#
+	</statement>
+	<statement id="updateGoodsCusPhone" resultClass="integer">
+		update umpay.t_goods_inf set cusPhone=#cusPhone#,modTime=CURRENT TIMESTAMP 
+		<isNotEmpty	property="modUser" prepend=" , ">
+				modUser=#modUser#
+		</isNotEmpty>
+		where merId=#merId# and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="insertGoodsExp" resultClass="GoodsInfo">
+		insert into umpay.t_hfgoods_exp(merId, goodsId, modLock
+				<isNotEmpty	property="busiType" prepend=" , "> busiType </isNotEmpty>
+				<isNotEmpty	property="addWay" prepend=" , "> addWay </isNotEmpty>
+				<isNotEmpty	property="category" prepend=" , "> category </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , "> amount </isNotEmpty>
+			) values(#merId#, #goodsId#, 0
+				<isNotEmpty	property="busiType" prepend=" , "> #busiType# </isNotEmpty>
+				<isNotEmpty	property="addWay" prepend=" , "> #addWay# </isNotEmpty>
+				<isNotEmpty	property="category" prepend=" , "> #category# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , "> #amount# </isNotEmpty>
+			)
+	</statement>
+	<statement id="insertMonGoods" resultClass="GoodsInfo">
+		insert into umpay.t_mon_goods(merId, goodsId 
+				<isNotEmpty	property="servMonth" prepend=" , "> servMonth </isNotEmpty>
+				<isNotEmpty	property="conMode" prepend=" , "> conMode </isNotEmpty>
+				<isNotEmpty	property="interval" prepend=" , "> interval </isNotEmpty>
+			) values(#merId#, #goodsId# 
+				<isNotEmpty	property="servMonth" prepend=" , "> #servMonth# </isNotEmpty>
+				<isNotEmpty	property="conMode" prepend=" , "> #conMode# </isNotEmpty>
+				<isNotEmpty	property="interval" prepend=" , "> #interval# </isNotEmpty>
+			)
+	</statement>
+	<statement id="insertGoodsInf" resultClass="GoodsInfo">
+		insert into umpay.t_goods_inf(merId, goodsId, state 
+				<isNotEmpty	property="goodsName" prepend=" , "> goodsName </isNotEmpty>
+				<isNotEmpty	property="goodsType" prepend=" , "> goodsType </isNotEmpty>
+				<isNotEmpty	property="servType" prepend=" , "> servType </isNotEmpty>
+				<isNotEmpty	property="pushInf" prepend=" , "> pushInf </isNotEmpty>
+				<isNotEmpty	property="mtNum" prepend=" , "> mtNum </isNotEmpty>
+				<isNotEmpty	property="cusPhone" prepend=" , "> cusPhone </isNotEmpty>
+				<isNotEmpty	property="goodsDesc" prepend=" , "> goodsDesc </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+				<isNotEmpty	property="priceMode" prepend=" , "> priceMode </isNotEmpty>
+			) values(#merId#, #goodsId#, 2  
+				<isNotEmpty	property="goodsName" prepend=" , "> #goodsName# </isNotEmpty>
+				<isNotEmpty	property="goodsType" prepend=" , "> #goodsType# </isNotEmpty>
+				<isNotEmpty	property="servType" prepend=" , "> #servType# </isNotEmpty>
+				<isNotEmpty	property="pushInf" prepend=" , "> #pushInf# </isNotEmpty>
+				<isNotEmpty	property="mtNum" prepend=" , "> #mtNum# </isNotEmpty>
+				<isNotEmpty	property="cusPhone" prepend=" , "> #cusPhone# </isNotEmpty>
+				<isNotEmpty	property="goodsDesc" prepend=" , "> #goodsDesc# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+				<isNotEmpty	property="priceMode" prepend=" , "> #priceMode# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="updateGoodsExp" resultClass="GoodsInfo">
+		update umpay.t_hfgoods_exp set modLock=0,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="busiType" prepend=" , "> busiType=#busiType# </isNotEmpty>
+			<isNotEmpty	property="addWay" prepend=" , "> addWay=#addWay# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+			<isNotEmpty	property="category" prepend=" , "> category=#category# </isNotEmpty>
+			<isNotEmpty	property="amount" prepend=" , "> amount=#amount# </isNotEmpty>
+		 where merId=#merId# and goodsId=#goodsId#
+	</statement>
+	<statement id="updateMonGoods" resultClass="GoodsInfo">
+		update umpay.t_mon_goods 
+		<dynamic prepend=" set ">
+			<isNotEmpty	property="servMonth" prepend=" , "> servMonth=#servMonth# </isNotEmpty>
+			<isNotEmpty	property="conMode" prepend=" , "> conMode=#conMode# </isNotEmpty>
+			<isNotEmpty	property="interval" prepend=" , "> interval=#interval# </isNotEmpty>
+		</dynamic>
+		 where merId=#merId# and goodsId=#goodsId#
+	</statement>
+	<statement id="updateGoodsInf" resultClass="GoodsInfo">
+		update umpay.t_goods_inf set modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="goodsName" prepend=" , "> goodsName=#goodsName# </isNotEmpty>
+			<isNotEmpty	property="goodsType" prepend=" , "> goodsType=#goodsType# </isNotEmpty>
+			<isNotEmpty	property="servType" prepend=" , "> servType=#servType# </isNotEmpty>
+			<isNotEmpty	property="priceMode" prepend=" , "> priceMode=#priceMode# </isNotEmpty>
+			<isNotEmpty	property="pushInf" prepend=" , "> pushInf=#pushInf# </isNotEmpty>
+			<isNotEmpty	property="mtNum" prepend=" , "> mtNum=#mtNum# </isNotEmpty>
+			<isNotEmpty	property="cusPhone" prepend=" , "> cusPhone=#cusPhone# </isNotEmpty>
+			<isNotEmpty	property="goodsDesc" prepend=" , "> goodsDesc=#goodsDesc# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where merId=#merId# and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="isOrNotAble" resultClass="GoodsInfo">
+		update umpay.t_goods_inf set state=#state#,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		where merId=#merId# and goodsId=#goodsId#
+	</statement>
+	<statement id="checkFromTgoods" resultClass="GoodsInfo">
+	   select goodsId from umpay.t_goods_inf where  1=1
+	  <isNotEmpty	property="goodsId" prepend=" and ">
+				goodsId=#goodsId#
+			</isNotEmpty>	
+			<isNotEmpty	property="merId" prepend=" and ">
+				merId=#merId#
+			</isNotEmpty>
+	</statement>
+	<!--  根据商户号查商品号-->
+		<statement id="GetGoodsByMerId" resultClass="GoodsInfo">
+	   select tge.goodsId from  umpay.t_hfgoods_exp tge 
+	           where 1=1
+			<isNotEmpty	property="merId" prepend=" and ">
+				tge.merId=#merId#
+			</isNotEmpty>
+	</statement>
+	
+	<statement id="loadGoodsInf" resultClass="GoodsInfo">
+		select merId,goodsId,goodsName,goodsType,servType,priceMode,
+		pushInf,mtNum,cusPhone,goodsDesc,modUser from UMPAY.t_goods_inf where merId=#merId#
+	</statement>
+	<statement id="loadGoodsExp" resultClass="GoodsInfo">
+		select merId,goodsId from UMPAY.t_hfgoods_exp where merId=#merId#
+	</statement>
+	<statement id="getChannelGoodsInfo" resultClass="GoodsInfo">
+       select t.goodsid,t.goodsname from umpay.t_goods_inf t where t.goodsid in(
+        select goodsid from umpay.T_HF_CHNL_GOODS where channelid=#channelid# and merid=#merid#
+       )
+	</statement>
+</sqlMap>

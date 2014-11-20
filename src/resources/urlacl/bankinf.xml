@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 支付服务商管理 -->
+<Options>
+ <!-- 查询权限 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/bankinf/query.do</url>
+	</Option>
+	<!-- 添加操作 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/bankinf/add.do</url>
+	</Option>
+	<!-- 启用操作 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/bankinf/enable.do</url>
+	</Option>
+	<!-- 禁用操作 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/bankinf/disable.do</url>
+	</Option>
+	<!-- 修改权限 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/bankinf/modify.do</url>
+	</Option>
+	
+</Options>

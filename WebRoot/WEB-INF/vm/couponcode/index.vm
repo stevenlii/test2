@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/couponcode.js"></script>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function() {
+		
+		//初始化兑换码状态列表
+        $('#state').omCombo({
+            dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponCodeStates',
+            width: '145px',
+            emptyText: '全部',
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+	
+		//初始化兑换券列表
+        $('#couponId').omCombo({
+            dataSource: '$request.contextPath/option/couponinflist.do',
+            width: '145px',
+            emptyText: '全部',
+            forceSelection: true,
+            filterStrategy : 'anywhere',
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+		$('#channel').omCombo({
+            dataSource: '$request.contextPath/option/channelinflist.do',
+            width: '145px',
+            emptyText: '全部',
+			forceSelection: true,
+			onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+		//初始化商户列表
+        $('#merId').omCombo({
+            dataSource: '$request.contextPath/option/couponmerinflist.do',
+            width: '150px',
+            emptyText: '全部',
+			listAutoWidth: true,
+			onValueChange: function(target, newValue, oldValue, event) {
+				var merId = $('#merId').omCombo('value');
+                // 连级更新商品列表
+				$('#goodsId').omCombo({
+                    dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+                    emptyText: '全部',
+        			listAutoWidth: true,
+        			forceSelection: true,
+        			onSuccess:function(data, textStatus, event){
+        		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+        		      	  data.unshift(tmp);
+        	   		}
+                });
+            },
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+	
+		//初始化商品列表
+        $('#goodsId').omCombo({
+            dataSource: [],
+            width: '145px',
+            emptyText: '全部',
+			listAutoWidth: true,
+			forceSelection: true,
+			onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });	
+	
+	
+        jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/couponcode/query.do?queryKey=couponcode.all",
+			method: 'POST',
+            width: '100%',
+            height: 440,
+            limit: 15,
+            colModel: [
+			{
+			    header: '操作',
+			    name: 'opt',
+			    width: 60,
+			    align: 'left',
+			    renderer: function(value, rowData, rowIndex) {
+			    	var result = "<img title='详情' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetailDialog(\"" + rowData.MERID + "\",\"" + rowData.COUPONCODE + "\")' />";
+			    	if( rowData.STATE == '2' ){
+						// 当兑换码状态为【已支付】时才能进行 补发/注销 操作
+						result += "&nbsp;&nbsp;<img title='补发' src='${request.contextPath}/profile/default/images/toggle_down_light.png' onclick='regive(\"" + rowData.MERID + "\",\"" + rowData.COUPONCODE + "\",\"" + rowData.ORDERID + "\",\"" + rowData.PAIDMOBILEID + "\",\"" + "umpay.T_COUPON_ORDER" + "\",\"" + "1" + "\")' />";
+						result += "&nbsp;&nbsp;<img title='注销' src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='cancel(\"" + rowData.MERID + "\",\"" + rowData.COUPONCODE + "\",\"" + rowData.ORDERID + "\",\"" + rowData.PAIDMOBILEID + "\",\"" + "umpay.T_COUPON_ORDER" + "\",\"" + "0" + "\")' />";
+					}else{
+						result += "&nbsp;&nbsp;<img title='补发' src='${request.contextPath}/profile/default/images/toggle_down_light1.png' />";
+						result += "&nbsp;&nbsp;<img title='注销' src='${request.contextPath}/profile/default/images/tool_Disable1.png' />";
+					}
+			    	result += "&nbsp;&nbsp;<img title='有效期' style='display:none' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='showModifyDialog(\"" + rowData.MERID + "\",\"" + rowData.COUPONCODE + "\")' />";
+			    	return result;
+			    }
+			},
+			{
+			    header: '手机号',
+			    name: 'paidMobileId',
+			    width: 80,
+			    align: 'left',
+			    renderer: function(value, rowData, rowIndex) {
+			    	return "<a title='" + rowData.PAIDMOBILEID + "'>" + rowData.PAIDMOBILEID + "</a>";
+			    }
+			},
+            {
+                header: '兑换码',
+                name: 'couponCode',
+                width: 100,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.COUPONCODE + "'>" + rowData.COUPONCODE + "</a>";
+                }
+            },
+            {
+                header: '兑换券',
+                name: 'coupon',
+                width: 155,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.COUPONID + "'>" + rowData.COUPONNAME + "（" + rowData.COUPONID + "）" + "</a>";
+                }
+            },
+            {
+                header: '渠道',
+                name: 'channel',
+                width: 150,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.CHANNEL + "'>" + rowData.CHANNEL + "</a>";
+                }
+            },
+            {
+                header: '商户',
+                name: 'mer',
+                width: 130,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.MERID + "'>" + rowData.MERNAME + "（" + rowData.MERID + "）" + "</a>";
+                }
+            },
+            {
+                header: '商品',
+                name: 'goods',
+                width: 164,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.GOODSID + "'>" + rowData.GOODSNAME + "（" + rowData.GOODSID + "）" + "</a>";
+                }
+            },
+            {
+                header: '兑换码状态',
+                name: 'state',
+                width: 80,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.STATENAME + "'>" + rowData.STATENAME + "</a>";
+                }
+            }]
+        });
+
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+		
+		jQuery('#dataform').submit(function() {
+			if (!jQuery("#dataform").valid()) 
+				return false;
+			jQuery(this).omAjaxSubmit({success:function(res){
+		      showSimpleTip(res);
+				close();
+			}
+			});
+			
+			return false; 
+		});
+	});
+</script>
+</head>
+<body>
+   <!--列表查询区-->
+   <div class="list_search" style="height: 80px;">
+   <table width="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+		  <tr><td>&nbsp;</td></tr>
+          <tr>
+           <th width="5%" height="30">兑换码：</th>
+             <td width="13%"><input id="couponCode" name="couponCode" type="text" class="input2" style="width:145px" maxlength="12"/></td>
+		   <th width="5%" height="30">手机号：</th>
+			 <td width="13%"><input id="paidMobileId" name="paidMobileId" class="input2" maxlength="11"/></td>
+           <th width="6%">兑换码状态：</th>
+             <td width="13%"><input id="state" name="state" /></td>
+             <th width="3%">渠道：</th>
+             <td width="13%"><input id="channel" name="channel"/></td>
+         </tr>
+		 <tr>
+		   <th>兑换券：</th>
+			 <td><input id="couponId" name="couponId" /></td>
+		   <th>商&nbsp;&nbsp;户：</th>
+             <td><input id="merId" name="merId" /></td>
+		   <th>商&nbsp;&nbsp;品：</th>
+             <td><input id="goodsId" name="goodsId" />
+            </td>
+           <th width="3%"></th>
+             <td width="13%"></td>
+		 </tr>
+        </table>
+         </form> 
+    </td>
+    <td>
+		<input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"  />
+    	&nbsp;
+		<input name="导出" type="image"  value="ee" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="exportCouponCode()"/>
+    </td>
+   </tr>
+   </table>
+  </div>
+  
+  <!-- 列表查询区 -->
+  <div align="center">
+	<table  align="left" id="grid" ></table>
+  </div>
+  
+ <div id="dialog">
+	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+
+</body>
+</html>

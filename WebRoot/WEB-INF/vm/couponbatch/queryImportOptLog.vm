@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>兑换码批量导入操作日志查询</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+	
+	$(document).ready(function(){
+		//初始化兑换券审核状态列表
+		$('#logopttype').omCombo({
+		    dataSource: '$request.contextPath/option/couponlogopttypelist.do',
+		    width: '155px',
+		    emptyText: '全部',
+		    forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+		});
+		//初始化商户列表
+        $('#merId').omCombo({
+            dataSource: '$request.contextPath/option/couponmerinflist.do',
+            width: '155px',
+            emptyText: '全部',
+			listAutoWidth: true,
+			onValueChange: function(target, newValue, oldValue, event) {
+				var merId = $('#merId').omCombo('value');
+                // 连级更新商品列表
+				$('#goodsId').omCombo({
+                    dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+					forceSelection: true
+                });
+            },
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+	      //初始化商品列表
+	        $('#goodsId').omCombo({
+	            dataSource: [],
+	            width: '155px',
+	            emptyText: '全部',
+				listAutoWidth: true,
+				forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+	        });
+
+		jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/couponrule/querylog.do?queryKey=couponbatch.queryimportoptlog",
+            width: '100%',
+            height: 456,
+            limit: 15,
+            colModel: [
+				{
+				    header: '商户',
+				    name: 'MERID',
+				    width: 120,
+				    align: 'center',
+				    renderer: function(value, rowData, rowIndex) {
+						return "<a title='" + rowData.MERID + "'>" + rowData.MERNAME + "（" + rowData.MERID + "）</a>";
+                	}
+				},
+				{
+				    header: '商品',
+				    name: 'GOODSID',
+				    width: 120,
+				    align: 'center',
+				    renderer: function(value, rowData, rowIndex) {
+						return "<a title='" + rowData.GOODSID + "'>" + rowData.GOODSNAME + "（" + rowData.GOODSID + "）</a>";
+                	}
+				},
+             	{
+                header: '兑换券',
+                name: 'couponId',
+                width: 120,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.COUPONID + "'>" + rowData.COUPONNAME + "（" + rowData.COUPONID + "）</a>";
+            	}
+            },
+            {
+                header: '批次',
+                name: 'batchName',
+                width: 60,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+						return rowData.BATCHNAME;
+                }
+            },
+            {
+                header: '操作日志',
+                name: 'OPERDATA',
+                width: 270,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+						return "<a title='"+rowData.OPERDATA+"'>" + rowData.OPERDATA + "</a>";
+                }
+            },
+            {
+                header: '操作人',
+                name: 'MODUSER',
+                width: 40,
+                align: 'center'
+            },
+            {
+                header: '操作日期',
+                name: 'INTIME',
+                width: 80,
+                align: 'center'
+            }],
+            autoFit: true
+        });
+
+	});
+
+	function queryLog(){
+		var couponId = jQuery('#couponId').val();
+		var merId = jQuery('#merId').val();
+		var goodsId = jQuery('#goodsId').val();
+		var moduser = jQuery("#moduser").val();
+		var logopttype= jQuery("#logopttype").val();
+		var key = "queryimportlog.do?queryKey=couponbatch.queryimportoptlog";
+		if (couponId != "") {
+			key = key + '&couponId=' + encodeURI(couponId);
+		}
+		if (merId != "") {
+			key = key + '&merId=' + encodeURI(merId);
+		}
+		if (goodsId != "") {
+			key = key + '&goodsId=' + encodeURI(goodsId);
+		}
+		$('#grid').omGrid("setData", key);
+	}
+	
+</script>
+</head>
+<body>
+   <!--列表查询区-->
+   <div class="list_search" style="height: 40px;">
+   <table width="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr height="50">
+            <th width="10%" >兑换券编号：</th>
+              <td><input id="couponId" name="couponId" class="input2" /></td>
+           <th width="10%" >商户：</th>
+              <td><input id="merId" name="merId" /></td>
+           <th width="10%" >商品：</th>
+              <td><input id="goodsId" name="goodsId" /></td>
+          </tr>
+        </table>
+         </form> 
+       </td>
+        <td rowspan="2">
+			<input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryLog()"  />
+        </td>
+       </tr>
+        </table>
+      </div>
+    
+ <!--列表查询区-->
+
+  <div align="center">
+         <table  align="left" id="grid" ></table>
+     </div>
+    
+  
+ <div id="dialog">
+	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/chnlaudit.js"></script>
+<script>
+jQuery(document).ready(function() {
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+});
+//渠道审核通过
+function goPass1(id){
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	var flag = confirm("确认审核通过此信息？");
+	if (flag){
+		$.ajax({
+			url : '$request.contextPath/chnlaudit/chnlAuditPass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'id' : id,
+					'resultDesc' : resultDesc
+			},
+			success : function(data){
+					closeDialog();
+					window.parent.shuaxin();
+					window.parent.showSimpleTip(data);
+			}
+		});
+	}
+}
+
+</script>
+</head>
+<body>
+<!--新增或启用/禁用渠道审核详情页面-->
+<form id ="dataform-add" method="post" name="dataform-add">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0" width="100%" >
+		<tr>
+		    <th width="115">渠道编号：</th>
+			<td class="td" colspan="2">${newChnl.channelId}</td>
+		</tr>
+		<tr>
+		    <th >渠道名称：</th>
+			<td class="td1" colspan="2">$!{newChnl.channelName}</td>
+		</tr>
+		<tr>
+		    <th width="115">运营负责人：</th>
+			<td class="td" colspan="2">$!{newChnl.service_user}</td>
+		</tr>
+		<tr>
+		    <th>联系人：</th>
+			<td class="td1">$!{newChnl.contact}</td>
+			#if(${auditType}==3)
+				<td width="40%" class="td" rowspan="2"><h2>禁用-><span style="color:red">启用</span><h2></td>
+			#elseif(${auditType}==4)
+				<td width="40%" class="td" rowspan="2"><h2>启用-><span style="color:red">禁用</span><h2></td>
+			#else
+				<td class="td"></td>
+			#end
+		</tr>
+		<tr>
+		    <th>联系电话：</th>
+			<td class="td">$!{newChnl.linkTel}</td>
+			#if(${auditType}==1)
+				<td class="td1"></td>
+			#else
+			#end
+		</tr>
+		<tr>
+		    <th>电子邮件：</th>
+			<td class="td1" colspan="2">$!{newChnl.email}</td>
+		</tr>
+		<tr>
+			<td height="63" colspan="3" align="left" valign="bottom"><textarea id="resultDesc" name="resultDesc" rows="3" style="{width:100%;}"></textarea></td>
+		</tr>
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" value="通过" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goPass1($auditId)"/>
+	   <input type="button" value="不通过" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goNotPass($auditId)"/>
+	   <input type="button" value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog(0)" />
+	 </div>
+</form>
+</body>
+</html>

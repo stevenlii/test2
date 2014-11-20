@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponMerTel">
+	<typeAlias alias="CouponMerTel" type="com.umpay.hfmng.model.CouponMerTel" />
+	<statement id="insert" resultClass="CouponMerTel">
+		insert into umpay.T_COUPON_MERTEL(merTelId
+			<isNotEmpty property="merId" prepend=" , "> merId	</isNotEmpty>
+			<isNotEmpty property="modTime" prepend=" , "> modTime </isNotEmpty>
+			<isNotEmpty property="linkTel" prepend=" , "> linkTel </isNotEmpty>
+			<isNotEqual property="exchangeType" prepend=" , " compareValue="-99"> exchangeType </isNotEqual>
+			<isNotEmpty property="remark" prepend=" , "> remark	</isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" , "> modUser </isNotEmpty>
+			<isNotEqual property="state" prepend=" , " compareValue="-99"> state </isNotEqual>
+			<isNotEmpty property="inTime" prepend=" , "> inTime	</isNotEmpty>)
+		values(#merTelId#
+			<isNotEmpty property="merId" prepend=" , "> #merId# </isNotEmpty>
+			<isNotEmpty property="modTime" prepend=" , "> #modTime# </isNotEmpty>
+			<isNotEmpty property="linkTel" prepend=" , "> #linkTel# </isNotEmpty>
+			<isNotEqual property="exchangeType" prepend=" , " compareValue="-99"> #exchangeType# </isNotEqual>
+			<isNotEmpty property="remark" prepend=" , "> #remark# </isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			<isNotEqual property="state" prepend=" , " compareValue="-99"> #state# </isNotEqual>
+			<isNotEmpty property="inTime" prepend=" , "> #inTime# </isNotEmpty>)
+	</statement>
+
+	<statement id="get" resultClass="CouponMerTel">
+		select merTelId,
+		       merId,
+		       linkTel,
+		       exchangeType,
+		       remark,
+		       state,
+		       modUser,
+		       modTime,
+		       inTime
+		  from umpay.T_COUPON_MERTEL
+		 where merTelId = #merTelId#
+	</statement>
+
+	<statement id="update" resultClass="integer">
+		update umpay.T_COUPON_MERTEL set merTelId=#merTelId#
+			<isNotEmpty property="merId" prepend=" , "> ruleId=#merId# </isNotEmpty>
+			<isNotEmpty property="modTime" prepend=" , "> modTime=#modTime# </isNotEmpty>
+			<isNotEmpty property="linkTel" prepend=" , "> linkTel=#linkTel# </isNotEmpty>
+			<isNotEqual property="exchangeType" prepend=" , " compareValue="-99"> exchangeType=#exchangeType# </isNotEqual>
+			<isNotEmpty property="remark" prepend=" , "> remark=#remark# </isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+			<isNotEqual property="state" prepend=" , " compareValue="-99"> state=#state# </isNotEqual>
+			<isNotEmpty property="inTime" prepend=" , "> inTime=#inTime# </isNotEmpty>
+		where merTelId=#merTelId#
+	</statement>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="merId" prepend=" and ">
+				merId =	#merId#
+			</isNotEmpty>
+			<isNotEmpty property="linkTel" prepend=" and ">
+				linkTel = #linkTel#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<statement id="find_count" resultClass="HashMap">
+		select count(*) as num from umpay.T_COUPON_MERTEL
+		<include refid="where_find" />
+	</statement>
+
+</sqlMap>

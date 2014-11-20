@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="hnsyntask"  >
+	<sql id="hnsyncbatch"> 
+	<![CDATA[
+		select taskid,tasktype,creator,synstate,synresult,resultdesc,intime,modtime,moduser from umpay.T_SYNTASK 
+		where (tasktype=4 or tasktype=5) 
+         #if( $taskType && $taskType!='' ) 
+		   and  taskType= :taskType   
+		 #end 
+		 #if( $synState && $synState!='' ) 
+		   and synState = :synState   
+		 #end 
+		 #if( $synResult && $synResult!='' ) 
+		   and  synResult = :synResult   
+		 #end 
+		 order by intime desc
+	  ]]>
+	</sql>
+</mapper> 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="merbusiconf"  >
+	<sql id="allBusiConf"> 
+	<![CDATA[
+		 SELECT c.MER_ID MERID,i.MERNAME,e.BUSI_ATTR BUSITYPE,c.BIZ_TYPE BIZTYPE,c.STATE,c.ADD_USER_ID CREATOR,c.MOD_USER_ID MODUSER,
+		 	c.UPDT_TIME MODTIME,c.IN_TIME INTIME,c.MOD_LOCK MODLOCK
+		 FROM UMPAY.T_MERBUSI_CONF c 
+		 INNER JOIN UMPAY.T_MER_INF i ON i.MERID=c.MER_ID 
+		 INNER JOIN UMPAY.T_HFMER_EXP e ON e.MERID=c.MER_ID
+		 WHERE 1=1 
+		 #if( $merId && $merId!='' )
+		   AND c.MER_ID=:merId 
+		 #end
+		 #if( $merName && $merName!='' ) 
+		   and  i.merName like '%$merName%'   
+		 #end 
+		 #if( $busiType && $busiType!='' ) 
+		   AND e.BUSI_ATTR=:busiType 
+		 #end 
+		 #if( $bizType && $bizType!='' ) 
+		   AND c.BIZ_TYPE=:bizType 
+		 #end 
+		 #if( $state && $state!='' ) 
+		   AND c.STATE=:state 
+		 #end 
+		 #if( $modUser && $modUser!='' ) 
+		   AND c.MOD_USER_ID=:modUser 
+		 #end
+		 ORDER BY MODTIME DESC
+	  ]]>
+	</sql>
+	
+	<sql id="allAudit"> 
+	<![CDATA[
+		 select id,tableName,ixdata,ixdata2,moddata,auditType,state,creator,modTime,modUser,
+		 resultDesc,inTime from umpay.t_hfaudit where tableName='UMPAY.T_MERBUSI_CONF' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  ixdata = :ixData   
+		 #end
+		 #if( $state && $state != '' ) 
+		   and  state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  auditType = :auditType 
+		 #end
+		 #if( $ixData2 && $ixData2 != '' ) 
+		   and  ixData2 = :ixData2 
+		 #end
+		 order by intime desc
+	  ]]>
+	</sql>
+</mapper> 

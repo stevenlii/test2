@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+    <script src="$request.contextPath/js/ui/jquery.min.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/couponstats.js"></script>
+ 	<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/couponstats/coupongetherStats.do?queryKey=stats.coupongetherStats";
+        jQuery(document).ready(function() {
+        	//jQuery("#search_div").width(jQuery(window).width());
+          	jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/couponstats/couponmergatherStats.do?queryKey=stats.couponMerGatherStats",
+                width:'100%',
+                height : 474,
+                limit : 15,
+				title : '统 计 信 息 列 表',
+				errorMsg : '取数据出错',
+				loadingMsg : '正在加载数据, 请稍后...',
+				emptyMsg : '没有数据',
+                autoFit : true,
+                colModel : [ 
+    				 {header : '商户编号', name : 'MERID',width : 60, align : 'center'}, 
+                     {header : '商户名称', name : 'MERNAME',width : 250, align : 'center' },
+                     {header : '售出数量', name : 'SALEDNUM', width : 60, align : 'center' },
+                     {header : '售出总金额 (元)', name : 'SALEDSUM', width : 60, align : 'right',
+							 renderer: function(value, rowData, rowIndex) {
+        							 var val = rowData.SALEDSUM + "";
+        							 var index = val.indexOf(".");
+        							 if(index > 0){
+        							 	var sub = val.substring(index + 1);
+        								if(sub.length < 2){
+        									return val + "0&nbsp;&nbsp;";
+        								}
+        							 	return val + "&nbsp;&nbsp;";
+        							 }
+        							 return rowData.SALEDSUM + ".00&nbsp;&nbsp;";
+        		                }
+	                 },
+                     {header : '兑换数量', name : 'EXCHANGEDNUM', width : 60, align : 'center' },
+    				 {header : '兑换总金额 (元)', name : 'EXCHANGEDSUM', width : 60, align : 'right',
+							 renderer: function(value, rowData, rowIndex) {
+            							 var val = rowData.EXCHANGEDSUM + "";
+            							 var index = val.indexOf(".");
+            							 if(index > 0){
+            							 	var sub = val.substring(index + 1);
+            								if(sub.length < 2){
+            									return val + "0&nbsp;&nbsp;";
+            								}
+            							 	return val + "&nbsp;&nbsp;";
+            							 }
+            							 return rowData.EXCHANGEDSUM + ".00&nbsp;&nbsp;";
+            		                }
+	                 }
+                ]
+            });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+			 $('#type').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+	            width: '155px',
+	            emptyText: '全部',
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+
+       });
+
+</script>
+
+</head>
+<body>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search" style="height:40px;">
+     <table width="100%" border="0">
+	   <tr>
+	    <td>
+	      <form id="form" action="" method="post"> 
+			<table width="100%" border="0">
+              <tr height="50">
+                <th width="5%">商户：</th>
+                <td><input id="type" name="type"/></td>
+             </tr>
+            </table>
+	         </form> 
+	       </td>
+	        <td>
+				<input title="查询" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="doQuery('couponmergatherStats.do?queryKey=stats.couponMerGatherStats');"/>
+				<input type="image" value="导出" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="doExport('exportMerGether.do?queryKey=stats.couponMerGatherStats');"/>
+	        </td>
+	       </tr>
+        </table>
+</div>    
+    </div>			      
+ <!--列表区-->
+  <div align="center">
+       <table id="grid" align="left"></table>
+  <div>
+</body>
+</html>

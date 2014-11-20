@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="chnls">
+	<sql id="allChnls">
+	<![CDATA[
+		 select chnl.channelId,chnl.channelName,chnl.state,chnl.notifyUrl,chnl.orderUrl,
+		 	chnl.service_user,chnl.contact,chnl.linkTel,chnl.email,chnl.inTime,chnl.modTime,chnl.modLock 
+		 from umpay.t_hf_chnl_inf chnl where 1=1 
+		 #if( $channelId && $channelId!='' )
+		   and  chnl.channelId = :channelId
+		 #end
+		 #if( $channelName && $channelName!='' )
+		   and  chnl.channelName like '%$channelName%'
+		 #end
+		 #if( $state && $state!='' )
+		   and  chnl.state=:state
+		 #end
+		 #if( $service_user && $service_user!='' )
+		   and  chnl.service_user=:service_user
+		 #end
+		 #if( $from && $from != '' && $to && $to != '')
+		   and  chnl.intime between '$from' and '$to'
+		 #end
+		 order by chnl.modtime desc
+	  ]]>
+	</sql>
+</mapper>

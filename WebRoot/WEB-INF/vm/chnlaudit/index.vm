@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css"/>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/chnlaudit.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+
+  var url="$request.contextPath/chnlaudit/query.do?queryKey=audit.allChnlAudits";
+    jQuery(document).ready(function() {
+    	jQuery("#search_div").width(jQuery(window).width()-20);
+    	
+    	var optStr="${opts}";
+    	var opts=optStr.split(',');
+    	jQuery('[code]').each(function () {
+    		var code=$(this).attr("code");
+    		for(var i=0;i<opts.length;i++){
+    			if(code==opts[i]){
+    				$(this).css('display','inline');						
+    			}
+    		};
+    	});
+    	
+      jQuery('#grid').omGrid({
+            dataSource : url,
+            width:'100%',
+        	height : 455,
+            limit : 15,
+            singleSelect : false,
+            colModel : [ {header : '审核类型', name : 'AUDITTYPE', align : 'left', width : 50,renderer:function(value , rowData , rowIndex){
+			             	var auditType = rowData.AUDITTYPE;
+			             	var name = "";
+			             	if (auditType=='1'){
+			             		name = "新增";
+			             	}else if (auditType=='2'){
+		                 		name = "修改";
+		                 	}else if (auditType=='3'){
+			             		name = "启用";
+			             	}else if (auditType=='4'){
+			             		name = "禁用";
+							}else{
+			             		name = "未知";
+							}
+						   	return "<a title='"+name+"'>"+name+"</a>";
+			             }},
+                         {header : '渠道编号', name : 'CHANNELID', align : 'left', width : 50,renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+                         {header : '渠道名称', name : 'CHANNELNAME', align : 'left', width : 100, renderer:function(value , rowData , rowIndex){
+                         	return "<a title='"+value+"'>"+value+"</a>";
+                         }},
+		                 {header : '提交时间', name : 'INTIME', align : 'left', width : 100,renderer:function(value , rowData , rowIndex){
+              				return "<a title='"+value+"'>"+value+"</a>";
+              			}},
+              			{header : '提交人', name : 'CREATOR', align : 'left', width : 80,renderer:function(value , rowData , rowIndex){
+              				return "<a title='"+value+"'>"+value+"</a>";
+              			}},
+		                 {header : '审核人', name : 'MODUSER', align : 'left', width : 80,renderer:function(value , rowData , rowIndex){
+              				return "<a title='"+value+"'>"+value+"</a>";
+              			}},
+              			{header : '审核时间', name : 'MODTIME', align : 'left', width : 100,renderer:function(value , rowData , rowIndex){
+              				return "<a title='"+value+"'>"+value+"</a>";
+              			}},
+		                 {header : '审核状态', name : 'STATE', align : 'left', width : 60, renderer:function(value , rowData , rowIndex){
+		                 	var state = rowData.STATE;
+		                 	var name = "";
+		                 	if (state==1){
+		                 		name = "不通过";
+		                 	}else if (state==0){
+		                 		name = "待审核";
+		                 	}else if (state==2){
+		                 		name = "通过";
+	              			}
+	                     	return "<a title='"+name+"'>"+name+"</a>";
+		                 }},
+                         {header : '操作', name:'oper', align : 'left', width : 60,renderer:function(value , rowData , rowIndex){
+                         	var state = rowData.STATE;
+                         	var id = rowData.ID;
+                         	var auditType = rowData.AUDITTYPE;
+                         	var result = "";
+                         	if(state==0){ //处于待审核状态，按钮可用
+                         		if(optStr.indexOf("011")!=-1){
+                         			result+="<input name='通过' title='通过' type='image' src='${request.contextPath}/profile/default/images/tool_pass.png' onclick='goPass(&quot;" + id + "&quot;);'/>";
+                         		}
+                         		if(optStr.indexOf("012")!=-1){
+                         			result+="<input name='不通过' title='不通过' type='image' src='${request.contextPath}/profile/default/images/tool_nopass.png' onclick='openNotPass(&quot;" + id + "&quot;)'/>";
+                         		}
+                         	}else if(state==1||state==2){
+                         		if(optStr.indexOf("011")!=-1){
+                         			result+="<input name='通过' title='通过' type='image' src='${request.contextPath}/profile/default/images/tool_pass1.png' />";
+                         		}
+                         		if(optStr.indexOf("012")!=-1){
+                         			result+="<input name='不通过' title='不通过' type='image' src='${request.contextPath}/profile/default/images/tool_nopass1.png' />";
+                         		}
+                         	}
+                         	result += '<input id="detail" name="detail" type="image" title="详情" src="${request.contextPath}/profile/default/images/tool_details.png" onclick="show(&quot;' + id + '&quot;, ' + auditType + ',' + state + ')" />';
+                         	return result;
+                         }}
+                  ],
+                  autoFit : true
+        });
+        
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+         });
+ 
+     	//获取提交人列表
+        $('#creator').omCombo({
+               dataSource : '$request.contextPath/option/creatorlist.do',
+               width:'85px',
+               listMaxHeight:150,
+               emptyText:'全部 ' ,
+               onSuccess:function(data, textStatus, event){
+      	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+      	  			data.unshift(tmp);
+         		},
+         		forceSelection : true,
+         		lazyLoad : true
+            });
+        //获取审核人列表   modUser
+        $('#modUser').omCombo({
+               dataSource : '$request.contextPath/option/modUserlist.do',
+               width:'85px',
+               listMaxHeight:150,
+               emptyText:'全部 ' ,
+               onSuccess:function(data, textStatus, event){
+      	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+      	  			data.unshift(tmp);
+         		},
+         		forceSelection : true,
+         		lazyLoad : true
+        });
+        //审核类型列表
+	      $('#auditType').omCombo({
+	          dataSource : [{"value":"","text":"全部"},{"value":"1","text":"新增"},{"value":"2","text":"修改"}
+	          				,{"value":"3","text":"启用"},{"value":"4","text":"禁用"}],
+	          width:'85px',
+	          emptyText:'全部 ',
+	          forceSelection : true
+	      });
+	      //审核状态列表
+	      $('#state').omCombo({
+	          dataSource : [{"value":"","text":"全部"},{"value":"0","text":"待审核"}
+	          				,{"value":"1","text":"不通过"},{"value":"2","text":"通过"}],
+	          width:'85px',
+	          emptyText:'全部 ' ,
+	          forceSelection:true
+	      });
+	  	  $('#state').omCombo('value','0');  //回填
+        
+		$('#grid').omGrid("setData", url+"&state=0");
+    
+   });
+
+</script>
+
+</head>
+<body>
+ <!--背景-->
+ <div class="list_btntool">
+    <!--增 删 改按钮区-->
+  <table width="100%">
+  <tr><td align="left">
+  	<input name="批量通过" type="image" code="011" style="display:none" src="${request.contextPath}/profile/default/images/bnt_pass.png" onclick="batchPass()"/>
+  	&nbsp;&nbsp;
+  	<input name="批量不通过" type="image" code="012" style="display:none" src="${request.contextPath}/profile/default/images/bnt_no_pass.png" onclick="batchNotPass()"/>
+  	</td>
+  </tr>
+  </table>
+  </div>
+ <!--列表查询区-->
+ <div  id="search_div">
+ <div class="list_search">
+     <table width="100%" border="0">
+       <tr>
+         <th width="10%" height="30">审核状态：</th>
+         <td width="10%"><input id="state" name="state" class="select1"/></td>
+         <th width="10%">审核类型：</th>
+         <td width="10%"><input id="auditType" name="auditType" class="select1"/></td>
+         <th width="10%">提交时间：</th>
+  		 <td >
+  		    <input type="text" id="from" name="from" onfocus="WdatePicker({startDate:'%y-%M-%d 00:00:00',dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:150px"/>
+  		 </td>
+  		<th>至</th>
+        <td><input type="text" id="to" name="to" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:150px"/></td>
+         <td rowspan="2"><input id="query" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"/></td>
+       </tr>
+       
+       <tr>
+         <th>提交人：</th>
+         <td><input id="creator" name="creator" class="select1" /></td>
+         <th>审核人：</th>
+         <td><input id="modUser" name="modUser" class="select1" /></td>
+		 <th width="10%">渠道编号：</th>
+         <td width="13%"><input id="channelId" name="channelId" type="text" class="input1" /></td>
+       </tr>
+     </table>
+   </div>
+   </div>
+   <!--列表区-->
+   <div align="center">
+       <table id="grid" align="left"></table>
+    </div>
+    
+    <div id="dialog">
+		<iframe frameborder="0" style="width:100%;height:100%" src="about:blank"></iframe>
+	</div>
+</body>
+</html>

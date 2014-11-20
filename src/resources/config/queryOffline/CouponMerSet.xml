@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="stl">
+	<sql id="all">
+	<![CDATA[
+       select a.stlcycle, 
+       a.stldate, 
+       a.merid, 
+       a.accid, 
+       a.accname, 
+       a.goodsid, 
+       a.settstatus, 
+       a.state, 
+       a.billtype,
+       a.merid,
+       sum(billsuccnumm) + sum(succnums) as succnum,
+       ROUND((sum(billsuccamtm/100) + sum(succamts/100)), 2) as succamt,
+       ROUND(sum(muteamt/100), 2) as muteamt, 
+       ROUND(sum(nbsmamt/100), 2) as nbsmamt,
+       ROUND(sum(paybackamt/100), 2) as paybackamt,
+       ROUND(sum(merstlpay/100), 2) as merstlpay,
+       is_valid
+	  from umpay.t_coupon_merset a
+	 where is_show=2 
+	 and isuse = 2
+	 #if( $accId && $accId!='' ) 
+		 and  accId = :accId
+	 #end
+	 #if( $settStatus && $settStatus!='' ) 
+		 and settStatus = :settStatus
+	 #end
+	 #if( $state && $state!='' ) 
+		 and state = :state
+	 #end
+	 #if( $stlCycle && $stlCycle!='' ) 
+		 and stlCycle = :stlCycle
+	 #end
+	 #if( $startDate && $startDate!='' ) 
+	  	 and a.stldate >= :startDate
+	 #end
+	 #if( $endDate && $endDate!='' ) 
+	   and a.stldate <= :endDate
+	 #end
+	 #if( $is_valid && $is_valid!='' )
+	   and a.is_valid = :is_valid
+	 #end
+	 group by a.stlcycle,
+          a.stldate,
+          a.merid,
+          a.accid,
+          a.accname,
+          a.goodsid,
+          a.settstatus,
+          a.state,
+          a.billtype,
+          a.is_valid
+     order by a.stldate desc,a.accid
+	]]>
+	</sql>
+</mapper> 

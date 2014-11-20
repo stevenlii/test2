@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script> 
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+</script>
+</head>
+<body>
+	<div>
+      <table class="infowrite" cellspacing="0" cellpadding="0" >
+       <tr >
+         <th width="30%">兑换券编号：</th>
+         <td  class="td">$!{couponInf.couponId}</td>
+       </tr>
+	   <tr >
+         <th>兑换券名称：</th>
+         <td class="td1">$!{couponInf.couponName}</td>
+       </tr>
+       <tr >
+         <th>兑换券类型：</th>
+         <td class="td">$!{couponInf.couponType}</td>
+       </tr>
+       <tr>
+         <th>兑换券启用状态：</th>
+         <td class="td1" >$!{couponInf.stateName}</td>
+       </tr>
+       <tr>
+         <th>兑换券说明：</th>
+         <td class="td">$!{couponInf.remark}</td>
+       </tr>
+       <tr>
+         <th>添加时间：</th>
+         <td class="td1">$!{couponInf.inTime.toString().replace('.0', '')}</td>
+       </tr>
+     </table>
+   </div>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

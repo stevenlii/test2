@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SecMerCnf">
+	<typeAlias alias="SecMerCnf" type="com.umpay.hfmng.model.SecMerCnf" />
+	<sql id="select_what">
+	 select SUBMERID,INFUNCODE,VERSION,ORDERURL,NOTIFYURL,MODUSER,MODTIME,INTIME from UMPAY.T_SECMER_CNF where 1=1 
+	</sql>
+	
+	<sql id="key_find">
+			subMerId = #subMerId# and inFunCode=#inFunCode#
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="subMerId" prepend=" and ">subMerId = #subMerId#</isNotEmpty>
+			<isNotEmpty	property="inFunCode" prepend=" and ">inFunCode = #inFunCode#</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<statement id="Get" resultClass="SecMerCnf" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="SecMerCnf" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from UMPAY.T_SECMER_INF
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="findBySubMerId" resultClass="SecMerCnf" >
+		<include refid="select_what" />
+		<isNotEmpty	property="subMerId" prepend=" and ">subMerId = #subMerId#</isNotEmpty>
+	</statement>
+	
+	<statement id="Insert" resultClass="SecMerCnf">
+		insert into UMPAY.T_SECMER_CNF(subMerId,inFunCode
+				<isNotEmpty	property="version" prepend=" , "> version </isNotEmpty>
+				<isNotEmpty	property="merCert" prepend=" , "> merCert </isNotEmpty>
+				<isNotEmpty	property="orderUrl" prepend=" , "> orderUrl </isNotEmpty>
+				<isNotEmpty	property="notifyUrl" prepend=" , "> notifyUrl </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+			) values(#subMerId#,#inFunCode#
+				<isNotEmpty	property="version" prepend=" , "> #version# </isNotEmpty>
+				<isNotEmpty	property="merCert" prepend=" , "> #merCert# </isNotEmpty>
+				<isNotEmpty	property="orderUrl" prepend=" , "> #orderUrl# </isNotEmpty>
+				<isNotEmpty	property="notifyUrl" prepend=" , "> #notifyUrl# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_SECMER_CNF set modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="version" prepend=" , "> version=#version# </isNotEmpty>
+			<isNotEmpty	property="merCert" prepend=" , "> merCert=#merCert# </isNotEmpty>
+			<isNotEmpty	property="orderUrl" prepend=" , "> orderUrl=#orderUrl# </isNotEmpty>
+			<isNotEmpty	property="notifyUrl" prepend=" , "> notifyUrl=#notifyUrl# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where subMerId=#subMerId# and inFunCode=#inFunCode#
+	</statement>
+</sqlMap>

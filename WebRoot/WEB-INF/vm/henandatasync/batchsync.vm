@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/henandatasync.js"></script>
+<script type="text/javascript">
+	url = "$request.contextPath/henandatasync/queryBatchSync.do?queryKey=hnsyntask.hnsyncbatch";
+	jQuery(document).ready(function() {
+		jQuery("#search_div").width(jQuery(window).width()-20);
+          jQuery('#grid').omGrid({
+                dataSource : url,              
+                width:'100%',
+                height : 455,
+                limit : 15,
+                colModel : [ {header : '任务类型', name : 'TASKTYPE',width : 90, align : 'left',renderer:function(value , rowData , rowIndex){
+				                	var taskType = rowData.TASKTYPE;
+				                 	var name = "";
+				                 	if(taskType==4)
+				                 		name = "河南小额同步商户银行";
+				                 	else if (taskType==5){
+				                 		name = "河南小额同步商品银行";
+				                 	}
+					 				return "<a title='"+name+"'>"+name+"</a>";
+					 			}},
+                             {header : '发起人', name : 'CREATOR',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '添加时间', name : 'INTIME', width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '最后处理时间', name : 'MODTIME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '任务状态', name : 'SYNSTATE', width : 70 , align : 'left',renderer:function(value , rowData , rowIndex){
+					 				var state = rowData.SYNSTATE;
+				                 	var name = "";
+				                 	if(state==0)
+				                 		name = "初始";
+				                 	else if (state==1){
+				                 		name = "处理中";
+				                 	}else if (state==2){
+				                 		name = "完成";
+				                 	} 	
+				                 	return "<a title='"+name+"'>"+name+"</a>";
+                             	}},
+                             {header : '处理结果', name : 'SYNRESULT',width : 75, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var result = rowData.SYNRESULT;
+                             	var name = "";
+                             	if(result==0)
+                             		name = "初始";
+                             	else if (result==1){
+                             		name = "处理成功";
+                             	}else if (result==2){
+                             		name = "部分失败";
+                         	    }else if (result==3){
+                             		name = "处理失败";
+                         	    }
+                             	return "<a title='"+name+"'>"+name+"</a>";
+                             }},
+                             {header : '操作', name : 'oper', width : 50 , align : 'left' ,renderer:function(value , rowData , rowIndex){
+                            	var taskId = rowData.TASKID;
+                            	result=" <input name='详情' alt='详情' title='详情' type='image' value='ee' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetail(&quot;"+taskId+"&quot;)' />";
+ 	                            return result;
+                             	}
+                             }                                       
+                            ],
+                            autoFit:true
+            });
+          //任务类型
+          $('#taskType').omCombo({
+   		       dataSource : [{"value":"","text":"全部"},{"value":"4","text":"河南小额同步商户银行"},{"value":"5","text":"河南小额同步商品银行"}],
+   	           width:'140px',
+   	           listMaxHeight:150,
+   	           emptyText:'全部 ' ,
+   	           forceSelection : true  
+   	       });
+          //任务状态
+       $('#synState').omCombo({
+   		       dataSource : [{"value":"","text":"全部"},{"value":"0","text":"初始"},{"value":"1","text":"处理中"},{"value":"2","text":"完成"}],
+   	           width:'140px',
+   	           listMaxHeight:150,
+   	           emptyText:'全部 ' ,
+   	           forceSelection : true  
+   	       });
+       //处理结果
+   	  $('#synResult').omCombo({
+   		       dataSource : [{"value":"","text":"全部"},{"value":"0","text":"初始"},{"value":"1","text":"处理成功"},{"value":"2","text":"部分失败"},{"value":"3","text":"处理失败"}],
+   	           width:'140px',
+   	           listMaxHeight:150,
+   	           emptyText:'全部 ' ,
+   	           forceSelection : true  
+   	       });   
+      
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+	});
+	 
+	    //批量完整同步
+	    function batchSync(sendFlag){
+	    	var sendFlag = sendFlag;
+	    	if('mer' == sendFlag) {
+		    	flag=confirm("确定执行批量同步<商户银行>信息？");
+	    	} else if ('goods' == sendFlag) {
+		    	flag=confirm("确定执行批量同步<商品银行>信息？");
+	    	}
+	    	if(flag){
+	    		$.ajax({
+	    			url : 'bacthMerBankSync.do',
+	    			type : 'POST',
+	    			dataType: 'json',
+	    			data : {
+	    				'sendFlag' : sendFlag
+	    			},
+	    			success : function(data){
+						if (data.retCode == '0000'){
+							jQuery('#grid').omGrid('reload');
+							$.omMessageBox.alert({
+	                			type : 'success',
+	                			title: '操作提示',
+	                			content:data.retMsg
+	            			});
+							} else{
+								$.omMessageBox.alert({
+		                			type : 'error',
+		                			title: '操作提示',
+		                			content: data.retMsg
+		            			});
+								}
+	     			}
+	    		});
+	    	}
+	    }
+	    
+
+	  //批量查询方法
+	  function queryBatchSync(){
+	  	var taskType=jQuery('#taskType').val();
+//	  	alert(jQuery('#taskType').val());
+	  	var synState=jQuery('#synState').val();
+//	  	alert(jQuery('#synState').val());
+	  	var synResult=jQuery('#synResult').val();
+//	  	alert(jQuery('#synResult').val());
+	  	var key="";
+	      if(taskType != ""){ //没要有查询条件，要显示全部数据
+	      	key=key+'&taskType='+encodeURI(taskType);
+	      }
+	      if(synState !=""){ 
+	      	key=key+'&synState='+encodeURI(synState);
+	      }
+	      if(synResult !=""){ 
+	      	key=key+'&synResult='+encodeURI(synResult);
+	      }
+//		  	alert('111');
+	      $('#grid').omGrid("setData", url+key);
+//		  	alert('222');
+	  }
+	  
+		//显示详情方法
+		function showDetail(taskId){
+//			alert(taskId);
+		      $( "#dialog").omDialog("option","width",'450');
+		      $( "#dialog").omDialog("option","title",'批量任务信息');
+		      $( "#dialog").omDialog("option","height",'400');
+		      $( "#dialog").omDialog("option", "modal", true);
+			  $( "#dialog").omDialog('open');
+			   var frameLoc=window.frames[0].location;
+	           frameLoc.href='detail.do?taskId='+taskId;
+	           $("#dialog").omDialog({onClose : function(event) {
+	          		window.frames[0].location.href='../wait.htm';
+	           }});
+			  return false;
+		}
+	 
+</script>
+</head>
+<body>
+<!--增 删 改按钮区-->
+<div class="list_btntool">
+<table width="100%">
+<tr>
+	<td align="right">
+	<input name="河南小额<商户>完整同步" type="image" src="${request.contextPath}/profile/default/images/btn_pltbsh.png" onclick="batchSync(&quot;mer&quot;)"/>
+	&nbsp;&nbsp;
+	<input name="河南小额<商品>完整同步" type="image" src="${request.contextPath}/profile/default/images/btn_pltbsp.png" onclick="batchSync(&quot;goods&quot;)"/>
+	</td>
+</tr>
+</table>
+</div>
+ <!--列表查询区-->
+ <div  id="search_div">
+ <div class="list_search">
+  <table width="80%" height="90%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr>
+	        <th width="7%">任务类型：</td>
+	        <td width="15%"><input id="taskType" name="taskType" class="select1" /></td>
+            <th width="7%">任务状态：</td>
+            <td width="13%"><input id="synState" name="synState" class="select1"/></td>
+            <th width="7%">处理结果：</td>
+            <td width="13%"><input id="synResult" name="synResult" class="select1"/></td>
+           </tr>
+        </table>
+         </form> 
+       </td>
+        <td><input id="query" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryBatchSync()" />
+        </td>
+       </tr>
+        </table>
+ </div>
+ </div>
+<!--列表区-->
+  <div align="center">
+     <table  align="left" id="grid" ></table>
+ </div>
+ <div id="dialog">
+	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+</div>
+</body>
+</html>

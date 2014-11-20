@@ -1,0 +1,143 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/proxygoodsaudit.js"></script>
+<script>
+jQuery(document).ready(function() {
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+});
+//审核通过方法
+function goPass(id){
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	var flag = confirm("确认审核通过此信息？");
+	if (flag){
+		$.ajax({
+			url : '$request.contextPath/proxygoodsaudit/auditPass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'id' : id,
+					'resultDesc' : resultDesc
+			},
+			success : function(data){
+					closeDialog();
+					window.parent.shuaxin();
+					window.parent.showAuditTip(data);
+			}
+		});
+	}
+}
+function goNotPass(id){
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(byteCount(resultDesc)<=0){
+		alert("请填写不通过理由！")
+		return false;
+	}
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	var flag = confirm("确认审核不通过此信息？");
+	if (flag){
+		$.ajax({
+			url : '$request.contextPath/proxygoodsaudit/auditNotPass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'id' : id,
+					'resultDesc' : resultDesc
+			},
+			success : function(data){
+					closeDialog();
+					window.parent.shuaxin();
+					window.parent.showAuditTip(data);
+			}
+		});
+	}
+}
+</script>
+</head>
+<body>
+<div>
+<!--新增或启用/禁用商户审核详情页面-->
+<form id ="dataform-add" method="post" name="dataform-add">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0" width="100%" >
+		<tr>
+			<th width="30%">二级商户号：</th>
+			<td width="70%" class="td1" colspan="2">${audit.subMerId}</td>
+		</tr>
+		<tr>
+			<th >二级商户名称：</th>
+			<td class="td" colspan="2">$!{subMerName}</td>
+		</tr>
+		<tr>
+			<th>代理商户号：</th>
+			<td class="td1" colspan="2">$!{audit.merId}</td>
+		</tr>	
+		<tr>
+			<th>代理商品号：</th>
+			<td class="td" colspan="2">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+			<th>代理商品名称：</th>
+			<td class="td1" colspan="2">$!{goodsName}</td>
+		</tr>
+		<tr>
+			<th>商品天销售数量：</th>
+			<td class="td">$!{audit.dayLimit}</td>
+			#if(${auditType}==3)
+				<td width="40%" class="td" rowspan="2"><h2>禁用-><span style="color:red">启用</span><h2></td>
+			#elseif(${auditType}==4)
+				<td width="40%" class="td" rowspan="2"><h2>启用-><span style="color:red">禁用</span><h2></td>
+			#else
+				<td class="td"></td>
+			#end
+		</tr>
+		<tr>
+			<th>预警数：</th>
+			<td class="td1">$!{audit.alarmLimit}</td>
+		</tr>
+		<tr>
+			<th>预警短信号码：</th>
+			<td class="td" colspan="2"><textarea rows="3" cols="42" disabled="true">$!{audit.alarmTel}</textarea></td>
+		</tr>
+		<tr>
+			<th>审核意见：</th>
+			<td colspan="3" align="left" valign="bottom"><textarea id="resultDesc" name="resultDesc" rows="3" style="{width:100%;}"></textarea></td>
+		</tr>
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" value="通过" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goPass($id)"/>
+	   <input type="button" value="不通过" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goNotPass($id)"/>
+	   <input type="button" value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog(0)" />
+	 </div>
+</form>
+</div>
+</body>
+</html>

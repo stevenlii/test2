@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/para.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+     
+     function success_function(info)
+     {
+	     return info;
+     }
+	 	$.validator.addMethod("Check",
+        function() {
+	        var paraType = $("#paraType").val();
+	        var paraCode = $("#paraCode").val();
+	        var rtcode = "0";
+			$.ajax({  
+	          type : "post",  
+	          url : "$request.contextPath/para/validate.do",  
+	          data : {"paraType":paraType,"paraCode":paraCode},  
+	          async : false,  
+	          success : function(data){  
+		          if(data=="1"){
+		        	  rtcode = "1";
+			       }
+	         	}  
+	          });
+	         if(rtcode=="0"){
+	        	return true;
+		     }
+			 return false;
+        }, '');	
+        
+        $.validator.addMethod("CheckValueLen",
+        function() {
+	        var paraValue = $("#paraValue").val();
+	       	if(getByteLen(paraValue)>128){
+		   		 return false;
+	       	}
+	       	return true;
+        }, '');	
+        
+        $.validator.addMethod("CheckCodeLen",
+        function() {
+	        var paraCode = $("#paraCode").val();
+	       	if(getByteLen(paraCode)>16){
+		   		 return false;
+	       	}
+	       	return true;
+        }, '');	
+        
+  	 	jQuery(document).ready(function() {
+  	 		jQuery("#dataform").validate({
+  	 			onkeyup: false,
+                rules: {
+                    "paraType": {
+  	 					required: true
+                    },
+                    "paraCode": {
+                        required: true,
+                        CheckCodeLen : true,
+                        Check: true
+                    },
+                    "paraValue": {
+                        required: true,
+                        CheckValueLen: true
+                    },
+                    "paraDesc": {
+                        maxlength : 128
+                    }
+                },
+                messages: {
+                    "paraType": {
+                		required: "请选择参数类型"
+                    },
+                    "paraCode": {
+                        required: "请输入参数编码",
+                		CheckCodeLen: "输入最大长度为中文8位，英文16位",
+                		Check: "参数编码已存在"
+                    },
+                    "paraValue": {
+                        required: "请输入参数值",
+                        CheckValueLen: "输入最大长度为中文64位，英文128位"
+                    },
+                    "paraDesc": {
+                        maxlength : "输入最大长度为128位"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+            var url = '';
+            if('${paraType}'=='B'){
+  	 	  	  	url = '$request.contextPath/para/getTypes.do?paraType=B';
+  	 	  	  }
+  	 	  	 if('${paraType}'=='S'){
+  	 	  	  	url = '$request.contextPath/para/getTypes.do?paraType=S';
+  	 	  	  }
+ 	 	  	  
+  	 	  $('#paraType').omCombo({
+              dataSource: url,
+              width: '150px',
+              emptyText: '请选择..',
+              forceSelection: false
+          });
+			
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_add").attr("disabled", "disabled");
+            jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					window.parent.showSimpleTip(res);
+					if( res == '1' ){
+						closeDialog();
+						window.parent.shuaxin();
+					}else{
+						// 设置按钮可用
+						$("#btn_add").removeAttr("disabled");
+					}
+                }
+            });
+            return false;
+        });});
+	
+  	 	function showResponse(responseText, statusText) {
+            var result = eval("(" + responseText + ")");
+            if (result.code == '0') {
+                window.parent.fillBackAndCloseDialog(result.msg);
+            }
+        }
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/para/save.do">
+   <input type="hidden" id="test1" name="test1" value=""/>
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="15%"><span>*</span>类    型：</th>
+         <td width="60%" class="td">
+			 <input id="paraType" name="paraType" />
+         </td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>编    码：</th>
+         <td  class="td1"><input id="paraCode" name="paraCode" type="text" class="input2" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th ><span>*</span>值：</th>
+         <td class="td"><input id="paraValue" name="paraValue" type="text" class="input2"/></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th>说    明：</th>
+         <td class="td1" ><textarea id="paraDesc" name="paraDesc" cols="40" rows="5" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:90%"></textarea></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+
+     </table>
+
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="添加" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+	   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html>

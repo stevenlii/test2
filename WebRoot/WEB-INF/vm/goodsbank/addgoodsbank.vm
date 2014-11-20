@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/goodsbank.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png") center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+</style>
+	<SCRIPT type="text/javascript">
+		var tree;
+		var setting = {
+			check: {
+				enable: true
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			}
+		};
+		var zNodes ;
+		function setCheck() {
+			var zTree = $.fn.zTree.getZTreeObj("tree");
+			zTree.setting.check.chkboxType =  { "Y" : "ps", "N" : "ps" };
+		}
+	</SCRIPT>
+     <script>  
+    	 jQuery(document).ready(function() {
+    		 jQuery("#search_div").width(jQuery(window).width());
+  	 //初始化商户列表
+  	   $('#merId').omCombo({
+               dataSource : '$request.contextPath/option/merlist.do',
+                width:'150px',
+                emptyText:'请选择..',
+                listMaxHeight:150,
+                onValueChange:function(target,newValue,oldValue,event){ 
+  		   			getGoodsId();
+	 			},
+	 			forceSelection : true
+            });
+          $('#goodsId').omCombo({
+        	  dataSource : [{"value":"","text":""}],
+        	  width:'150px',
+        	  listMaxHeight:150,
+        	  onValueChange:function(target,newValue,oldValue,event){ 
+  				getBankIdByGoodsId();
+          	  },
+          	forceSelection : true
+          });
+          //添加自定义的校验方法 
+			$.validator.addMethod("checkVerifytag", function(value) {
+                var regu = /^-1$|^0$|^1$|^2$|^3$/; 
+                var reg = new RegExp(regu);
+                return reg.test(value);  // 二次确认校验码验证 值为  -1,0 ,1 ,2,3
+            }, '必须为-1到3之间的整数');
+       
+          
+  	 	  jQuery("#dataform").validate({
+  	 		  	onkeyup: false,
+                rules : {
+                    "merId" : {
+                    	required : true
+                    },
+                     "goodsId" : {
+                    	required : true
+                    },
+                    "showamount": {
+                        required : true,
+                         digits : true ,
+                         maxlength : 13
+                    },
+                    "verifyTag": {
+                        checkVerifytag : true,
+                        required : true ,
+                        maxlength : 1
+                    },
+                     "checkDay" : {
+                    	required : true ,
+                    	 digits : true ,
+                    	 maxlength : 10
+                    },
+                     "kstate" : {
+                    	required : true
+                    },
+                    "isRealTime" :{
+                        required :true
+                    },
+                    "bankMerId" : {
+                        maxlength : 32
+                    },
+                      "bankPosId" : {
+                        maxlength : 32
+                    }
+                },
+                messages : {
+                    "merId"  : {
+                        required : "请输入商户编号"
+                    },
+                     "goodsId"  : {
+                        required : "请输入商品编号"
+                    },
+                    "showamount": {
+                        required : "请输入商品金额" ,
+                         digits    : "请填写数字" ,
+                         maxlength : "输入的长度超过13位"
+                    },                    
+                    "verifyTag":{
+                      required : "请填写二次确认校验码" ,
+                      maxlength : "只能输入一位二次确认码"
+                    },
+                    "checkDay":{
+                      required : "请填写商品最长计费天数",
+                       digits    : "请填写数字" ,
+                       maxlength : "输入长度超过10位"
+                    },
+                    "kstate":{
+                      required : "请选择商品开通状态"
+                    },
+                    "isRealTime" :{
+                       required : "请选择下发商品时间"
+                    },
+                    "bankMerId"  : {
+                       maxlength : "长度不能超过32位"
+                     },
+                     "bankPosId" : {
+                        maxlength :  "长度不能超过32位"
+                      }
+                },
+                
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },          
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+     $('.errorImg').bind('mouseover',function(){
+        $(this).next().css('display','block');
+		}).bind('mouseout',function(){
+				$(this).next().css('display','none');
+		});
+  	 	 jQuery('#dataform').submit(function() {
+   	 	 	 if (!jQuery("#dataform").valid()) { 
+                 return false;
+              }
+            if(!checkedNodes()){
+                return false;
+            }
+            if(!changeNodes()){
+                return false;
+            }
+	       jQuery(this).omAjaxSubmit({
+	            dataType: 'json',
+	            success:function(res){
+	                   alert(res.msg);
+	                   if(res.res == '1'){
+	                	   closeDialog();
+	                   }
+	               }
+	            });
+              return false; 
+            });  
+          var zNodes1="${zNodes}";		
+		  var zNodes=eval(zNodes1);
+		   //   alert(zNodes);
+		    tree=$.fn.zTree.init($("#tree"), setting, zNodes);
+			setCheck();
+  	 });
+      function showRes(res ){
+         var res= eval(res);
+        // 	alert("res:"+data.res);
+	    //	alert("msg:"+data.msg);
+             alert(res.msg);
+           }
+       //关闭窗口方法
+       function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }     
+    //异步获取商户号下的商品号码
+     function getGoodsId(){
+    	 $('#goodsId').omCombo('setData', []);
+	   var merId = jQuery('#merId').val();
+		$.ajax({
+				url : '$request.contextPath/goodsbank/getgoodsids.do',
+				type : 'POST',
+				dataType: 'text',
+				data : {
+						'merId' : merId
+				},
+				success : function(goodsIdList){	
+				  $('#goodsId').omCombo('setData', eval(goodsIdList));	
+				}
+		});
+   }
+  //根据商品号获取银行号
+  function getBankIdByGoodsId(){
+	  $("#errorImg").hide();
+    var zTreeObj = $.fn.zTree.getZTreeObj("tree");
+    zTreeObj.destroy();
+    var merId = jQuery('#merId').val();
+    var goodsId = jQuery('#goodsId').val();
+    $.ajax({
+		url : '$request.contextPath/goodsbank/getTreeByGoodsId.do',
+		type : 'POST',
+		dataType: 'json',
+		data : {
+				'GoodsId' : goodsId ,
+				'merId'   : merId 
+		},
+		success : function(res){
+			if(res.busyType == "MW"){
+				$("#tdAmount").html("<lable>"+res.amount+" 分</lable>");
+				$("#amount").val(res.amount);
+			}else{
+				if(res.priceMode == 0){
+					$("#tdAmount").html('<input id="showamount" name="showamount" value="'+res.amount+'" type="text" onchange="setAmount()" class="input1" maxlength="13"/> 分');
+					$("#amount").val(res.amount);
+				}else{
+					$("#tdAmount").html("<lable>非定价商品</lable>");
+				}
+			}
+			var zNodes=eval(res.zTreeNodes);
+			tree=$.fn.zTree.init($("#tree"), setting, zNodes);
+			setCheck();
+			if(res.select == 'yes'){
+				var treeObj = $.fn.zTree.getZTreeObj("tree");
+				var node = treeObj.getNodeByParam("id", "2", null);
+				treeObj.checkNode(node, true, true);
+			}
+		}
+	});
+   }
+  //获取页面上的商品金额值，赋给隐藏框
+  function setAmount(){
+	  var showamount=jQuery('#showamount').val();
+	  $("#amount").val(showamount);
+  }
+  
+   //获取树结构选取的节点内容
+	function checkedNodes(){
+		var checkedNodes = tree.getCheckedNodes();
+		//alert(checkedNodes);
+		//alert(checkedNodes.length);
+		if(checkedNodes.length==0){
+			 alert("请选择支付银行");
+			 return false;
+		 }else {
+		 	var relatedMenuIds = [];
+			for(var i = 0; i < checkedNodes.length; i++){
+				var node = checkedNodes[i];
+				relatedMenuIds[relatedMenuIds.length] = node.id;
+			}
+			var ids = relatedMenuIds.join(",");
+		    //alert("选择的节点内容"+ids);
+			  $("#bankId").val(ids); 
+			 return true;
+		}
+	}
+		//获取树结构发生修改的节点内容
+     function changeNodes(){
+	    var checkedNodes = tree.getChangeCheckedNodes();
+	    if(checkedNodes.length==0){
+		   alert("没有修改支付银行，不需提交！");
+		   return false;
+	       }else {
+	    	var relatedMenuIds = [];
+		 for(var i = 0; i < checkedNodes.length; i++){
+			var node = checkedNodes[i];
+			relatedMenuIds[relatedMenuIds.length] = node.id;
+			}
+		var ids = relatedMenuIds.join(",");
+		//alert("修改的节点"+ids);
+		//$("#bankId").val(ids); 
+		 return true;
+	  }
+   }
+</script>
+</head>
+<body>
+  <div>
+  <div  id="search_div">
+    <form id ="dataform" method="post" name="dataform"  action="${request.contextPath}/goodsbank/save.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="23%"><span>*</span>商户号：</th>
+         <td class="td1" width="20%">
+           <input id="merId" name="merId" class="select1"/>
+         </td>
+         <td  class="td1" width="10%"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		 <td rowspan="10" class="td">
+			 <input id="bankId" name="bankId" type="hidden">
+			<div><span>*</span><span style="color:#000000; font-weight:bold">选择银行：</span></div>
+             <div style="width:250px;height:315px;text-align:left;overflow:auto;">
+    		      <ul id="tree" class="ztree"></ul>
+    	      </div>
+			  <div style="clear:both; height:0;overflow:hidden;"></div>
+		 </td>
+       </tr>
+       <tr>
+         <th ><span>*</span>商品号：</th>
+         <td  class="td">  <input id="goodsId" name="goodsId" class="select1"/></td>
+         <td class="td" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th ><span>*</span>商品金额：</th><input type="hidden" id="amount" name="amount"/>
+         <td id="tdAmount" class="td1"><input id="showamount" name="showamount" type="text" class="input1" maxlength="13"/> 分</td>
+         <td class="td1"><span class="errorImg" id="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>2次确认校验码：</th>
+        <td class="td"><input name="verifyTag" type="text" class="input1" value="3" maxlength="2" /></td>        
+        <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       
+       <tr>
+         <th><span>*</span>商品最长计费天数：</th>
+         <td class="td1" ><input id="checkDay" name="checkDay" value="10" class="input1"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+  
+        <tr>
+         <th><span>*</span>商品开通状态：</th>
+         <td class="td" colspan="1">
+         <input type="radio" name="kState" value="11" />
+               只开通新增<br/>
+           <input type="radio" name="kState" value="12" />
+               只保留续费<br/>
+         <input type="radio" name="kState" value="13" checked="true"/>
+               新增与续费全部开通<br/>
+                <input type="radio" name="kState" value="23" />
+               新增与续费全部注销<br/>
+               </td>
+          <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span>*</span>下发商品时间：</th>
+           <td class="td1" colspan="1"><input type="radio" name="isRealTime" value="0" checked="true" />
+               即时下发<br/>
+           <input type="radio" name="isRealTime" value="1" disabled="disabled"/>
+               智能网异步发货<br/>
+         <input type="radio" name="isRealTime" value="2" disabled="disabled"/>
+			BOSS异步发货<br/>
+         <input type="radio" name="isRealTime" value="3" />
+               全部异步发货<br/>
+               </td>
+         
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       
+        <tr>
+         <th>平台在机构商户号：</th>
+         <td class="td"><input name="bankMerId" type="text" class="input2"  maxlength="32" /></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th>平台在机构终端号：</th>
+         <td class="td1"><input name="bankPosId" type="text" class="input2"  maxlength="32" /></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+	    	<th>操作原因：</th>
+	    	<td class="td"><input name="desc" type="text" class="input2"  maxlength="32" /></td>
+	    	<td class="td"></td>
+		</tr>
+     </table>
+           
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="确认" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+	   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	  	
+	 </div>
+	 </form>
+   </div>
+  </div>
+ 
+</body>
+</html>

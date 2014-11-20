@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/proxymer.js"></script>
+<script type="text/javascript">
+
+  var url="$request.contextPath/proxymer/query.do?queryKey=proxymer.all";
+    jQuery(document).ready(function() {
+    	jQuery("#search_div").width(jQuery(window).width()-20);
+
+		    var optStr="${opts}";
+				var opts=optStr.split(',');
+		    jQuery('[code]').each(function () {
+		        var code=$(this).attr("code");
+		        for(var i=0;i<opts.length;i++){
+				   if(code==opts[i]){
+					   $(this).css('display','inline');
+						}
+		    		};
+				});
+	
+      jQuery('#grid').omGrid({
+            dataSource : url,
+            width:'100%',
+            height : 455,
+            limit : 15,
+            singleSelect : false,
+            rowClasses : function(rowIndex,rowData){
+				if(rowData.MODLOCK==1){
+					return "lock";
+				}else{
+					return "checkbox";
+				}
+			},
+            colModel : [ {header : '新增时间', name : 'INTIME',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}}, 
+                         {header : '商户号', name : 'MERID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                         	    return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                          {header : '商户名称', name : 'MERNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                        	  return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                         {header : '运营负责人', name : 'OPERATOR',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                      	    return "<a title='"+value+"'>"+value+"</a>";
+                         } }
+                        ],
+            autoFit:true
+        });
+        
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+         });
+         
+       //初始化运营负责人列表
+        jQuery('#operator').omCombo({
+            dataSource : '$request.contextPath/option/operatorlist3.do',
+            width:'75px',
+            listMaxHeight:150,
+            emptyText:'全部 ',
+            valueField : 'id',
+            inputField : 'name',
+            optionField : function(data, index) {return data.name;},
+            onSuccess:function(data, textStatus, event){
+   	  			var tmp = $.parseJSON('{"id":"","name":"全部","initials":"qb"}');
+   	  			data.unshift(tmp);
+      		},
+      	  filterStrategy : function(value, data) {
+      			var initials=data.initials+"";
+      			var list=initials.split(",");
+      			for(var i=0;i<list.length;i++){
+      				if(list[i].indexOf(value) == 0)
+      					return true;
+      			}
+                  return false;
+            },
+            filterDelay : 100,
+      	  forceSelection : true
+        });
+  	  
+    });
+    
+   
+</script>
+
+</head>
+<body>
+
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+      <table border="0" width="100%">
+        <tr>
+        <td align="left">
+		<td align="right">
+         </tr>
+        </table>
+     </div>
+  
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="90%" border="0">
+       <tr>
+        <td  align="left" >
+          <!--查询块区 start--> 
+           <form id="form" method="post"> 
+            <table width="100%" border="0">
+              <tr>
+	              <th width="8%">商户号：</th>
+	              <td width="8%"><input id="merId" name="merId" type="text" class="input1"/></td>
+		         <th width="10%">商户名称：</th>
+		         <td width="10%"><input id="merName" name="merName" type="text" class="input1"/></td>
+		         <th>运营负责人：</th>
+		         <td><input id="operator" name="operator" class="select1"/></td>
+          </tr>
+        </table>
+        </form> 
+       </td>
+         <td align="left"><input id="query" title="查询" name="submit" type="image" style="display:none" code="001" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+   </div>  
+   
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+ 
+</body>
+</html>

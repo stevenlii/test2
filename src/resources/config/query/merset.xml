@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="merset">
+	<sql id="getMid">
+	<![CDATA[
+       select goodsid,
+       localflag,
+       stltype,
+       transtype,
+       batchseq,
+       stldate,
+       accid,
+       bankid,
+       seqid,
+       stlcycle,
+       accname,
+       merid,
+       billtype,
+       agentid,
+       agentname,
+       succnumm,
+       succamtm,
+       succnums,
+       succamts,
+       billsuccnumm,
+       billsuccamtm,
+       mutenum,
+       muteamt,
+       shamnum,
+       shamamt,
+       nbsmnum,
+       nbsmamt,
+       xkcostnum,
+       xkcostamt,
+       paybacknum,
+       paybackamt,
+       transamt,
+       cmccstlrates,
+       cmccstlratem,
+       umpstlratem,
+       cmccamount,
+       merrate,
+       merratedes,
+       merstlamt,
+       merstlpay,
+       profit,
+       filemonth,
+       publishtype,
+       agrate,
+       agstlamt,
+       agstlpay,
+       agtpublishtype,
+       agtfilemonth,
+       tax,
+       monum,
+       mtnum,
+       finishsign,
+       state,
+       moduser,
+       modtime,
+       intime,
+       m_goods_id,
+       local_flag
+  from umpay.t_coupon_merset_mid  
+  where 1=1
+    #if( $goodsid && $goodsid!='' ) 
+     and  goodsid = :goodsid
+   #end
+   #if( $localflag && $localflag!='' ) 
+     and  localflag = :localflag
+   #end
+   #if( $stltype && $stltype!='' ) 
+     and stltype = :stltype
+   #end
+   #if( $transtype && $transtype!='' ) 
+     and transtype = :transtype
+   #end
+   #if( $batchseq && $batchseq!='' ) 
+     and batchseq = :batchseq
+   #end
+   #if( $stldate && $stldate!='' ) 
+     and stldate = :stldate
+   #end
+   #if( $accid && $accid!='' ) 
+      and accid = :accid
+   #end
+   #if( $bankid && $bankid!='' ) 
+     and bankid = :bankid
+   #end
+   order by seqid desc
+	]]>
+	</sql>
+
+	<sql id="getMerset">
+	<![CDATA[
+	SELECT
+	ACCID ,
+	STLCYCLE ,
+	STLDATE ,
+	GOODSID ,
+	LOCALFLAG ,
+	SEQID ,
+	ACCNAME ,
+	MERID ,
+	BILLTYPE ,
+	AGENTID ,
+	AGENTNAME ,
+	CMCCSTLRATES ,
+	UMPSTLRATEM ,
+	SUCCNUMM ,
+	SUCCAMTM ,
+	SUCCNUMS ,
+	SUCCAMTS ,
+	BILLSUCCNUMM ,
+	BILLSUCCAMTM ,
+	SUCCALLNUMM ,
+	SUCCALLAMTM ,
+	MSGAMTM ,
+	MUTENUM ,
+	MUTEAMT ,
+	SHAMNUM ,
+	SHAMAMT ,
+	MONUM ,
+	MTNUM ,
+	NBSMNUM ,
+	NBSMAMT ,
+	PAYBACKNUM ,
+	PAYBACKAMT ,
+	MERSTLAMT ,
+	MERSTLPAY ,
+	CMCCAMOUNT ,
+	SETTSTATUS ,
+	STATE ,
+	ISUSE ,
+	MODUSER ,
+	MODTIME ,
+	INTIME ,
+	BAD_BILL ,
+	UMP_INCOME ,
+	BALANCE_AMOUNT ,
+	IS_SHOW ,
+	IS_VALID 
+FROM
+	UMPAY.T_COUPON_MERSET 
+	where 1=1
+    #if( $ACCID && $ACCID!='' ) 
+     and  ACCID = :ACCID
+   #end
+    #if( $STLCYCLE && $STLCYCLE!='' ) 
+     and  STLCYCLE = :STLCYCLE
+   #end
+    #if( $STLDATE && $STLDATE!='' ) 
+     and  STLDATE = :STLDATE
+   #end
+    #if( $GOODSID && $GOODSID!='' ) 
+     and  GOODSID = :GOODSID
+   #end
+   #if( $LOCALFLAG && $LOCALFLAG!='' ) 
+     and  LOCALFLAG = :LOCALFLAG
+   #end
+	]]>
+	</sql>
+</mapper> 

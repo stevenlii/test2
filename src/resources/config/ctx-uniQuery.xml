@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<!-- 统一查询相关bean -->
+	<bean id="namedJt" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSource" />   
+	</bean>
+	<bean id="uniQueryService" class="com.umpay.uniquery.impl.UniQueryServiceImpl">
+		<property name="jt" ref="namedJt" />
+		<property name="dialect" ref="db2Dialect" />
+		<property name="sqlTemplate">  
+			<ref bean="sqlTemplate" />
+		</property>
+	</bean>
+	<bean id="db2Dialect" class="com.umpay.uniquery.impl.DB2Dialect">
+	</bean>
+	<bean id="sqlTemplate" class="com.umpay.uniquery.impl.VelocitySqlTemplate">  
+		<property name="sqlConfig">  
+			<ref bean="sqlConfig" />
+		</property>
+	</bean>
+	
+	<bean id="sqlConfig" class="com.umpay.uniquery.impl.XmlSqlConfig">
+		<constructor-arg index="0" value="query" />
+	</bean>
+	<!-- 统一查询相关bean    离线库 -->
+	<bean id="namedJtOffline" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSourceOffline" />   
+	</bean>
+	<bean id="uniQueryServiceOffline" class="com.umpay.uniquery.impl.UniQueryServiceImpl">
+		<property name="jt" ref="namedJtOffline" />
+		<property name="dialect" ref="db2Dialect" />
+		<property name="sqlTemplate">  
+			<ref bean="sqlTemplateOffline" />
+		</property>
+	</bean>
+	<bean id="sqlTemplateOffline" class="com.umpay.uniquery.impl.VelocitySqlTemplate">  
+		<property name="sqlConfig">  
+			<ref bean="sqlConfigOffline" />
+		</property>
+	</bean>
+	
+	<bean id="sqlConfigOffline" class="com.umpay.uniquery.impl.XmlSqlConfig">
+		<constructor-arg index="0" value="queryOffline" />
+	</bean>
+</beans>

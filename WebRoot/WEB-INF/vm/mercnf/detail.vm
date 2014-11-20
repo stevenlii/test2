@@ -1,0 +1,124 @@
+<html>
+<head> 
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+  <script>
+   //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     } 
+  </script>  
+  </head>
+  <body>
+	<div>
+	    <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+	      <tr>
+	            <th width="40%">商户：</th>
+	            <td class="td" >$!{merCnf.merId}【$!{merCnf.merName}】</td>
+	      </tr>
+	      <tr>
+	            <th>合并模式：</th>
+	            <td class="td1" >#if ($!{merCnf.merGer}==1) 合并 #else 不合并 #end</td>
+	      </tr>
+	       <tr>
+	            <th >版本：</th>
+	            <td class="td" >$!{merCnf.version}</td>
+	      </tr>
+	     <tr>
+	            <th >通知模式：</th>
+	            <td class="td1" >
+	            #if ($!{merCnf.notifyMode} == 11)
+	            	仅前台成功后通知
+	            #elseif ($!{merCnf.notifyMode} == 12)
+	                                                仅前台成功或失败后通知
+	            #elseif ($!{merCnf.notifyMode} == 21)
+	                                                仅后台成功后通知
+	            #elseif ($!{merCnf.notifyMode} == 22)
+	                                               仅后台成功或失败后通知
+	            #elseif ($!{merCnf.notifyMode} == 31)
+                                                           前后台成功后通知
+                #elseif ($!{merCnf.notifyMode} == 32)
+                                                          前后台成功或失败后均通知
+	            #end
+	            </td>
+	      </tr>
+	     <tr>
+	            <th >通知次数：</th>
+	            <td class="td" >$!{merCnf.notifyTimes}</td>
+	      </tr>
+	      <tr>
+	            <th >过期时长(秒)：</th>
+	            <td  class="td1" >$!{merCnf.expireTime}</td>
+	      </tr>
+		  <tr>
+	            <th >支持点卡兑换券：</th>
+	            <td  class="td" >#if ($!{merCnf.spCardPay} == 0) 否 #else 是 #end</td>
+	      </tr>
+		  <tr>
+	            <th >前台通知方式：</th>
+	            <td class="td" >
+	            #if ($!{merCnf.retMethod} == 0)
+	            	GET
+	            #elseif ($!{merCnf.retMethod} == 1)
+	            	POST
+	            #end
+                </td>
+	      </tr>
+	      <tr>
+	            <th >后台通知方式：</th>
+	            <td  class="td1" >
+	            #if ($!{merCnf.notifyMethod} == 0)
+	            	GET
+	            #elseif ($!{merCnf.notifyMethod} == 1)
+	            	POST
+	            #end
+	            </td>
+	      </tr>
+	      <tr>
+	            <th >默认支付方式：</th>
+	            <td class="td1" >
+	            #if ($!{merCnf.defBankType} == 1)
+	            	手机银行卡
+	            #elseif ($!{merCnf.defBankType} == 2)
+	            	网银
+	            #elseif ($!{merCnf.defBankType} == 4)
+	                                                积分
+	            #elseif ($!{merCnf.defBankType} == 5)
+	                                                嗖付
+	            #elseif ($!{merCnf.defBankType} == 6)
+	                                               话费
+	            #end
+	            </td>
+	      </tr>
+	      <tr>
+	            <th >证书文件名：</th>
+	            <td class="td" >$!{merCnf.certName}</td>
+	      </tr>
+		     <tr>
+	            <th >页面模板ID：</th>
+	            <td class="td1" >$!{merCnf.pageId}</td>
+	      </tr>
+	     <tr>
+	            <th >页面模板优先级：</th>
+	            <td class="td" >$!{merCnf.styleLevel}</td>
+	      </tr>
+	      <tr>
+	            <th >默认网银：</th>
+	            <td  class="td1" >$!{merCnf.defGateId}</td>
+	      </tr>
+		  <tr>
+	            <th >修改人：</th>
+	            <td  class="td" >$!{merCnf.modUser}</td>
+	      </tr>
+	      </table>
+	</div>
+	  <div class="pop_btn">
+	      <input name="close" type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog();"/>
+	  </div>
+  </body>
+  </html>

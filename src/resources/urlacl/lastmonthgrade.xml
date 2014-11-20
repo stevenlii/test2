@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 上月评分管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/mergrade/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/mergrade/exportMerGrade.do</url>
+	</Option>
+	<!-- 修改按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/mergrade/modify.do</url>
+	</Option>
+	<!-- 导入按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/mergrade/batchImport.do</url>
+	</Option>
+	<!-- 交易数据入库 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/mergrade/loadTradeGrade.do</url>
+	</Option>
+	<!-- 核减数据入库 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/mergrade/loadReduceDataGrade.do</url>
+	</Option>
+	<!-- 手工计算评分 -->
+	<Option>
+		<code>007</code>
+		<url>hfMngBusi/mergrade/calculateGrade.do</url>
+	</Option>
+	
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/mergrade/auditPass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/mergrade/auditNotPass.do</url>
+	</Option>
+</Options>

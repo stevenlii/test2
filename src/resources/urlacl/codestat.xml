@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 计费代码使用查询 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/code/stat/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/code/stat/export.do</url>
+	</Option>
+</Options>

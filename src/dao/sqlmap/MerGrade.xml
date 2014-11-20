@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MerGrade">
+	<typeAlias alias="MerGrade" type="com.umpay.hfmng.model.MerGrade" />
+	<typeAlias alias="HSMerSet" type="com.umpay.hfmng.model.HSMerSet" />
+	
+	<sql id="select_what">
+		select t.*,i.merName,i.state,i.inTime merInTime,e.operator from umpay.t_hfmer_grade t,umpay.t_mer_inf i ,umpay.t_hfmer_exp e 
+		where t.merId=i.merId and i.merId=e.merId
+	</sql>
+	
+	<sql id="key_find">
+			<isNotEmpty	property="merId" prepend=" and ">
+				t.merId = #merId#
+			</isNotEmpty>
+			<isNotEmpty	property="month" prepend=" and ">
+				t.month = #month#
+			</isNotEmpty>
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="merId" prepend=" and ">
+				t.merId  = #merId#
+			</isNotEmpty>
+			<isNotEmpty	property="month" prepend=" and ">
+				t.month = #month#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<statement id="Get" resultClass="MerGrade" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+
+	<statement id="Find" resultClass="MerGrade" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_hfmer_grade t 
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="updateModLock" resultClass="integer">
+	   update umpay.t_hfmer_grade set modLock=#modLock# where merId=#merId# and month=#month#
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update umpay.t_hfmer_grade set modLock=0,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+			<isNotEmpty	property="turnoverIndex" prepend=" , "> turnoverIndex=#turnoverIndex# </isNotEmpty>
+			<isNotEmpty	property="riseRateIndex" prepend=" , "> riseRateIndex=#riseRateIndex# </isNotEmpty>
+			<isNotEmpty	property="falseTradeIndex" prepend=" , "> falseTradeIndex=#falseTradeIndex# </isNotEmpty>
+			<isNotEmpty	property="complaintIndex" prepend=" , "> complaintIndex=#complaintIndex# </isNotEmpty>
+			<isNotEmpty	property="sysStabIndex" prepend=" , "> sysStabIndex=#sysStabIndex# </isNotEmpty>
+			<isNotEmpty	property="cooperateIndex" prepend=" , "> cooperateIndex=#cooperateIndex# </isNotEmpty>
+			<isNotEmpty	property="breachIndex" prepend=" , "> breachIndex=#breachIndex# </isNotEmpty>
+			<isNotEmpty	property="upgradeIndex" prepend=" , "> upgradeIndex=#upgradeIndex# </isNotEmpty>
+			<isNotEmpty	property="marketingIndex" prepend=" , "> marketingIndex=#marketingIndex# </isNotEmpty>
+			<isNotEmpty	property="supportIndex" prepend=" , "> supportIndex=#supportIndex# </isNotEmpty>
+			<isNotEmpty	property="total" prepend=" , "> total=#total# </isNotEmpty>
+		 where merId=#merId# and month=#month#
+	</statement>
+
+		<statement id="insertMerGrade" resultClass="MerGrade">
+		insert into umpay.t_hfmer_grade(merId, month 
+				<isNotEmpty	property="turnover" prepend=" , "> turnover </isNotEmpty>
+				<isNotEmpty	property="lastTurnover" prepend=" , "> lastTurnover </isNotEmpty>
+				<isNotEmpty	property="riseRate" prepend=" , "> riseRate </isNotEmpty>
+				<isNotEmpty	property="reduceSum" prepend=" , "> reduceSum </isNotEmpty>
+				<isNotEmpty	property="reduceRate" prepend=" , "> reduceRate </isNotEmpty>
+				<isNotEmpty	property="tradingCount" prepend=" , "> tradingCount </isNotEmpty>
+				<isNotEmpty	property="complaintCount" prepend=" , "> complaintCount </isNotEmpty>
+				<isNotEmpty	property="turnoverIndex" prepend=" , "> turnoverIndex </isNotEmpty>
+				<isNotEmpty	property="riseRateIndex" prepend=" , "> riseRateIndex </isNotEmpty>
+				<isNotEmpty	property="falseTradeIndex" prepend=" , "> falseTradeIndex </isNotEmpty>
+				<isNotEmpty	property="complaintIndex" prepend=" , "> complaintIndex </isNotEmpty>
+				<isNotEmpty	property="sysStabIndex" prepend=" , "> sysStabIndex </isNotEmpty>
+				<isNotEmpty	property="cooperateIndex" prepend=" , "> cooperateIndex </isNotEmpty>
+				<isNotEmpty	property="breachIndex" prepend=" , "> breachIndex </isNotEmpty>
+				<isNotEmpty	property="upgradeIndex" prepend=" , "> upgradeIndex </isNotEmpty>
+				<isNotEmpty	property="marketingIndex" prepend=" , "> marketingIndex </isNotEmpty>
+				<isNotEmpty	property="supportIndex" prepend=" , "> supportIndex </isNotEmpty>
+				<isNotEmpty	property="total" prepend=" , "> total </isNotEmpty>
+			) values(#merId#, #month#  
+				<isNotEmpty	property="turnover" prepend=" , "> #turnover# </isNotEmpty>
+				<isNotEmpty	property="lastTurnover" prepend=" , "> #lastTurnover# </isNotEmpty>
+				<isNotEmpty	property="riseRate" prepend=" , "> #riseRate# </isNotEmpty>
+				<isNotEmpty	property="reduceSum" prepend=" , "> #reduceSum# </isNotEmpty>
+				<isNotEmpty	property="reduceRate" prepend=" , "> #reduceRate# </isNotEmpty>
+				<isNotEmpty	property="tradingCount" prepend=" , "> #tradingCount# </isNotEmpty>
+				<isNotEmpty	property="complaintCount" prepend=" , "> #complaintCount# </isNotEmpty>
+				<isNotEmpty	property="turnoverIndex" prepend=" , "> #turnoverIndex# </isNotEmpty>
+				<isNotEmpty	property="riseRateIndex" prepend=" , "> #riseRateIndex# </isNotEmpty>
+				<isNotEmpty	property="falseTradeIndex" prepend=" , "> #falseTradeIndex# </isNotEmpty>
+				<isNotEmpty	property="complaintIndex" prepend=" , "> #complaintIndex# </isNotEmpty>
+				<isNotEmpty	property="sysStabIndex" prepend=" , "> #sysStabIndex# </isNotEmpty>
+				<isNotEmpty	property="cooperateIndex" prepend=" , "> #cooperateIndex# </isNotEmpty>
+				<isNotEmpty	property="breachIndex" prepend=" , "> #breachIndex# </isNotEmpty>
+				<isNotEmpty	property="upgradeIndex" prepend=" , "> #upgradeIndex# </isNotEmpty>
+				<isNotEmpty	property="marketingIndex" prepend=" , "> #marketingIndex# </isNotEmpty>
+				<isNotEmpty	property="supportIndex" prepend=" , "> #supportIndex# </isNotEmpty>
+				<isNotEmpty	property="total" prepend=" , "> #total# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="updateMerGradeNoAudit" resultClass="MerGrade">
+		update umpay.t_hfmer_grade set modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="turnover" prepend=" , "> turnover=#turnover# </isNotEmpty>
+			<isNotEmpty	property="lastTurnover" prepend=" , "> lastTurnover=#lastTurnover# </isNotEmpty>
+			<isNotEmpty	property="riseRate" prepend=" , "> riseRate=#riseRate# </isNotEmpty>
+			<isNotEmpty	property="reduceSum" prepend=" , "> reduceSum=#reduceSum# </isNotEmpty>
+			<isNotEmpty	property="reduceRate" prepend=" , "> reduceRate=#reduceRate# </isNotEmpty>
+			<isNotEmpty	property="tradingCount" prepend=" , "> tradingCount=#tradingCount# </isNotEmpty>
+			<isNotEmpty	property="complaintCount" prepend=" , "> complaintCount=#complaintCount# </isNotEmpty>
+			<isNotEmpty	property="turnoverIndex" prepend=" , "> turnoverIndex=#turnoverIndex# </isNotEmpty>
+			<isNotEmpty	property="riseRateIndex" prepend=" , "> riseRateIndex=#riseRateIndex# </isNotEmpty>
+			<isNotEmpty	property="falseTradeIndex" prepend=" , "> falseTradeIndex=#falseTradeIndex# </isNotEmpty>
+			<isNotEmpty	property="complaintIndex" prepend=" , "> complaintIndex=#complaintIndex# </isNotEmpty>
+			<isNotEmpty	property="sysStabIndex" prepend=" , "> sysStabIndex=#sysStabIndex# </isNotEmpty>
+			<isNotEmpty	property="cooperateIndex" prepend=" , "> cooperateIndex=#cooperateIndex# </isNotEmpty>
+			<isNotEmpty	property="breachIndex" prepend=" , "> breachIndex=#breachIndex# </isNotEmpty>
+			<isNotEmpty	property="upgradeIndex" prepend=" , "> upgradeIndex=#upgradeIndex# </isNotEmpty>
+			<isNotEmpty	property="marketingIndex" prepend=" , "> marketingIndex=#marketingIndex# </isNotEmpty>
+			<isNotEmpty	property="supportIndex" prepend=" , "> supportIndex=#supportIndex# </isNotEmpty>
+			<isNotEmpty	property="total" prepend=" , "> total=#total# </isNotEmpty>
+		 where merId=#merId# and month=#month#
+	</statement>
+	
+	<statement id="updateMerGrade" resultClass="MerGrade">
+		update umpay.t_hfmer_grade set modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="turnover" prepend=" , "> turnover=#turnover# </isNotEmpty>
+			<isNotEmpty	property="lastTurnover" prepend=" , "> lastTurnover=#lastTurnover# </isNotEmpty>
+			<isNotEmpty	property="riseRate" prepend=" , "> riseRate=#riseRate# </isNotEmpty>
+			<isNotEmpty	property="reduceSum" prepend=" , "> reduceSum=#reduceSum# </isNotEmpty>
+			<isNotEmpty	property="reduceRate" prepend=" , "> reduceRate=#reduceRate# </isNotEmpty>
+			<isNotEmpty	property="tradingCount" prepend=" , "> tradingCount=#tradingCount# </isNotEmpty>
+			<isNotEmpty	property="complaintCount" prepend=" , "> complaintCount=#complaintCount# </isNotEmpty>
+			<isNotEmpty	property="turnoverIndex" prepend=" , "> turnoverIndex=#turnoverIndex# </isNotEmpty>
+			<isNotEmpty	property="riseRateIndex" prepend=" , "> riseRateIndex=#riseRateIndex# </isNotEmpty>
+			<isNotEmpty	property="falseTradeIndex" prepend=" , "> falseTradeIndex=#falseTradeIndex# </isNotEmpty>
+			<isNotEmpty	property="sysStabIndex" prepend=" , "> sysStabIndex=#sysStabIndex# </isNotEmpty>
+			<isNotEmpty	property="cooperateIndex" prepend=" , "> cooperateIndex=#cooperateIndex# </isNotEmpty>
+			<isNotEmpty	property="breachIndex" prepend=" , "> breachIndex=#breachIndex# </isNotEmpty>
+			<isNotEmpty	property="upgradeIndex" prepend=" , "> upgradeIndex=#upgradeIndex# </isNotEmpty>
+			<isNotEmpty	property="marketingIndex" prepend=" , "> marketingIndex=#marketingIndex# </isNotEmpty>
+			<isNotEmpty	property="supportIndex" prepend=" , "> supportIndex=#supportIndex# </isNotEmpty>
+			<isNotEmpty	property="total" prepend=" , "> total=#total# </isNotEmpty>
+		 where merId=#merId# and month=#month#
+	</statement>
+	<statement id="getXEReduceData" resultClass="HSMerSet"> 
+		select merid, sum(succamtm) as billSuccAmtm, sum(muteamt) as muteamt
+		from umpay.T_HS_XETRANS_STL
+		where platdate like '$lastLMonth$%' group by merid
+	</statement>
+	<statement id="getMWReduceData" resultClass="HSMerSet"> 
+		select merid, sum(feeamount) as  billSuccAmtm, sum(muteamount) as muteamt
+		from umpay.T_HS_MNMERSTL
+		where stlmonth like '$lastLMonth$%' and localflag=1 group by merid
+	</statement>
+</sqlMap>

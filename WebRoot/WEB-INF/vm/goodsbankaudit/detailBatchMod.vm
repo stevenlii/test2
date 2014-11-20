@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid-standard.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/busi/goodsbankaudit.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function() {
+	
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+	
+	jQuery('#grid').omGrid({
+		dataSource : "$request.contextPath/goodsbankaudit/auditBatchDetail.do?queryKey=audit.getByBatchId&batchId="+$!{batchId},
+		width:'100%',
+		autoFit : true,		
+		height : 360,
+		limit : 10,
+		colModel : [ {header : '审核类型', name : 'AUDITTYPE', align : 'left', width : 40,renderer:function(value , rowData , rowIndex){
+				         	var auditType = rowData.AUDITTYPE;
+				         	var name = "";
+				         	if (auditType=='1'){
+				         		name = "新增";
+				         	}else if (auditType=='2'){
+				         		name = "修改";
+				         	}else if (auditType=='3'){
+				         		name = "启用";
+				         	}else if (auditType=='4'){
+				         		name = "禁用";
+				         	}else{
+				         		name = "未知";
+				         	}
+						   	return "<a title='"+name+"'>"+name+"</a>";
+				         }},
+				         {header : '商户号', name : 'MERID',width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+								return "<a title='"+value+"'>"+value+"</a>";
+	                  		}}, 
+	                  {header : '商品号', name : 'GOODSID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+	                  			return "<a title='"+value+"'>"+value+"</a>";
+	                  		}}, 
+	                  {header : '商品支付银行', name : 'BANKNAME',width : 70, align : 'left',renderer:function(value , rowData , rowIndex){
+	                  			return "<a title='"+value+"'>"+value+"</a>";
+	                  		}},
+                  		{header : '二次确认校验码', name : 'VERIFYTAG',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                  			var color = "";
+                  			if(value!='$!{newVerifyTag}'){
+                  				color = " style='color:red' ";
+                  			}
+	              			return "<a title='"+value+"'"+color+">"+value+"</a>";
+                  		}},
+                  		{header : '商品最长计费天数', name : 'CHECKDAY',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                  			var color = "";
+                  			if(value!='$!{newCheckDay}'){
+                  				color = " style='color:red' ";
+                  			}
+	              			return "<a title='"+value+"'"+color+">"+value+"</a>";
+                  		}},
+                  		{header : '商品开通状态', name : 'KSTATE',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                  			var name = "";
+                         	if(value==11)
+                         		name = "只开通新增";
+                         	else if (value == 12){
+                         		name = "只开通续费";
+                         	}
+                         	else if (value==13){
+                         		name = "新增与续费全部开通";
+                     	    }
+                         	else if (value==23){
+                         		name = "新增与续费全部注销";
+                         	}
+                  			var color = "";
+                  			if(value!='$!{newkState}'){
+                  				color = " style='color:red' ";
+                  			}
+	              			return "<a title='"+name+"'"+color+">"+name+"</a>";
+                  		}},
+                  		{header : '下发商品时间', name : 'ISREALTIME',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                  			var name = "";
+                         	if(value=='0')
+                         		name = "即时下发";
+                         	else if (value == '1'){
+                         		name = "智能网异步发货";
+                         	}
+                         	else if (value=='2'){
+                         		name = "BOSS异步发货";
+                     	    }
+                         	else if (value=='3'){
+                         		name = "全部异步发货";
+                         	}
+                  			var color = "";
+                  			if(value!='$!{newIsRealTime}'){
+                  				color = " style='color:red' ";
+                  			}
+	              			return "<a title='"+name+"'"+color+">"+name+"</a>";
+                  		}},
+                  		{header : '平台在机构商户号', name : 'BANKMERID',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+                  			var color = "";
+                  			if(value!='$!{newBankMerId}'){
+                  				color = " style='color:red' ";
+                  			}
+	              			return "<a title='"+value+"'"+color+">"+value+"</a>";
+                  		}},
+                  		{header : '平台在机构终端号', name : 'BANKPOSID',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+                  			var color = "";
+                  			if(value!='$!{newBankPosId}'){
+                  				color = " style='color:red' ";
+                  			}
+	              			return "<a title='"+value+"'"+color+">"+value+"</a>";
+                  		}}
+	               ]
+	});
+	$('#grid').omGrid("setData", "$request.contextPath/goodsbankaudit/auditBatchDetail.do?queryKey=audit.getByBatchId&batchId="+$!{batchId});
+});
+
+//商品银行配置审核通过方法
+function goBatchPass(batchId){
+	var flag = confirm("确认审核通过此信息？");
+	if (flag){
+		$.ajax({
+			url : '$request.contextPath/goodsbankaudit/goPass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'batchId' : batchId
+			},
+			success : function(data){
+				closeDialog();
+				window.parent.shuaxin();
+				window.parent.showSimpleTip(data);
+			}
+		});
+	}
+}
+
+//批量审核不通过方法             
+function goNotPass(batchId){
+	var flag = confirm("确认审核不通过此信息？");;
+	if(flag){
+		$.ajax({
+			url : 'notPass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'batchId' : batchId
+			},
+			success : function(data){
+				closeDialog();
+				window.parent.shuaxin();
+				showSimpleTip(data);
+			}
+		});
+	}
+}
+</script>
+</head>
+<body>
+	<form id ="dataform-mod" method="post" name="dataform-mod">
+		<table width="750px">
+			<tr>
+				<td rowspan="2" width="10%"><b>统一配置为</b>：</td>
+				<td width="14%" align="right"><b>二次确认校验码</b>：</td>
+				<td width="11%">$!{newVerifyTag}</td>
+				<td width="15%" align="right"><b>商品最长计费天数</b>：</td>
+				<td width="8%">$!{newCheckDay}</td>
+				<td width="15%" align="right"><b>商品开通状态</b>：</td>
+				<td width="15%">
+					#if ($!{newkState}==11) 只开通新增#elseif ($!{newkState}==12) 只开通续费
+					#elseif ($!{newkState}==13) 新增与续费全部开通#elseif ($!{newkState}==23) 新增与续费全部注销#end
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><b>下发商品时间</b>：</td>
+				<td>
+					#if ($!{newIsRealTime}==0) 即时下发#elseif ($!{newIsRealTime}==1) 智能网异步发货 
+					#elseif ($!{newIsRealTime}==2) BOSS异步发货 #elseif ($!{newIsRealTime}==3) 全部异步发货#end
+				</td>
+				<td align="right"><b>平台在机构商户号</b>：</td>
+				<td>$!{newBankMerId}</td>
+				<td align="right"><b>平台在机构终端号</b>：</td>
+				<td>$!{newBankPosId}</td>
+			</tr>
+		</table>
+		</br><table id="grid" align="left"></table>
+		<div style="text-align: center;">
+		#if($!{state}==0)
+			<input type="button" class="popbtn" code="013" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goBatchPass(&quot;${batchId}&quot;);"/>
+			<input type="button" class="popbtn" code="014" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="不通过" onclick="goNotPass(&quot;${batchId}&quot;)"/>
+		#end
+			<input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="返回" onclick="closeDialog()"/>
+		</div>
+	</form>
+</body>
+</html>

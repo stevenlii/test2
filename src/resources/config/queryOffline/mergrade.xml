@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="mergrade"  >
+	<sql id="lastMonthGrade"> 
+	<![CDATA[
+		 SELECT I.MERNAME,G.MERID,I.STATE,G.TURNOVERINDEX,G.RISERATEINDEX,G.FALSETRADEINDEX,G.COMPLAINTINDEX,
+		 	G.SYSSTABINDEX,G.COOPERATEINDEX,G.BREACHINDEX,G.UPGRADEINDEX,G.MARKETINGINDEX,
+		 	G.SUPPORTINDEX,G.TOTAL,G.MODLOCK,I.INTIME,G.MODTIME,G.MONTH 
+		 	FROM UMPAY.T_HFMER_GRADE G,UMPAY.T_HFMER_EXP E,UMPAY.T_MER_INF I 
+		 	#if( $operator && $operator!='' ) 
+			   ,UMPAY.T_HFMER_OPER O 
+			#end
+		 WHERE G.MERID=E.MERID AND E.MERID=I.MERID AND G.MONTH=:lastMonth 
+		 	#if( $operator && $operator!='' ) 
+			   AND O.MER_ID=E.MERID AND O.STATE=2 AND O.OPERATOR=:operator 
+			#end
+		 #if( $merId && $merId!='' )
+		   AND G.MERID=:merId 
+		 #end
+		 #if( $merName && $merName!='' ) 
+		   AND I.MERNAME LIKE '%$merName%' 
+		 #end 
+		 #if( $after && $after!='' ) 
+		   AND I.INTIME>=:after 
+		 #end
+		 #if( $befor && $befor!='' ) 
+		   AND I.INTIME<:befor 
+		 #end
+		 #if( $low && $low!='' ) 
+		   AND G.TOTAL>=:low 
+		 #end
+		 #if( $high && $high!='' ) 
+		   AND G.TOTAL<:high 
+		 #end
+		 ORDER BY G.MODTIME DESC
+	  ]]>
+	</sql>
+	<sql id="historyGrade"> 
+	<![CDATA[
+		 SELECT I.MERNAME,G.MERID,I.STATE,G.TURNOVERINDEX,G.RISERATEINDEX,G.FALSETRADEINDEX,G.COMPLAINTINDEX,
+		 	G.SYSSTABINDEX,G.COOPERATEINDEX,G.BREACHINDEX,G.UPGRADEINDEX,G.MARKETINGINDEX,
+		 	G.SUPPORTINDEX,G.TOTAL,E.OPERATOR,G.MODLOCK,I.INTIME,G.MODTIME,G.MONTH 
+		 	FROM UMPAY.T_HFMER_GRADE G,UMPAY.T_HFMER_EXP E,UMPAY.T_MER_INF I
+		 	#if( $operator && $operator!='' ) 
+			   ,UMPAY.T_HFMER_OPER O 
+			#end
+		 	 WHERE G.MERID=E.MERID AND E.MERID=I.MERID  AND G.MONTH<:lastMonth 
+		 	#if( $operator && $operator!='' ) 
+			   AND O.MER_ID=E.MERID AND O.STATE=2 AND O.OPERATOR=:operator 
+			#end
+		 #if( $merId && $merId!='' )
+		   AND G.MERID=:merId   
+		 #end
+		 #if( $month && $month!='' )
+		   AND G.MONTH=:month   
+		 #end
+		 #if( $merName && $merName!='' ) 
+		   AND I.MERNAME LIKE '%$merName%'   
+		 #end 
+		 #if( $after && $after!='' ) 
+		   AND I.INTIME>=:after 
+		 #end
+		 #if( $befor && $befor!='' ) 
+		   AND I.INTIME<:befor 
+		 #end
+		 #if( $low && $low!='' ) 
+		   AND G.TOTAL>=:low 
+		 #end
+		 #if( $high && $high!='' ) 
+		   AND G.TOTAL<:high 
+		 #end
+		 ORDER BY G.MODTIME DESC
+	  ]]>
+	</sql>
+</mapper> 

@@ -1,0 +1,783 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+        <link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-dialog.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-numberfield.js">
+        </script>
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+        <script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js">
+        </script>
+        <script src="$request.contextPath/js/busi/merInf.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js">
+        </script>
+        <script>
+            var setting2 = {
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                },
+                callback: {
+                    beforeClick: beforeClick2,
+                    onClick: onClick2
+                }
+            };
+            jQuery(document).ready(function() {
+                jQuery("#container").width(jQuery(window).width());
+                var zNodes1 = "${zNodes}";
+                var zNodes = eval(zNodes1);
+                $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+                var busiType1 = "${busiType}";
+                var busiType = eval(busiType1);
+                $.fn.zTree.init($("#busiTypeTree"), setting2, busiType);
+
+                $.validator.addMethod("exist",
+                function(value) {
+                    return checkMerId(value);
+                },
+                "当前商户号已存在");
+                //  	 $.validator.addMethod("checkName", function(value) {
+                //	        return checkMerName(value);
+                //	    }, "当前商户名称已存在");
+                jQuery("#dataform").validate({
+                    onkeyup: false,
+                    rules: {
+                        "merId": {
+                            required: true,
+                            digits: true,
+                            minlength: 4,
+                            maxlength: 4,
+                            exist: true
+                        },
+                        "merName": {
+                            required: true,
+                            maxlength: 13
+                        },
+                        "busiType": {
+                            required: true
+                        },
+                        "category": {
+                            required: true
+                        },
+                        "interType": {
+                            required: true
+                        },
+                        "chnlCheck": {
+                            required: true
+                        },
+                        "operator": {
+                            required: true
+                        },
+                        "companyName": {
+                            required: true,
+                            maxlength: 26
+                        },
+                        "companyDesc": {
+                            required: true,
+                            maxlength: 128
+                        },
+                        "busiDesc": {
+                            required: true,
+                            maxlength: 128
+                        },
+                        "merWeb": {
+                            required: true,
+                            maxlength: 128
+                        },
+                        "saleChannel": {
+                            required: true,
+                            maxlength: 128
+                        },
+                        "regCapital": {
+                            required: true,
+                            number: true
+                        },
+                        "regTime": {
+                            required: true
+                        },
+                        "srcMer": {
+                            required: true
+                        },
+                        "yearProfit": {
+                            required: true,
+                            number: true
+                        },
+                        "userScale": {
+                            required: true,
+                            digits: true
+                        },
+                        "support": {
+                            required: true,
+                            digits: true
+                        },
+                        "sharedRate": {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        "merId": {
+                            required: "请输入商户编号",
+                            digits: "请填写数字",
+                            minlength: "商户号不能小于4位",
+                            maxlength: "商户号不能大于4位"
+                        },
+                        "merName": {
+                            required: "请输入商户名称",
+                            maxlength: "商户名称最多13个字"
+                        },
+                        "busiType": {
+                            required: "请选择业务属性类型"
+                        },
+                        "category": {
+                            required: "请选择商户分类"
+                        },
+                        "interType": {
+                            required: "请选择接口类型"
+                        },
+                        "chnlCheck": {
+                            required: "请选择是否渠道报备"
+                        },
+                        "operator": {
+                            required: "请选择运营负责人"
+                        },
+                        "companyName": {
+                            required: "请输入公司名称",
+                            maxlength: "公司名称最多26个字"
+                        },
+                        "companyDesc": {
+                            required: "请输入公司介绍",
+                            maxlength: "公司介绍最多128个字"
+                        },
+                        "busiDesc": {
+                            required: "请输入业务介绍",
+                            maxlength: "业务介绍最多128个字"
+                        },
+                        "merWeb": {
+                            required: "请输入商户网址",
+                            maxlength: "商户网址最多128个字"
+                        },
+                        "saleChannel": {
+                            required: "请输入自有营销渠道",
+                            maxlength: "自有营销渠道最多128个字"
+                        },
+                        "regCapital": {
+                            required: "请输入注册资本",
+                            number: "请填写数字"
+                        },
+                        "regTime": {
+                            required: "请输入公司成立时间"
+                        },
+                        "srcMer": {
+                            required: "请输入商户来源"
+                        },
+                        "yearProfit": {
+                            required: "请输入年收益",
+                            number: "请填写数字"
+                        },
+                        "userScale": {
+                            required: "请输入用户规模",
+                            digits: "请填写数字"
+                        },
+                        "support": {
+                            required: "请输入运营支撑",
+                            digits: "请填写数字"
+                        },
+                        "sharedRate": {
+                        	required: "请选择分成比例"
+                        }
+                    },
+
+                    errorPlacement: function(error, element) {
+                        if (error.html()) {
+                            $(element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.css('display', 'block');
+                                    attentionElement.next().html(error);
+                                    attentionElement.next().css('display', 'block');
+                                }
+                            });
+                        }
+                    },
+                    showErrors: function(errorMap, errorList) {
+                        if (errorList && errorList.length > 0) {
+                            $.each(errorList,
+                            function(index, obj) {
+                                var msg = this.message;
+                                $(obj.element).parents().map(function() {
+                                    if (this.tagName.toLowerCase() == 'td') {
+                                        var attentionElement = $(this).next().children().eq(0);
+                                        attentionElement.show();
+                                        attentionElement.next().html(msg);
+                                    }
+                                });
+                            });
+                        } else {
+                            $(this.currentElements).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    $(this).next().children().eq(0).hide();
+                                    $(this).next().children().eq(1).hide();
+                                }
+                            });
+                        }
+                        this.defaultShowErrors();
+                    },
+                    submitHandler: function() {
+                        jQuery(this).submit();
+                        return false;
+                    }
+                });
+
+                jQuery('#dataform').submit(function() {
+                    if (!jQuery("#dataform").valid()) {
+                        return false;
+                    }
+                    jQuery(this).omAjaxSubmit({
+                        success: function(res) {
+                            var msg = "";
+                            var ty = "";
+                            if (res != '1') {
+                                ty = 'error';
+                                var msg = '操作失败';
+                                if (res != '0') {
+                                    msg = res;
+                                }
+                            } else {
+                                ty = 'success';
+                                msg = '操作成功，已提交审核';
+                                closeDialog();
+                            }
+                            window.parent.$.omMessageBox.alert({
+                                type: ty,
+                                title: '操作提示',
+                                content: msg
+                            });
+                        }
+
+                    });
+
+                    return false;
+                });
+
+                //获取商户分类列表
+                $('#category').omCombo({
+                    dataSource: '$request.contextPath/option/mercategory.do',
+                    emptyText: '请选择..',
+                    listMaxHeight: 120,
+                    forceSelection: true,
+                    width: '100px'
+                });
+
+                //获取商户来源列表
+                $('#srcMer').omCombo({
+                    dataSource: [{
+                        "value": "联动拓展",
+                        "text": "联动拓展"
+                    },
+                    {
+                        "value": "移动推荐",
+                        "text": "移动推荐"
+                    }],
+                    emptyText: '请选择..',
+                    listAutoWidth: true,
+                    forceSelection: false,
+                    value: '联动拓展',
+                    width: '100px'
+                });
+
+              	//初始化支付银行列表
+                $('#bankId').omCombo({
+                    dataSource: '$request.contextPath/option/shareratexebanklist.do',
+                    width: '160',
+                    emptyText: '全部 ',
+                    listMaxHeight: 150,
+                    listAutoWidth: true,
+                    multi : true,
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"全部","text":"全部"}');
+                        data.unshift(tmp);
+                        tmp = $.parseJSON('{"value":"其他","text":"其他"}');
+                        data.unshift(tmp);
+                    },
+                    forceSelection: true
+                });
+              	
+              	// 初始化分成比例输入框
+                $('#sharedRateText').omNumberField({
+                    allowDecimals : false,
+                    allowNegative : false
+                });
+              	
+              	// 增加分成比例按钮点击事件
+                $("#sharedRateBtn").click(function() {
+                	var vBankId = $("#bankId").val();
+                	var vSharedRateText = $("#sharedRateText").val();
+                	if("" == vBankId || vSharedRateText == ""){
+                		return;
+                	}
+                	var sharedRate = $("#sharedRate").val();
+                	if("" == sharedRate){
+                		sharedRate = vBankId + ":" + vSharedRateText;
+                	}else{
+                		sharedRate = sharedRate + "|" + vBankId + ":" + vSharedRateText;
+                	}
+                	$("#sharedRate").val(sharedRate);
+                	$("#bankId").val("全部");
+                });
+              	
+             	// 清空分成比例按钮点击事件
+                $("#clearBtn").click(function() { 
+                	$("#sharedRate").val("");
+                });
+            });
+
+            //关闭窗口方法
+            function closeDialog() {
+                window.parent.fillBackAndCloseDialog("#dialog");
+            }
+        </script>
+    </head>
+    
+    <body>
+        <div id="container">
+            <form id="dataform" method="post" name="dataform" action="${request.contextPath}/merinf/save.do">
+                <table width="100%">
+                    <tr>
+                        <td>
+                            <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+                                <tr>
+                                    <th width="21%" align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        商户号：
+                                    </th>
+                                    <td width="47%" class="td">
+                                        <input id="merId" name="merId" type="text" maxlength="5" class="input1"
+                                        />
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        商户名称：
+                                    </th>
+                                    <td class="td1">
+                                        <input name="merName" type="text" maxlength="14" class="input2" />
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>
+                                            *
+                                        </span>
+                                        业务属性：
+                                    </th>
+                                    <td class="td">
+                                        <span class="om-combo om-widget om-state-default" style="width: 90px;">
+                                            <input type="text" id="merBusiType" readonly value="请选择" onclick="showMenu2(); return false;"
+                                            onkeydown="refuseBackspace()" class="select1" style="width: 69px;">
+                                            <span onclick="showMenu2(); return false;" class="om-combo-trigger ioi_trigger">
+                                            </span>
+                                        </span>
+                                        <input type="hidden" id="busiType" name="busiType" value="" type="text"
+                                        />
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>
+                                            *
+                                        </span>
+                                        运营负责人：
+                                    </th>
+                                    <td class="td1">
+                                        <input id="showOperator" type="text" readonly value="" class="input2"
+                                        onclick="showMenu();" />
+                                        <input type="hidden" id="operator" name="operator" />
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>
+                                            *
+                                        </span>
+                                        商户分类：
+                                    </th>
+                                    <td class="td">
+                                        <input id="category" name="category" class="select1" />
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>
+                                            *
+                                        </span>
+                                        接口类型：
+                                    </th>
+                                    <td class="td1">
+                                        <input type='radio' name='interType' value='0'>
+                                        标准&nbsp;&nbsp;
+                                        <input type='radio' name='interType' value='1'>
+                                        特殊
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>
+                                            *
+                                        </span>
+                                        是否渠道报备：
+                                    </th>
+                                    <td class="td">
+                                        <input type='radio' name='chnlCheck' value='1'>
+                                        是 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <input type='radio' name='chnlCheck' value='0'>
+                                        否
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>
+                                            *
+                                        </span>
+                                        开通对账文件下载：
+                                    </th>
+                                    <td class="td1">
+                                        <input type='radio' name='fileDL' value='1' checked>
+                                        是 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <input type='radio' name='fileDL' value='0'>
+                                        否
+                                    </td>
+                                    <td class="td1">
+                                        （默认开通商户自服务对账文件下载）
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        公司名称：
+                                    </th>
+                                    <td class="td">
+                                        <input name="companyName" type="text" maxlength="27" class="input2" />
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        公司介绍：
+                                    </th>
+                                    <td class="td1">
+                                        <textarea id="companyDesc" name="companyDesc" rows="3" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%"></textarea>
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        业务介绍：
+                                    </th>
+                                    <td class="td">
+                                        <textarea id="busiDesc" name="busiDesc" rows="3" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%"></textarea>
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        商户网址：
+                                    </th>
+                                    <td class="td1">
+                                        <input id="merWeb" name="merWeb" type="text" maxlength="27" class="input2"
+                                        />
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        自有营销渠道：
+                                    </th>
+                                    <td class="td">
+                                        <input id="saleChannel" name="saleChannel" type="text" maxlength="27"
+                                        class="input2" />（可以填渠道名称或渠道网址）
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        注册资本：
+                                    </th>
+                                    <td class="td1">
+                                        <input id="regCapital" name="regCapital" type="text" maxlength="27" class="input2"
+                                        />
+                                        &nbsp;万元
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        成立时间：
+                                    </th>
+                                    <td class="td">
+                                        <input type="text" id="regTime" name="regTime" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})"
+                                        class="Wdate" style="width:100px" />
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        商户来源：
+                                    </th>
+                                    <td class="td1">
+                                        <input id="srcMer" name="srcMer" class="select1" />
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        年收益：
+                                    </th>
+                                    <td class="td">
+                                        <input id="yearProfit" name="yearProfit" class="select1" />
+                                        &nbsp;万
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        用户规模：
+                                    </th>
+                                    <td class="td1">
+                                        <input id="userScale" name="userScale" class="select1" />
+                                        &nbsp;人
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        运营支撑：
+                                    </th>
+                                    <td class="td">
+                                        <input id="support" name="support" class="select1" />
+                                        &nbsp;人
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                        <span>
+                                            *
+                                        </span>
+                                        	分成比例：
+                                    </th>
+                                    <td class="td1">
+                                        <input id="bankId" name="bankId" type="text" class="input2" />
+                                                                                                            比例：
+                                        <input id="sharedRateText" type="text" maxlength="2" class="input3" style="width:30px" />
+                                        <input id="sharedRateBtn" type="button" value="增加" >&nbsp;<input id="clearBtn" type="button" value="清空" >
+                                    </td>
+                                    <td class="td1">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="left">
+                                    </th>
+                                    <td class="td">
+                                        <textarea id="sharedRate" name="sharedRate" rows="4" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%" readonly="readonly" ></textarea>
+                                    </td>
+                                    <td class="td">
+                                        <span class="errorImg">
+                                        </span>
+                                        <span class="errorMsg">
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td height="15">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <input id="add_button1" name="submit" type="submit" value="添加" class="popbtn"
+                                        onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"
+                                        />
+                                        <input id="add_button2" name="add_button2" type="reset" value="取消" class="popbtn"
+                                        onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"
+                                        onclick="closeDialog();" />
+                                </tr>
+                            </table>
+                            </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div id="menuContent" class="list_zTree">
+            <ul id="treeDemo" class="ztree" style="margin-top:0; width:140px; height:200px;overflow:auto;">
+            </ul>
+        </div>
+        <div id="menuContent2" class="list_zTree">
+            <ul id="busiTypeTree" class="ztree" style="margin-top:0; width:160px; height:150px;overflow:auto;">
+            </ul>
+        </div>
+    </body>
+
+</html>

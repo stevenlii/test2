@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/busi/codestat.js"></script>
+ 	<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/code/stat/query.do?queryKey=code.FeeCodeStats";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+        	
+		    var optStr="${opts}";
+				var opts=optStr.split(',');
+		    jQuery('[code]').each(function () {
+		        var code=$(this).attr("code");
+		        for(var i=0;i<opts.length;i++){
+				   if(code==opts[i]){
+					   $(this).css('display','inline');
+						}
+		    		};
+				});
+		
+          jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/code/stat/query.do?queryKey=code.FeeCodeStats",
+                width:'100%',
+                height : 430,
+                limit : 15,
+                singleSelect : true,
+                colModel : [ {header : '代码', name : 'SERVICEID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				       				return "<a title='"+value+"'>"+value+"</a>";
+				       			}},
+                             {header : '代码名称', name : 'DETAIL', width : 75, align : 'left',renderer:function(value , rowData , rowIndex){
+				       				return "<a title='"+value+"'>"+value+"</a>";
+				       			}},
+                             {header : '类型', name : 'FEETYPE', width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+	                             	var feeType = rowData.FEETYPE;
+	                             	var name = "";
+	                             	if(feeType==2){
+	                             		name = "按次";
+	                             	}else {
+	                             		name = "包月";
+					       			}
+			                     	return "<a title='"+name+"'>"+name+"</a>";
+				       			}},
+                             {header : '分类', name : 'CATEGORY', width : 65, align : 'left',renderer:function(value , rowData , rowIndex){
+                    				return "<a title='"+value+"'>"+value+"</a>";
+                    			}},
+                             {header : '金额(分)', name : 'AMOUNT', width : 45,align : 'left',renderer:function(value , rowData , rowIndex){
+                    				return "<a title='"+value+"'>"+value+"</a>";
+                    			}},
+                             {header : '状态', name : 'STATE', width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	var name = "";
+                             	if(state==2){
+                             		name = "启用";
+                             	}else {
+                             		name = "禁用";
+                    			}
+		                     	return "<a title='"+name+"'>"+name+"</a>";
+                              }},
+                             {header : '使用次数', name : 'USECOUNT', width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+                            	  	if(value == ""){
+                            	  		value = 0;
+                            	  	}
+                     				return "<a title='"+value+"'>"+value+"</a>";
+                     			}},
+                             {header : '匹配度', name : 'MATCHTYPE', width : 65 , align : 'left',renderer:function(value , rowData , rowIndex){
+                      			var matchType=rowData.MATCHTYPE;
+                      			var name = "";
+                      			if(matchType == 0){
+                      				name = "精配";
+                      			}
+                      			else if(matchType == 1){
+                      				name = "套用";
+                      			}
+                      		    else if(matchType == 2){
+                      		    	name = "-";
+                      			}
+                      			else if(matchType == -99){
+                      				name = "未知";
+                      			}
+                      			else{
+                      				name = "-";
+                      			}
+                      			return "<a title='"+name+"'>"+name+"</a>";
+                      		}}],
+                      		autoFit:true
+            	});
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+             
+          //初始化商品分类列表
+    	   $('#category').omCombo({
+    		   dataSource : '$request.contextPath/option/feecategory.do',
+    		   width:'85px',
+               listMaxHeight:150,
+               emptyText:'全部 ' ,
+               onSuccess:function(data, textStatus, event){
+      	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+      	  			data.unshift(tmp);
+         		},
+         		forceSelection : true
+          }); 
+    	   
+    	 //类型列表
+          	$('#feeType').omCombo({
+               dataSource : [{"value":"","text":"全部"},{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+               width:'85px',
+               forceSelection : true,
+               emptyText:'全部 '
+           });
+          	
+          	//状态列表
+          	$('#state').omCombo({
+               dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+               width:'85px',
+               forceSelection : true,
+               emptyText:'全部 '
+           });
+          	
+          //匹配度列表
+          	$('#matchType').omCombo({
+               dataSource : [{"value":"","text":"全部"},{"value":"0","text":"精配"},{"value":"1","text":"套用"}
+               					,{"value":"2","text":"其他"}],
+               width:'85px',
+               forceSelection : true,
+               emptyText:'全部 '
+           });
+        
+       });
+       
+</script>
+
+</head>
+<body>
+    <!--背景-->
+    <div class="list_btntool" style="height:1px;"></div>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="80%" border="0">
+       <tr>
+        <td  align="left" >
+          <!--查询块区 start--> 
+            <table width="100%" border="0">
+              <tr>
+                 <th width="10%" height="30">类型：</th>
+		         <td><input id="feeType" name="feeType" class="select1" /></td>
+		         <th width="10%" height="30">分类：</th>
+		         <td><input id="category" name="category" class="select1"/></td>
+		         <th width="10%" height="30">金额：</th>
+		         <td width="10%"><input id="amount" name="amount" type="text" class="input1" /></td>
+		         <th>状态：</th>
+		         <td><input id="state" name="state" class="select1"/></td>
+		     </tr>
+		     <tr>
+		         <th>代码：</th>
+		         <td><input id="serviceId" name="serviceId" type="text" class="input1" /></td>
+		         <th>代码名称：</th>
+		         <td><input id="detail" name="detail" type="text" class="input1" /></td>
+		         <th>匹配度：</th>
+		         <td ><input id="matchType" name="matchType" class="select1" /></td>
+          </tr>
+        </table>
+       </td>
+         <td align="left">
+           <input id="query" title="查询" name="submit" type="image" style="display:none" code="001" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+         <td align="left">
+          <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expFeeCode();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+     </div>
+   <!--列表区-->
+    <div><table id="grid" align="left"></table></div>
+</body>
+</html>

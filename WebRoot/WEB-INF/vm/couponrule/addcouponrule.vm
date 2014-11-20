@@ -1,0 +1,983 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-itemselector.js"></script>
+<script src="$request.contextPath/js/ui/js/om-panel.js"></script>
+<script src="$request.contextPath/js/busi/couponrule.js"></script>
+<script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		width: 110px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display: none ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	.titletest{
+    	width: 145px;
+    	white-space:nowrap;
+    	word-break:keep-all;
+    	overflow:hidden;
+    	text-overflow:ellipsis;
+    }
+</style>
+     <script>
+		merstr = '';
+		$.validator.addMethod("Check4",
+        function() {
+			var useStartDate = $('#useStartDate').val();
+			var useEndDate = $('#useEndDate').val();
+			if ( useStartDate >= useEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		$.validator.addMethod("Check5",
+        function() {
+			var sellStartDate = $('#sellStartDate').val();
+			var sellEndDate = $('#sellEndDate').val();
+			if ( sellStartDate >= sellEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		// 判断[兑换码销售有效期]截止时间必须小于等于[兑换码使用有效期]截止时间
+		$.validator.addMethod("Check6",
+        function() {
+			var useEndDate = $('#useEndDate:disabled').val();
+			if( useEndDate == undefined ){
+				// 有效期类型为：时间段
+				useEndDate = $('#useEndDate').val();
+				var sellEndDate = $('#sellEndDate').val();
+    			if ( sellEndDate > useEndDate ) {
+                	return false;
+                }
+			}
+            return true;
+        }, '');
+		
+		// 判断[兑换码销售有效期]开始时间必须小于等于[兑换码使用有效期]开始时间
+		$.validator.addMethod("Check7",
+        function() {
+			var useStartDate = $('#useStartDate:disabled').val();
+			if( useStartDate == undefined ){
+				// 有效期类型为：时间段
+				useStartDate = $('#useStartDate').val();
+				var sellStartDate = $('#sellStartDate').val();
+    			if ( sellStartDate > useStartDate ) {
+                	return false;
+                }
+			}
+            return true;
+        }, '');
+		
+		
+		
+		// 检查售出后有效天数是否合法
+		$.validator.addMethod("CheckEffDays",
+        function() {
+			var effDays = $('#effDays').val();
+			if ( effDays.indexOf(',') > -1 ) {
+				return false;
+			}
+			if ( effDays <= 0) {
+            	return false;
+            }
+            return true;
+        }, '有效天数必须大于0');
+		
+		// 检查库存告警阀值是否合法
+		$.validator.addMethod("Check8",
+        function() {
+			var switchAmt = $('#switchAmt').val();
+			if ( switchAmt.indexOf(',') > -1 ) {
+				return false;
+			}
+			if ( switchAmt < 0) {
+            	return false;
+            }
+            return true;
+        }, '库存阀值必须大于等于0');
+		
+		// 检查到期提醒天数是否合法
+		$.validator.addMethod("CheckEffWarnDays",
+        function() {
+			var effWarnDays = $('#effWarnDays').val();
+			if ( effWarnDays.indexOf(',') > -1 ) {
+				return false;
+			}
+			if ( effWarnDays < 0) {
+            	return false;
+            }
+            return true;
+        }, '提醒天数必须大于等于0');
+		
+		$.validator.addMethod("checkOriginalprice",
+        function() {
+			var originalprice = $('#originalprice').val();
+			var ruletype = $('#ruletype').val();
+			var consumetype = $("#consumetype").val();//是否是代金劵
+			if (ruletype == 0 && consumetype == 1) {//兑换劵,不能导出
+				return true;
+			}
+			if(originalprice < 1 || originalprice > 1000000){
+				return false;
+			}
+            return true;
+        }, '面值必须大于等于1小于等于1000000');
+		
+		$.validator.addMethod("checkObjmers",
+        function() {
+			var consumetype = $("#consumetype").val();
+			if(consumetype == 2){//代金劵
+				var userange = $('#userange').val();
+				if(userange == 1){//多个商户下的任意商品
+					var size = $("input[name='merList']").size();
+					if(size == 0){
+						return false;
+					}
+				}
+			}
+            return true;
+        }, '请选择商户');
+		
+		$.validator.addMethod("checkObjmer",
+        function() {
+			var consumetype = $("#consumetype").val();
+			if(consumetype == 2){//代金劵
+				var userange = $('#userange').val();
+				if(userange == 2){//特定商户特定商品
+					var objmer = $("#objmer").val();
+					if(objmer == ''){
+						return false;
+					}
+				}
+			}
+            return true;
+        }, '请选择商户');
+		
+		$.validator.addMethod("checkObjgoods",
+        function() {
+			var consumetype = $("#consumetype").val();
+			if(consumetype == 2){//代金劵
+				var userange = $('#userange').val();
+				if(userange == 2){//特定商户特定商品
+					var objgoods = $("#objgoods").val();
+					if(objgoods == ''){
+						return false;
+					}
+				}
+			}
+            return true;
+        }, '请选择商户');
+		
+		// 检查库存数量是否合法
+		$.validator.addMethod("checkGoodsSum1",
+        function() {
+			var goodsSum = $('#goodsSum').val();
+			var ruletype = $('#ruletype').val();
+			if (ruletype == 1 && (goodsSum > 50000 || goodsSum < 0)) {
+				return false;
+			}
+            return true;
+        }, '库存数量不能为-1且最大值为50000');
+		
+		
+		$.validator.addMethod("CheckGoodsSum",
+        function() {
+			var goodsSum = $('#goodsSum').val();
+			var consumetype = $("#consumetype").val();
+			var ruletype = $('#ruletype').val();
+			if(consumetype == 2 || ruletype == 0){//代金劵
+				if (goodsSum < -1 || goodsSum == 0 || goodsSum > 500000) {
+                	return false;
+                }
+			}
+            return true;
+        }, '库存数量只能为-1或大于0且小于等于500000');
+		
+  	 	jQuery(document).ready(function() {
+			//初始化兑换码形式列表
+            $('#couponCodeType').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponCodeTypes',
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true,
+                value: '$!{couponRule.couponCodeType}'
+            });
+			//初始化兑换码生成方式列表
+            $('#generateMethod').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponCodeMethod',
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true,
+				value: '$!{couponRule.generateMethod}',
+				onValueChange:function(target,newValue,oldValue,event){ 
+					var gen = $('#consumetype').val();
+					if( newValue == '$!{codeGenerateMethodUnLocal}' ){
+						// 默认生成方式为：第三方导入
+						$("tr.modeDiv").hide();
+						$("tr.subModeDiv").hide();
+						$("tr.subModeDiv1").hide();
+						$("tr.modeDiv input").attr("disabled", "disabled");
+						$("tr.subModeDiv input").attr("disabled", "disabled");
+						$("tr.subModeDiv1 input").attr("disabled", "disabled");
+						if($('#consumetype').val() == 1){
+							$("#ruletypetr").hide();
+    						$("#originalpricetr").hide();
+    						$("#ruletype").attr("disabled", "disabled");
+    						$("#originalprice").attr("disabled", "disabled");						
+						}else{
+							$("#ruletypetr").hide();
+    						$("#originalpricetr").show();
+    						$("#ruletype").attr("disabled", "disabled");
+    						$("#originalprice").removeAttr("disabled");
+						}
+					}else {
+						// 本平台随机生成
+						if($('#consumetype').val() == 1){
+							$("#ruletypetr").show();
+    						$("#ruletype").removeAttr("disabled");
+    						if($("#ruletype").val() == 1){
+        						$("#originalpricetr").show();
+        						$("#originalprice").removeAttr("disabled");
+    						}				
+						}else{
+							$("#ruletypetr").hide();
+    						$("#originalpricetr").show();
+    						$("#ruletype").attr("disabled", "disabled");
+    						$("#originalprice").removeAttr("disabled");
+						}
+						$("tr.modeDiv").show();
+						$("tr.modeDiv input").removeAttr("disabled");
+						if( $('#effType').omCombo('value') == '$!{couponRule.effType}' ){
+    						// 默认类型为：售出后有效天数
+            				$("tr.subModeDiv").hide();
+            				$("tr.subModeDiv1").show();
+							$("tr.subModeDiv input").attr("disabled", "disabled");
+							$("tr.subModeDiv1 input").removeAttr("disabled");
+            			}else{
+            				$("tr.subModeDiv1").hide();
+            				$("tr.subModeDiv").show();
+							$("tr.subModeDiv1 input").attr("disabled", "disabled");
+							$("tr.subModeDiv input").removeAttr("disabled");
+            			}
+					}
+                }
+            });
+			//初始化兑换码有效期列表
+            $('#effType').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponCodeEffTypes',
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true,
+				value: '1',
+				onValueChange:function(target,newValue,oldValue,event){ 
+					var gen = $('#consumetype').val();
+					if( newValue == '$!{couponRule.effType}' ){
+						// 默认类型为：售出后有效天数
+        				$("tr.subModeDiv").hide();
+        				$("tr.subModeDiv1").show();
+						$("tr.subModeDiv input").attr("disabled", "disabled");
+						$("tr.subModeDiv1 input").removeAttr("disabled");
+						if($('#consumetype').val() == 1){
+							$("#ruletypetr").hide();
+    						$("#originalpricetr").hide();
+    						$("#ruletype").attr("disabled", true);
+    						$("#originalprice").attr("disabled", true);		
+						}else{
+							$("#ruletypetr").hide();
+    						$("#originalpricetr").show();
+    						$("#ruletype").attr("disabled", "disabled");
+    						$("#originalprice").removeAttr("disabled");
+						}
+        			}else{
+        				$("tr.subModeDiv1").hide();
+        				$("tr.subModeDiv").show();
+						$("tr.subModeDiv1 input").attr("disabled", "disabled");
+						$("tr.subModeDiv input").removeAttr("disabled");
+						
+						if($('#consumetype').val() == 1){
+							$("#ruletypetr").show();
+    						$("#ruletype").removeAttr("disabled");
+    						if($("#ruletype").val() == 1){
+        						$("#originalpricetr").show();
+        						$("#originalprice").removeAttr("disabled");
+    						}	
+						}else{
+							$("#ruletypetr").hide();
+    						$("#originalpricetr").show();
+    						$("#ruletype").attr("disabled", "disabled");
+    						$("#originalprice").removeAttr("disabled");
+						}
+        			}
+                }
+            });
+			
+		
+			//初始化兑换券列表
+            $('#couponId').omCombo({
+                dataSource: '$request.contextPath/option/couponinflist.do',
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true,
+                filterStrategy : 'anywhere'
+            });
+		
+			//初始化商户列表
+            $('#merId').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+                width: '155px',
+                emptyText: '请选择..',
+				listAutoWidth: true,
+				onValueChange: function(target, newValue, oldValue, event) {
+					var merId = $('#merId').omCombo('value');
+                    // 连级更新商品列表
+					$('#goodsId').omCombo({
+                        dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+                        // multi : true, // 多选
+						forceSelection: true
+                    });
+                },
+                forceSelection: true
+            });
+		
+			//初始化商品列表
+            $('#goodsId').omCombo({
+                dataSource: [],
+                width: '155px',
+                emptyText: '请选择..',
+				listAutoWidth: true,
+				forceSelection: true
+            });
+				
+			//初始化是否能批量导出列表
+            $('#ruletype').omCombo({
+                dataSource: [{value :0, text: '否'}, {value :1, text :'是'}],
+                width: '155px',
+				value : '0',
+				onValueChange: function(target, newValue, oldValue, event) {
+					if(newValue == 1){
+						$("#originalpricetr").show();
+    					$("#originalprice").removeAttr("disabled");
+					}else{
+						$("#originalpricetr").hide();
+						$("#originalprice").attr("disabled", "disabled");
+					}
+                }
+            });
+			//是否能抵扣订单金额
+			$('#consumetype').omCombo({
+                dataSource: [{value :1, text: '否'}, {value :2, text :'是'}],
+                width: '155px',
+				value : '1',
+				onValueChange: function(target, newValue, oldValue, event) {
+					if(newValue == 2){
+						$("#ismultitr").show();
+						$("#ismulti").removeAttr("disabled");
+						$("#istransfertr").show();
+						$("#istransfer").removeAttr("disabled");
+						$("#userangetr").show();
+						$("#userange").removeAttr("disabled");
+						var userange = $("#userange").val();
+						if(userange == '0'){
+							$("#objmerstr").hide();
+							$("#objmers").attr("disabled", "disabled");
+							$("#objmertr").hide();
+							$("#objmer").attr("disabled", "disabled");
+							$("#objgoodstr").hide();
+							$("#objgoods").attr("disabled", "disabled");
+						}else if(userange == '1'){
+							$("#objmerstr").show();
+							$("#objmers").removeAttr("disabled");
+							$("#objmertr").hide();
+							$("#objmer").attr("disabled", "disabled");
+							$("#objgoodstr").hide();
+							$("#objgoods").attr("disabled", "disabled");
+						}else{
+							$("#objmerstr").hide();
+							$("#objmers").attr("disabled", "disabled");
+							$("#objmertr").show();
+							$("#objmer").removeAttr("disabled");
+							$("#objgoodstr").show();
+							$("#objgoods").removeAttr("disabled");
+						}
+						$("#ruletypetr").hide();
+						$("#ruletype").attr("disabled", "disabled");
+						$("#originalpricetr").show();
+						$("#originalprice").removeAttr("disabled");
+					}else{
+						$("#ismultitr").hide();
+						$("#ismulti").attr("disabled", "disabled");
+						$("#istransfertr").hide();
+						$("#istransfer").attr("disabled", "disabled");
+						$("#userangetr").hide();
+						$("#userange").attr("disabled", "disabled");
+						$("#objmerstr").hide();
+						$("#objmers").attr("disabled", "disabled");
+						$("#objmertr").hide();
+						$("#objmer").attr("disabled", "disabled");
+						$("#objgoodstr").hide();
+						$("#objgoods").attr("disabled", "disabled");
+						$("#ruletypetr").show();
+						$("#ruletype").removeAttr("disabled");
+						if($("#ruletype").val() == 1){
+    						$("#originalpricetr").show();
+    						$("#originalprice").removeAttr("disabled");
+						}else{
+							$("#originalpricetr").hide();
+							$("#originalprice").attr("disabled", "disabled");
+						}
+					}
+                }
+            });
+			//一笔订单中能否使用多个该类型的劵码
+			$('#ismulti').omCombo({
+                dataSource: [{value :0, text: '否'}, {value :1, text :'是'}],
+                width: '155px',
+				value : '0'
+            });
+			//是否能转赠他人
+			$('#istransfer').omCombo({
+                dataSource: [{value :0, text: '否'}, {value :1, text :'是'}],
+                width: '155px',
+				value : '1'
+            });
+			//使用范围 
+			$('#userange').omCombo({
+                dataSource: [{value :0, text: '所有商户下的任意商品'}, {value :1, text :'多个商户下的任意商品'},{value:2, text:'特定商户的一个商品'}],
+                width: '155px',
+				value : '0',
+				onValueChange: function(target, newValue, oldValue, event) {
+					if(newValue == '0'){
+						$("#objmerstr").hide();
+						$("#objmers").attr("disabled", "disabled");
+						$("#objmertr").hide();
+						$("#objmer").attr("disabled", "disabled");
+						$("#objgoodstr").hide();
+						$("#objgoods").attr("disabled", "disabled");
+					}else if(newValue == '1'){
+						$("#objmerstr").show();
+						$("#objmers").removeAttr("disabled");
+						$("#objmertr").hide();
+						$("#objmer").attr("disabled", "disabled");
+						$("#objgoodstr").hide();
+						$("#objgoods").attr("disabled", "disabled");
+					}else{
+						$("#objmerstr").hide();
+						$("#objmers").attr("disabled", "disabled");
+						$("#objmertr").show();
+						$("#objmer").removeAttr("disabled");
+						$("#objgoodstr").show();
+						$("#objgoods").removeAttr("disabled");
+					}
+				}
+            });
+			//初始化对象商户列表1
+			
+			$('#objmers').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+                width: '155px',
+                emptyText: '请选择..',
+				listAutoWidth: true,
+				onValueChange: function(target, newValue, oldValue, event) {
+					if(newValue == ''){
+						return;
+					}
+					var id = newValue.split('-')[0];
+					if(merstr == ''){
+						merstr = id + ",";
+					}else{
+						if(merstr.indexOf(id) > -1){
+							return;
+						}else{
+							merstr+= id + ",";
+						}
+					}
+					
+                    var hidden = "<input type='hidden' name='merList' value='" + id + "'></input>";
+                    var label = "<label>" + newValue + "</label>";
+					var div = "<div id='" + id + "' title='双击移除' ondblclick=removeDIV('" + id + "'); style='cursor:pointer;float:left;display:block;width:145px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:keep-all;'>" + hidden + newValue + "</div>";
+					$('#panel').append(div); 
+                },
+                valueField : function(data, index) {
+                    return data.text;
+                }
+            });
+			
+			 $('#panel').omPanel({
+                width: '155px',
+                height: '120px',
+                title: '可兑换商户',
+                collapsed: false,//组件创建后为收起状态
+                collapsible: false,//渲染收起与展开按钮
+                closable: false //渲染关闭按钮
+            });
+			$(".om-widget.om-panel").css("margin-top", "5px");
+        	
+			//初始化对象商户列表2
+            $('#objmer').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+                width: '155px',
+                emptyText: '请选择..',
+				listAutoWidth: true,
+				onValueChange: function(target, newValue, oldValue, event) {
+                    // 连级更新商品列表
+					$('#objgoods').omCombo({
+                        dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + newValue,
+						forceSelection: true
+                    });
+                },
+                forceSelection: true
+            });
+		
+			//初始化商品列表
+            $('#objgoods').omCombo({
+                dataSource: [],
+                width: '155px',
+                emptyText: '请选择..',
+				listAutoWidth: true,
+				forceSelection: true
+            });
+			
+			jQuery("#dataform").validate({
+                rules: {
+                    "couponId": {
+						required: true
+                    },
+					"merId": {
+						required: true
+                    },
+					"goodsId": {
+						required: true
+                    },
+					"couponCodeType": {
+						required: true
+                    },
+					"generateMethod": {
+						required: true
+                    },
+					"objmers": {
+						checkObjmers: true
+                    },
+					"objmer": {
+						checkObjmer: true
+                    },
+					"objgoods": {
+						checkObjgoods: true
+                    },
+					"effType": {
+						required: true
+                    },
+					"effDays": {
+						required: true,
+						number: true,
+						CheckEffDays: true
+                    },
+					"useStartDate": {
+						required: true,
+						Check4: true,
+						Check7: true
+                    },
+					"useEndDate": {
+						required: true,
+						Check4: true,
+						Check6: true
+                    },
+					"sellStartDate": {
+						required: true,
+						Check5: true,
+						Check7: true
+                    },
+					"sellEndDate": {
+						required: true,
+						Check5: true,
+						Check6: true
+                    },
+					"goodsSum": {
+						required: true,
+						number: true,
+						CheckGoodsSum: true,
+						checkGoodsSum1: true
+                    },
+					"switchAmt": {
+                        required: true,
+						number: true,
+						Check8: true
+                    },
+                    "alarmEmail": {
+                        required: true,
+						email: true,
+						rangelength: [1,32]
+                    },
+					"alarmMobile": {
+                        required: true,
+						number: true,
+						rangelength: [11,11]
+                    },
+					"effWarnDays": {
+                        required: true,
+						number: true,
+						CheckEffWarnDays: true
+                    },
+					"originalprice": {
+						required: true,
+						number: true,
+						checkOriginalprice: true
+                    },
+                },
+                messages: {
+                    "couponId": {
+                        required: "请选择兑换券"
+                    },
+                    "merId": {
+                        required: "请选择商户"
+                    },
+					"goodsId": {
+						required: "请选择商品"
+                    },
+					"couponCodeType": {
+						required: "请选择兑换码形式"
+                    },
+					"generateMethod": {
+                        required: "请选择码生成方式"
+                    },
+					"effType": {
+						required: "请选择码有效期类型"
+                    },
+					"effDays": {
+						required: "请输入售出有效天数",
+						number: "请输入合法的天数"
+                    },
+					"useStartDate": {
+                        required: "请选择有效期",
+						Check4: "开始时间应小于结束时间",
+						Check7: "销售开始应小于等于使用开始"
+                    },
+					"useEndDate": {
+                        required: "请选择有效期",
+						Check4: "开始时间应小于结束时间",
+						Check6: "销售截止应小于等于使用截止"
+                    },
+					"sellStartDate": {
+                        required: "请选择销售期",
+						Check5: "开始时间应小于结束时间",
+						Check7: "销售开始应小于等于使用开始"
+                    },
+					"sellEndDate": {
+                        required: "请选择销售期",
+						Check5: "开始时间应小于结束时间",
+						Check6: "销售截止应小于等于使用截止"
+                    },
+					"goodsSum": {
+						required: "请输入库存数量",
+						number: "请输入合法的数量"
+                    },
+					"switchAmt": {
+                        required: "请输入阀值",
+						number: "请输入合法的阀值"
+                    },
+					"alarmEmail": {
+                        required: "请输入Email地址",
+						email: "Email地址有误",
+						rangelength: "超出最大长度"
+                    },
+					"alarmMobile": {
+                        required: "请输入手机号",
+						number: "手机号有误",
+						rangelength: "手机号有误"
+                    },
+                    "effWarnDays": {
+                        required: "请输入提醒天数",
+						number: "请输入合法的天数"
+                    },
+					"originalprice": {
+						required: "请输入面值",
+						number: "面值必须为数字"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+			
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_add").attr("disabled", "disabled");
+            jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					if(res == '1'){
+    					window.parent.showSimpleTip(res);
+             			closeDialog();
+    					window.parent.shuaxin();
+             		}else if(res == '0'){
+             			window.parent.showSimpleTip(res);
+             		}else{
+             			window.parent.$.omMessageBox.alert({
+        		    		type:'error',
+        		            title : '操作提示',
+        		            content : res
+        		        });
+             		}
+					// 设置按钮可用
+					$("#btn_add").removeAttr("disabled");
+                }
+            });
+            return false;
+        });});
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+		
+		function removeDIV(id){
+			merstr = merstr.replace(id + ",", "");
+			$("#" + id).remove();
+		}
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/couponrule/save.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="23%"><span>*</span>兑换券：</th>
+         <td width="50%" class="td">
+			<input id="couponId" name="couponId" />
+         </td>
+         <td class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th><span>*</span>商    户：</th>
+         <td class="td1">
+			<input id="merId" name="merId" />
+         </td>
+         <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th><span>*</span>商    品：</th>
+         <td class="td">
+			<input id="goodsId" name="goodsId" />
+         </td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th><span>*</span>是否为代金劵：</th>
+         <td class="td1">
+			<input id="consumetype" name="consumetype" />
+         </td>
+         <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="ismultitr" style="display:none">
+         <th><span>*</span>一笔订单中能否使用多个该类型的劵码：</th>
+         <td class="td">
+			<input id="ismulti" name="ismulti" />
+         </td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="istransfertr" style="display:none">
+         <th><span>*</span>是否能转赠他人：</th>
+         <td class="td1">
+			<input id="istransfer" name="istransfer" />
+         </td>
+         <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="userangetr" style="display:none">
+         <th><span>*</span>使用范围：</th>
+         <td class="td">
+			<input id="userange" name="userange" />
+         </td>
+         <td class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="objmerstr" style="display:none" valign="top">
+         <th><span>*</span>可兑换商户：</th>
+         <td class="td1">
+            <input id="objmers" name="objmers" title="选择添加"/>
+			<div id="panel" style="padding-top:0px;padding-left:0px;"/>
+         </td>
+         <td  class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="objmertr" style="display:none">
+         <th><span>*</span>可兑换商户：</th>
+         <td class="td1">
+			<input id="objmer" name="objmer"/>  
+         </td>
+         <td  class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="objgoodstr" style="display:none">
+         <th><span>*</span>可兑换商品：</th>
+         <td class="td">
+			<input id="objgoods" name="objgoods" />
+         </td>
+         <td  class="td"><span class="errorImg"></span><span class="errorMsg" ></span></td>
+       </tr>
+	   
+	   <tr>
+         <th><span>*</span>兑换码形式：</th>
+         <td class="td1">
+			<input id="couponCodeType" name="couponCodeType" />
+         </td>
+         <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th><span>*</span>兑换码生成方式：</th>
+         <td class="td">
+			<input id="generateMethod" name="generateMethod" />
+         </td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   
+       <tr class="modeDiv">
+         <th ><span>*</span>兑换券有效期类型：</th>
+		 <td class="td1">
+			<input id="effType" name="effType" />
+		 </td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+	   <tr class="subModeDiv1">
+         <th ><span>*</span>售出后：</th>
+         <td class="td"><input id="effDays" name="effDays" type="text" class="input3" />&nbsp;天有效</td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr class="subModeDiv">
+         <th ><span>*</span>兑换券有效期：</th>
+         <td class="td"><input type="text" id="useStartDate" name="useStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+     		   至 <input type="text" id="useEndDate" name="useEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr class="modeDiv">
+         <th ><span>*</span>兑换券销售期：</th>
+         <td class="td1"><input type="text" id="sellStartDate" name="sellStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+     		   至 <input type="text" id="sellEndDate" name="sellEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr class="modeDiv">
+         <th ><span>*</span>库存数量：</th>
+         <td class="td"><input id="goodsSum" name="goodsSum" type="text" class="input3" />&nbsp;（注：-1为不限库存数量）</td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+		   
+	   <tr>
+         <th><span>*</span>库存告警阀值：</th>
+         <td class="td1" >
+			<input id="switchAmt" name="switchAmt" type="text" class="input3" value="$!{couponRule.switchAmt}"/>&nbsp;（注：0为不告警）
+		 </td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+	   <tr>
+         <th ><span>*</span>库存告警邮件地址：</th>
+         <td class="td"><input id="alarmEmail" name="alarmEmail" type="text" class="input2" /></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th ><span>*</span>库存告警短信手机号：</th>
+         <td class="td1"><input id="alarmMobile" name="alarmMobile" type="text" class="input2" /></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>到期前：</th>
+         <td class="td" ><input id="effWarnDays" name="effWarnDays" type="text" class="input3" value="0"/>&nbsp;天短信提醒用户码即将过期 （注：0为不提醒）</td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+	   <tr id="ruletypetr" style="display:none">
+         <th><span>*</span>是否需批量导出：</th>
+         <td class="td" ><input id="ruletype" name="ruletype" type="text" class="input3"/></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr id="originalpricetr" style="display:none">
+         <th><span>*</span>面值：</th>
+         <td class="td" ><input id="originalprice" name="originalprice" type="text" class="input3" value="0"/>&nbsp;(分)</td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+     </table>
+
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="添加" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+	   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html>

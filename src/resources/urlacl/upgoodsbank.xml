@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商品银行管理 -->
+<Options>
+ <!-- 查询权限 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/upgoodsbank/query.do</url>
+	</Option>
+	<!-- 单个添加操作 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/upgoodsbank/add.do</url>
+	</Option>
+	<!-- 批量添加操作 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/upgoodsbank/batchAdd.do</url>
+	</Option>
+	<!-- 批量配置操作 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/upgoodsbank/batchMod.do</url>
+	</Option>
+	<!-- 修改权限 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/upgoodsbank/modify.do</url>
+	</Option>
+
+</Options>

@@ -1,0 +1,255 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+		
+  	 	jQuery(document).ready(function() {
+  	 		$('#div1').show();
+			$('#div2').hide();
+			$("#div2 input").attr("disabled", "disabled");
+			
+			//初始化商户列表
+            $('#merId').omCombo({
+                 dataSource: '$request.contextPath/option/couponmerinflist.do',
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true
+            });
+    		
+    		//初始化文件类型列表
+            $('#fileTypeName').omCombo({
+                dataSource: [{text:'日交易',value:'1'},{text:'日清算',value:'2'},{text:'月清算',value:'3'}],
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true,
+				onValueChange:function(target,newValue,oldValue,event){
+					if( newValue == '3' ){
+						$('#div1').hide();
+						$('#div2').show();
+						$("#div1 input").attr("disabled", "disabled");
+						$("#div2 input").removeAttr("disabled");
+					}else{
+						$('#div1').show();
+						$('#div2').hide();
+						$("#div2 input").attr("disabled", "disabled");
+						$("#div1 input").removeAttr("disabled");
+					}
+					
+                }
+            });
+			
+			$.validator.addMethod("Check1",
+            function() {
+    			var startDate = $('#startDate').val();
+    			var endDate = $('#endDate').val();
+    			if ( startDate > endDate ) {
+                	return false;
+                }
+                return true;
+            }, '开始日期必须小于等于结束日期');
+			
+			jQuery("#dataform").validate({
+                rules: {
+                    "merId": {
+						required: true
+                    },
+                    "fileTypeName": {
+                        required: true
+                    },
+					"startDate": {
+						required: true,
+						Check1: true
+                    },
+					"endDate": {
+						required: true,
+						Check1: true
+                    }
+                },
+                messages: {
+                    "merId": {
+                        required: "请选择商户"
+                    },
+                    "fileTypeName": {
+                        required: "请选择文件类型"
+                    },
+					"startDate": {
+						required: "请选择开始日期"
+                    },
+					"endDate": {
+						required: "请选择结束日期"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_add").attr("disabled", "disabled");
+            jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					if(res == '1'){
+    					window.parent.showSimpleTip(res);
+             			closeDialog();
+    					window.parent.shuaxin();
+             		}else if(res == '0'){
+             			window.parent.showSimpleTip(res);
+             		}else{
+             			window.parent.$.omMessageBox.alert({
+        		    		type:'error',
+        		            title : '操作提示',
+        		            content : res
+        		        });
+             		}
+					// 设置按钮可用
+					$("#btn_add").removeAttr("disabled");
+                }
+            });
+            return false;
+        });});
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/checkfileparseinf/save.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="15%"><span>*</span>商    户：</th>
+         <td width="55%" class="td"><input id="merId" name="merId" /></td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span>
+         </td>
+       </tr>
+       <tr>
+         <th ><span>*</span>文件类型：</th>
+         <td  class="td1"><input id='fileTypeName' name="fileTypeName" type="text" class="input2" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th><span>*</span>时    间：</th>
+         <td class="td" >
+	         <div id=div1>
+				<input type="text" id="startDate" name="startDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+				至
+				<input type="text" id="endDate" name="endDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+			 </div>
+			 <div id=div2>
+				<input type="text" id="startDate" name="startDate" onfocus="WdatePicker({startDate:'%y-%M',dateFmt:'yyyy-MM'})" class="Wdate" style="width:100px"/>
+				至
+				<input type="text" id="endDate" name="endDate" onfocus="WdatePicker({startDate:'%y-%M',dateFmt:'yyyy-MM'})" class="Wdate" style="width:100px"/>
+			 </div>
+		 </td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+
+     </table>
+
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="添加" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+	   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 
+	 <div class="pop_btn" style="text-align:left">
+		注：1、商户如果选择全部则生成某该时间内全部商户的对账任务<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2、添加完成的任务可在“对账文件管理”页面查看<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3、每日7:30和19:30系统会自动执行该任务
+     </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html>

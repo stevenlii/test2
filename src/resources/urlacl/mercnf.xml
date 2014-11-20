@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商户管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/mercnf/query.do</url>
+	</Option>
+	<!-- 添加按钮 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/mercnf/save.do</url>
+	</Option>
+	<!-- 修改按钮 -->
+	<Option>
+		<code>007</code>
+		<url>hfMngBusi/mercnf/update.do</url>
+	</Option>
+	<!-- 配置证书 -->
+	<Option>
+		<code>008</code>
+		<url>hfMngBusi/mercnf/cnfcert.do</url>
+	</Option>
+</Options>

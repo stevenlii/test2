@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig
+PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings useStatementNamespaces="true"
+		cacheModelsEnabled="true"
+		enhancementEnabled="true"
+		lazyLoadingEnabled="true"
+		maxRequests="64"		
+		maxSessions="20"
+		maxTransactions="10"/>
+	<sqlMap resource="sqlmap/MerGrade.xml" />
+	<sqlMap resource="sqlmap/DocInfo.xml" />
+	<sqlMap resource="sqlmap/CheckFileParseInf.xml" />
+	<sqlMap resource="sqlmap/HNSynTask.xml" />
+	<sqlMap resource="sqlmap/Category.xml" />
+	<sqlMap resource="sqlmap/BatchTask.xml" />
+	<sqlMap resource="sqlmap/CouponMerSet.xml" />
+	<sqlMap resource="sqlmap/StlPayBack.xml" />
+	<sqlMap resource="sqlmap/StlMerger.xml" />
+	<sqlMap resource="sqlmap/MersetSwitch.xml" />
+	<sqlMap resource="sqlmap/report.xml" />
+</sqlMapConfig>

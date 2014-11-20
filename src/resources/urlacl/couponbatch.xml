@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- 兑换码批次导入管理 -->
+<Options>
+	<!-- 启用按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/couponBatch/start.do</url>
+	</Option>
+</Options>

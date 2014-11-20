@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="proxymer"  >
+	<sql id="all">
+	<![CDATA[
+		 SELECT p.INTIME,p.MERID,m.MERNAME,e.OPERATOR
+		 FROM (SELECT MERID,MIN(INTIME) INTIME from UMPAY.T_PROXYGOODS_INF group by MERID) p
+		 INNER JOIN UMPAY.T_MER_INF m on m.MERID=p.MERID
+		 LEFT JOIN UMPAY.T_HFMER_EXP e on e.MERID=p.MERID
+		 WHERE 1=1
+		 #if( $merId && $merId!='' )
+		   AND p.MERID=:merId
+		 #end
+		 #if( $merName && $merName!='' )
+		   AND m.MERNAME like '%$merName%'
+		 #end
+		 #if( $operator && $operator!='' )
+		   AND  e.OPERATOR=:operator
+		 #end
+		 ORDER BY p.INTIME DESC
+	  ]]>
+	</sql>
+</mapper> 

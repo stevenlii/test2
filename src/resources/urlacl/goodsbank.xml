@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商品银行管理 -->
+<Options>
+ <!-- 查询权限 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/goodsbank/query.do</url>
+	</Option>
+	<!-- 单个添加操作 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/goodsbank/add.do</url>
+	</Option>
+	<!-- 批量添加操作 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/goodsbank/batchAdd.do</url>
+	</Option>
+	<!-- 批量配置操作 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/goodsbank/batchMod.do</url>
+	</Option>
+	<!-- 修改权限 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/goodsbank/modify.do</url>
+	</Option>
+	
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/goodsbankaudit/goodsbankauditpass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/goodsbankaudit/goodsbankauditnotpass.do</url>
+	</Option>
+	<!-- 批量审核通过操作 -->
+	<Option>
+		<code>013</code>
+		<url>hfMngBusi/goodsbankaudit/goPass.do</url>
+	</Option>
+	<!-- 批量审核不通过操作 -->
+	<Option>
+		<code>014</code>
+		<url>hfMngBusi/goodsbankaudit/notPass.do</url>
+	</Option>
+</Options>

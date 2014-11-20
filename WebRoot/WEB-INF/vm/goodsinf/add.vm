@@ -1,0 +1,710 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-tabs.js"></script>
+<script src="$request.contextPath/js/ui/js/om-panel.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/goodsInf.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script type="text/javascript">
+var setting = {
+	data: {simpleData: {enable: true}},
+	callback: {beforeClick: beforeClick,onClick: onClick}
+};
+  	 jQuery(document).ready(function() {
+  		  $('#make-tab').omTabs({width: 600,height: 510,closable : false});
+  		var zNodes1="${zNodes}";
+  		var zNodes=eval(zNodes1);
+  		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+  		$.fn.zTree.init($("#treeDemo2"), setting, zNodes);
+  	 //初始化商户列表
+  	   $('#merId').omCombo({
+               dataSource : '$request.contextPath/option/merlist.do',
+                width:'150px',
+                listMaxHeight:150,
+                emptyText:'请选择..' ,
+            	forceSelection : true
+            });
+            //获取风控类型列表
+  	 $('#goodsType').omCombo({
+                dataSource : '$request.contextPath/option/goodstype.do',
+                width:'150px',
+                listMaxHeight : 150,
+                emptyText:'请选择..' ,
+            	forceSelection : true
+            });
+  	 
+  	 //初始化商户列表
+	   $('#merId2').omCombo({
+             dataSource : '$request.contextPath/option/merlist.do',
+              width:'150px',
+              emptyText:'请选择..' ,
+              listMaxHeight:150,
+              forceSelection:true
+          });
+          //获取风控类型列表
+	 $('#goodsType2').omCombo({
+              dataSource : '$request.contextPath/option/goodstype.do',
+              width:'150px',
+              listMaxHeight : 150,
+              emptyText:'请选择..' ,
+              forceSelection:true
+          });
+	 $.validator.addMethod("notChinese", function(value) {
+		 	var words = value.split("");
+		 	for (var i=0;i<words.length;i++) {
+				if(words[i].charCodeAt(0)>256){
+					return false;
+				}
+			}
+	        return true;
+	    }, "客服电话只能为数字或字符");
+	 $.validator.addMethod("checkby", function(value) {
+	        return checkBYGoods(value);
+	    }, "商品号已经存在");
+	 $.validator.addMethod("lengthBY", function(value) {
+		 	if(value.length==6){
+		 		return true;
+		 	}
+	        return false;
+	    }, "包月商品号为6位");
+	 $.validator.addMethod("notEmptyBY", function(value) {
+    	if($("input[name='pushInfBY']:checked").val()=="11"){
+    		return true;
+  		}else{
+  			if(value==""){
+  				return false;
+  			}
+  		}
+    	return true;
+    }, '请填写商品描述');
+  	 jQuery("#dataform-by").validate({
+  		 onkeyup: false,
+         rules : {
+             "merId2" : {
+             	required : true 
+             },
+              "goodsId2" : {
+             	required : true ,
+             	digits :  true,
+            	lengthBY : true,
+            	checkby : true 
+             },
+             "goodsName": {
+                 required : true,
+             	maxlength : 13
+             },
+             "busiType": {
+                 required : true
+             },
+              "category2" : {
+             	required : true
+             },
+              "goodsType2" : {
+             	required : true
+             },
+              "servType2" : {
+             	required : true
+             },
+              "servMonth" : {
+                 required : true,
+                 digits :  true
+             },
+              "conMode" :  {
+                 required :true 
+             },
+              "interval" :  {
+                 required :true,
+                 digits :  true
+             },  
+             "priceModeBY" :{
+                 required :true
+             },
+             "pushInfBY" : {
+                 required :true
+             },
+             "goodsDesc" : {
+            	 notEmptyBY : true ,
+                 maxlength : 25 
+             },    
+             "cusPhone" :{
+                required:true,
+                notChinese:true
+             }
+         },
+         messages : {
+             "merId2"  : {
+                 required : "请输入商户编号"
+             },
+              "goodsId2"  : {
+                 required : "请输入商品编号" ,
+                 digits : "输入必须为数字"
+             },
+             "goodsName": {
+                 required : "请输入商品名称" ,
+             	maxlength : "商品名长度不能超过13位"
+             },
+             "busiType":{
+               required : "请选择业务覆盖类型"
+             },
+             "category2":{
+               required : "请选择商品类型"
+             },
+             "servType2":{
+               required : "请选择服务类型"
+             },
+             "goodsType2" :{
+                required : "请选择风控类型"
+             },
+             "priceModeBY" :{
+                required : "请选择价格模式"
+             },
+             "pushInfBY" : {
+                required : "请选择商品信息"
+             },                  
+             "servMonth" : {
+                 required : "请填写服务月份" ,
+                 digits :  "请填写数字"
+             },
+              "conMode" :  {
+                 required :  "请选择续费方式"
+             },
+              "interval" :  {
+                 required : "请填写间隔周期",
+                 digits :   "请填写数字"
+             },  
+             "goodsDesc" : {
+                 maxlength : "输入长度应为25位" 
+             }, 
+             "cusPhone":{
+               required : "请填写客服电话"                   
+              }
+         },
+         errorPlacement : function(error, element) { 
+             if(error.html()){
+                 $(element).parents().map(function(){
+                     if(this.tagName.toLowerCase()=='td'){
+                         var attentionElement = $(this).next().children().eq(0);
+                         attentionElement.css('display','block');
+ 	                    attentionElement.next().html(error);
+ 	                   attentionElement.next().css('display','block');
+                     }
+                 });
+             }
+	        },
+	        showErrors: function(errorMap, errorList) {
+             if(errorList && errorList.length > 0){
+                 $.each(errorList,function(index,obj){
+                     var msg = this.message;
+                     $(obj.element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.show();
+	    	                    attentionElement.next().html(msg);
+	                        }
+	                    });
+                 });
+             }else{
+                 $(this.currentElements).parents().map(function(){
+                     if(this.tagName.toLowerCase()=='td'){
+                         $(this).next().children().eq(0).hide();
+                         $(this).next().children().eq(1).hide();
+                     }
+                 });
+             }
+             this.defaultShowErrors();
+         },          
+         submitHandler : function(){
+				jQuery(this).submit();
+             return false;
+         }
+     });
+ 
+    $.validator.addMethod("checkac", function(value) {
+	        return checkACGoods(value);
+	    }, "商品号已经存在");
+    $.validator.addMethod("lengthAC", function(value) {
+	 	if(value.length==1||value.length==3){
+	 		return true;
+	 	}
+        return false;
+    }, "按次商品号为1位或3位");
+    $.validator.addMethod("notEmptyAC", function(value) {
+    	if($("input[name='pushInfAC']:checked").val()=="11"){
+    		return true;
+  		}else{
+  			if(value==""){
+  				return false;
+  			}
+  		}
+    	return true;
+    }, '请填写商品描述');
+jQuery("#dataform-ac").validate({
+	onkeyup: false,
+    rules : {
+        "merId" : {
+        	required : true
+        },
+         "goodsId" : {
+        	required : true ,
+        	digits :true ,
+        	lengthAC : true,
+        	checkac : true 
+        },
+        "goodsName": {
+            required : true ,
+            maxlength : 13
+        },
+        "busiType": {
+            required : true
+        },
+         "category" : {
+        	required : true
+        },
+         "goodsType" : {
+        	required : true
+        },
+         "servType" : {
+        	required : true
+        },
+        "priceMode" :{
+            required :true
+        },
+        "pushInfAC" : {
+            required :true
+        },
+        "goodsDesc" : {
+        	notEmptyAC  : true ,
+            maxlength : 44 
+        }, 
+        "cusPhone" :{
+           required:true,
+           notChinese:true
+        }
+    },
+    messages : {
+        "merId"  : {
+            required : "请输入商户编号"
+        },
+         "goodsId"  : {
+            required : "请输入商品编号" ,
+            digits : "输入必须为数字"
+        },
+        "goodsName": {
+            required : "请输入商品名称" ,
+        	maxlength : "商品名长度不能超过13位"
+        },
+        "busiType":{
+          required : "请选择业务覆盖类型"
+        },
+        "category":{
+          required : "请选择商品分类"
+        },
+        "servType":{
+          required : "请选择服务类型"
+        },
+        "goodsType" :{
+           required : "请选择风控类型"
+        },
+        "priceMode" :{
+           required : "请选择价格模式"
+        },
+        "pushInfAC" : {
+           required : "请选择商品信息"
+        },
+        "goodsDesc" : {
+            maxlength : "输入长度应为44位" 
+        }, 
+        "cusPhone":{
+          required : "请填写客服电话"
+         }
+    },
+    errorPlacement : function(error, element) { 
+        if(error.html()){
+            $(element).parents().map(function(){
+                if(this.tagName.toLowerCase()=='td'){
+                    var attentionElement = $(this).next().children().eq(0);
+                    attentionElement.css('display','block');
+                    attentionElement.next().html(error);
+                    attentionElement.next().css('display','block');
+                }
+            });
+        }
+    },
+    showErrors: function(errorMap, errorList) {
+        if(errorList && errorList.length > 0){
+            $.each(errorList,function(index,obj){
+                var msg = this.message;
+                $(obj.element).parents().map(function(){
+                    if(this.tagName.toLowerCase()=='td'){
+                        var attentionElement = $(this).next().children().eq(0);
+                        attentionElement.show();
+	                    attentionElement.next().html(msg);
+                    }
+                });
+            });
+        }else{
+            $(this.currentElements).parents().map(function(){
+                if(this.tagName.toLowerCase()=='td'){
+                    $(this).next().children().eq(0).hide();
+                    $(this).next().children().eq(1).hide();
+                }
+            });
+        }
+        this.defaultShowErrors();
+    },          
+    submitHandler : function(){
+			jQuery(this).submit();
+        return false;
+    }
+});
+    //按次商品提交 begin
+	 jQuery('#dataform-ac').submit(function() {
+		 $("#pushInf1").val( $("input[name='pushInfAC']:checked").val() );
+		 
+	 	if (!jQuery("#dataform-ac").valid()) { 
+	       return false;
+	   }
+	    if(!checkAmount()){ //验证金额问题
+		     return false;
+	    }
+	    jQuery(this).omAjaxSubmit({async:  false,
+	    	success:function(res){
+		         // showSimpleTip(res);
+		    	var msg = "";
+					var ty = "";
+		   		if(res !='1') {
+		   			ty = 'error';
+			  		var msg = '操作失败';
+			  		if(res != '0'){
+			  			msg = res;
+			  		}
+			   }else{
+				   ty = 'success';
+				   msg = '操作成功，已提交审核';
+				   closeDialog(); 
+			   }
+		   		window.parent.$.omMessageBox.alert({
+		   			type : ty,
+		   			title : '操作提示',
+		   			content : msg
+		   		});
+            }
+        });
+         return false; 
+   });  
+	    //按次商品提交 end
+	 //包月商品提交 begin
+	 jQuery('#dataform-by').submit(function() {
+	  	  $("#merId3").val( document.getElementById("merId2").value ); 
+	  	  $("#goodsId3").val( $("#goodsId2").val() ); 
+	  	  $("#servType3").val( $("#servType2").val() ); 
+	  	  $("#category3").val( document.getElementById("category2").value ); 
+	  	  $("#goodsType3").val( document.getElementById("goodsType2").value ); 
+	  	  $("#priceModeBY2").val( $("input[name='priceModeBY']:checked").val() );
+	  	  $("#pushInf2").val( $("input[name='pushInfBY']:checked").val() );
+	 	 	if (!jQuery("#dataform-by").valid()) { 
+             return false;
+         }
+	 	    if(!checkBYAmount()){ //验证金额问题
+    	        return false;
+          }
+      //   if(!checkBYGoodsId()){
+         //     return false;
+      //   }     
+	         jQuery(this).omAjaxSubmit({async:  false,success:function(res){
+          //     showSimpleTip(res);
+	        	 var msg = "";
+		  			var ty = "";
+	           		if(res !='1') {
+	           			ty = 'error';
+	    		  		var msg = '操作失败';
+	    		  		if(res != '0'){
+	    		  			msg = res;
+	    		  		}
+	    		   }else{
+	    			   ty = 'success';
+	    			   msg = '操作成功，已提交审核';
+	    			   closeDialog(); 
+	    		   }
+	           		window.parent.$.omMessageBox.alert({
+	           			type : ty,
+	           			title : '操作提示',
+	           			content : msg
+	           		});
+		        	  
+	                 }
+	             });
+	            //  closeDialog();
+               return false; 
+         });  
+	    // 包月商品提交 end
+	 
+	 	 //增加定价模式与金额的联动
+	 	jQuery("input[name='priceMode']").click(function(){
+	 			if(this.value == '0'){
+	 				jQuery('#amountSpan').show();
+	 			}else{
+	 				jQuery('#amountSpan').hide();
+	 			}
+	 	});
+	 	
+	 	 //增加定价模式与金额的联动
+	 	jQuery("input[name='priceModeBY']").click(function(){
+	 			if(this.value == '0'){
+	 				jQuery('#amountSpanBY').show();
+	 			}else{
+	 				jQuery('#amountSpanBY').hide();
+	 			}
+	 	});
+  	 });
+</script>
+
+<script>
+ function showResponse(responseText, statusText) {
+        var result = eval("("+responseText+")");
+          if(result.code=='0'){
+          	window.parent.fillBackAndCloseDialog(result.msg);
+          }
+        }
+       //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }
+ 
+</script>		
+     	
+</head>
+<body>
+		<div id="make-tab">
+	         <ul>
+		         <li>
+		         <a href="#tab1">添加按次商品</a>
+		         </li>
+	             <li>
+	                 <a href="#tab2">添加包月商品</a>
+	             </li>
+	         </ul>
+	         <div id="tab1">
+	        <form id ="dataform-ac" method="post" name="dataform-ac"  action="${request.contextPath}/goodsinf/save.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="15%"><span>*</span>所属商户：</th>
+         <td width="60%" class="td">
+           <input id="merId" name="merId" class="select1" />
+         </td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>商品号：</th>
+         <td  class="td1"><input name="goodsId" type="text" class="input2"  maxlength="3" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th ><span>*</span>商品名称：</th>
+         <td class="td"><input name="goodsName" type="text" class="input2" maxlength="13" /></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>业务覆盖：</th>
+         <td class="td1"><input id="busiType1" type="checkbox" name="busiType" value="10" />
+           全网 &nbsp;&nbsp;
+             <input id="busiType2" type="checkbox" name="busiType" value="01" />
+         省网 </td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>商品分类：</th>
+         <td class="td" >
+         <span class="om-combo om-widget om-state-default" style="width: 150px;">
+	         <input type="text" id="goodsCategory" readonly value="" onclick="showMenu(''); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 129px;"><span onclick="showMenu(''); return false;" class="om-combo-trigger ioi_trigger"></span>
+	     </span>
+	     <input type="hidden" id="category" name="category" value="" type="text" />
+         </td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+          <tr>
+         <th><span>*</span>风控类型：</th>
+         <td class="td1"><input id="goodsType" name="goodsType" class="select1"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span>*</span>服务类型：</th>
+         <td class="td"><input type="radio" name="servType" value="2" checked disabled='disabled'/>
+                              按次 
+         <input type="hidden" name="servType" value="2"/>
+                                
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+          <tr>
+         <th><span>*</span>价格模式：</th>
+         <td class="td1"><input type="radio"  name="priceMode" value="0" />
+                定价 &nbsp;&nbsp; <span id="amountSpan" style="color:black;"><input id="amount" name="amount" size="13" maxlength="13" class="input1" />分</span>
+           <input type="radio" name="priceMode" value="1" />
+                非定价</td>
+        <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+        <tr>
+         <th><span>*</span>商品信息：</th><input type="hidden" id="pushInf1" name="pushInf"/>
+         <td class="td" colspan="1"><input type="radio" name="pushInfAC" value="12" onclick="showStar('starAC')"/>
+               下发描述+信息 
+           <input type="radio" name="pushInfAC" value="11" onclick="hideStar('starAC')"/>
+               仅下发商品信息
+         <input type="radio" name="pushInfAC" value="01" onclick="showStar('starAC')"/>
+               仅下发商品描述</td>
+          <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span id="starAC">*</span>商品描述：</th>
+         <td class="td1"><input name="goodsDesc" type="text" class="input2" maxlength="44" />
+        </td>
+         <td class="td1"><span class="errorImg" id="imgstarAC"></span><span class="errorMsg" id="msgstarAC"></span></td>
+       </tr>
+        <tr>
+         <th><span>*</span>客服电话：</th>
+         <td class="td"><input name="cusPhone" type="text" class="input2" maxlength="32"  /></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+	       <td class="td" colspan="3"><span>*注意：<br/>走非小额支付银行扣费的商品:1.价格模式只能配置"定价模式";2.商品信息只能配置"下发描述+信息"。</td>
+	   </tr>
+      </table>
+      <div class="pop_btn">
+      <input name="submit" type="submit" class="popbtn" value="添加"  onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+     <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+     </div>
+   </form>
+ </div>
+     <div id="tab2">
+           <form id ="dataform-by" method="post" name="dataform-by"  action="${request.contextPath}/goodsinf/save.do">
+           <table class="infowrite" cellspacing="0" cellpadding="0">
+            <tr>
+               <th width="15%"><span>*</span>所属商户：</th>
+               <td width="60%" class="td">
+                 <input id="merId2" name="merId2" class="select1" />
+                 <input id="merId3" name="merId" type="hidden"/>
+               </td>
+               <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+          <tr>
+             <th ><span>*</span>商品号：</th>
+             <td  class="td1"><input id="goodsId2" name="goodsId2" type="text" class="input2" maxlength="6" /></td>
+             <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+             <input id="goodsId3" name="goodsId" type="hidden">
+          </tr>
+          <tr>
+             <th ><span>*</span>商品名称：</th>
+             <td class="td"><input name="goodsName" type="text" class="input2" maxlength="13" /></td>
+             <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+          <tr>
+             <th><span>*</span>业务覆盖：</th>
+             <td class="td1"><input type="checkbox" id="busiTypeBY" name="busiType" value="10" />
+                                                     全网 &nbsp;&nbsp;
+               <input type="checkbox" name="busiType" value="01" />
+                                                     省网 </td>
+              <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+         </tr>
+         <tr>
+            <th><span>*</span>商品分类：</th>
+            <td class="td" >
+	            <span class="om-combo om-widget om-state-default" style="width: 150px;">
+		         	<input type="hidden" id="category2" name="category2" value="" type="text" />
+		         	<input type="text" id="goodsCategory2" readonly value="" onclick="showMenu('2'); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 129px;"><span onclick="showMenu('2'); return false;" class="om-combo-trigger ioi_trigger"></span>
+	         	</span>
+            <input id="category3" name="category" type="hidden"> </td>
+            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+         </tr>
+         <tr>
+             <th><span>*</span>风控类型：</th>
+             <td class="td1"><input id="goodsType2" name="goodsType2" class="select1"/> <input id="goodsType3" name="goodsType" type="hidden"></td>
+            
+             <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+         </tr>
+         <tr>
+             <th><span>*</span>服务类型：</th>
+             <td class="td">  <input type="radio" id ="servType2" name="servType2" value="3" checked disabled='disabled' />
+                 <input type="hidden" id= "servType3" name="servType" />
+                                                                        包月</td>
+             <td class="td"></td>
+         </tr>
+         <tr>        
+            <th><span>*</span>服务月份：</th>
+            <td class="td1"><input name="servMonth" type="text" class="input2" maxlength="3"/></div></td>
+            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td> 
+         </tr>      
+         <tr>
+            <th><span>*</span>续费方式：</th>
+            <td class="td"><input type="radio" name="conMode" value="0" />
+                                                         正向 &nbsp;&nbsp;
+            <input type="radio" name="conMode" value="1" />
+                                             反向
+            <input type="radio" name="conMode" value="2" />
+                                             取消
+            </td>
+            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+         </tr>
+         <tr>   
+            <th><span>*</span>间隔周期：</th>
+            <td class="td1"><input name="interval" type="text" class="input2" maxlength="3"/></td>
+            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td> 
+         </tr>
+         <tr>
+           <th><span>*</span>价格模式：</th>
+           <td class="td"><input type="radio" id="priceModeBY" name="priceModeBY" value="0" />
+                                                   定价 &nbsp;&nbsp; 
+          <span id="amountSpanBY" style="color:black;"><input  id="amountBY" name="amount" size="13" maxlength="13" class="input1" />分</span>
+          <input type="radio" name="priceModeBY" value="1" />非定价
+          </td>
+              <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td> 
+              <input type="hidden" id="priceModeBY2" name="priceMode" />
+         </tr>
+         <tr>
+             <th><span>*</span>商品信息：</th><input type="hidden" id="pushInf2" name="pushInf"/>
+             <td class="td1" colspan="1">
+             	<input type="radio" name="pushInfBY" value="12" onclick="showStar('starBY')"/>下发描述+信息
+                <input type="radio" name="pushInfBY" value="11" onclick="hideStar('starBY')"/>仅下发商品信息
+                <input type="radio" name="pushInfBY" value="01" onclick="showStar('starBY')"/>仅下发商品描述
+             </td>
+             <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+          <tr>
+             <th><span id="starBY">*</span>商品描述：</th>
+             <td class="td"><input name="goodsDesc" type="text" class="input2" maxlength="25" />
+              </td>
+              <td class="td"><span class="errorImg" id="imgstarBY"></span><span class="errorMsg" id="msgstarBY"></span></td>
+          </tr>
+          <tr>
+             <th><span>*</span>客服电话：</th>
+             <td class="td1"><input name="cusPhone" type="text" maxlength="32" class="input2" /></td>
+             <td><span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+          <tr>
+	          <td class="td" colspan="3"><span>*注意：<br/>走非小额支付银行扣费的商品:1.价格模式只能配置"定价模式";2.商品信息只能配置"下发描述+信息"。</td>
+	      </tr>
+          </table>
+        <div class="pop_btn">
+            <input name="Submit" type="submit" class="popbtn" value="添加" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+            <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+         </div>
+      </form>
+     </div>
+ </div>
+<div id="menuContent" class="list_zTree">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+<div id="menuContent2" class="list_zTree">
+	<ul id="treeDemo2" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="HFTaskMnt">
+	<typeAlias alias="HFTaskMnt" type="com.umpay.hfmng.model.HFTaskMnt" />
+
+	<sql id="select_what">
+		select
+		taskRpid,taskId,state,sendType,errorInf,errorTimes,planRunTime,taskRunTime,deadTime,
+		taskRuleDesc,taskDesc,postUrl,isReTry,reTryTimes,reTryInterval,retTimeout,modTime,inTime
+		from umpay.t_hftask_mnt
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where "> 1=1
+			<isNotEmpty property="taskRpid" prepend=" and ">
+				taskRpid = #taskRpid#
+			</isNotEmpty>
+			<isNotEmpty property="taskId" prepend=" and ">
+				taskId = #taskId#
+			</isNotEmpty>
+			<isNotEqual property="state" prepend=" and " compareValue="-1">
+				state = #state#
+			</isNotEqual>
+			<isNotEqual property="sendType" prepend=" and " compareValue="-1">
+				sendType = #sendType#
+			</isNotEqual>
+			<isNotEqual property="errorTimes" prepend=" and " compareValue="-1">
+				errorTimes = #errorTimes#
+			</isNotEqual>
+			<isNotEmpty property="planRunTime" prepend=" and ">
+				planRunTime = #planRunTime#
+			</isNotEmpty>
+			<isNotEmpty property="taskRunTime" prepend=" and ">
+				taskRunTime = #taskRunTime#
+			</isNotEmpty>
+			<isNotEqual property="isReTry" prepend=" and " compareValue="-1">
+				isReTry = #isReTry#
+			</isNotEqual>
+		</dynamic>
+	</sql>
+	<sql id="key_find">
+		where taskRpid=#taskRpid#
+	</sql>
+
+	<statement id="Get" resultClass="HFTaskMnt">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	<statement id="Find" resultClass="HFTaskMnt">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_hftask_mnt
+		<include refid="where_find" />
+	</statement>
+
+	<sql id="Insert_column">
+		<isNotEmpty property="taskRpid">
+			taskRpid
+		</isNotEmpty>
+		<isNotEmpty property="taskId" prepend=" , ">
+			taskId
+		</isNotEmpty>
+		<isNotEqual property="state" prepend=" , " compareValue="-1">
+			state
+		</isNotEqual>
+		<isNotEqual property="sendType" prepend=" , " compareValue="-1">
+			sendType
+		</isNotEqual>
+		<isNotEmpty property="errorInf" prepend=" , ">
+			errorInf
+		</isNotEmpty>
+		<isNotEqual property="errorTimes" prepend=" , " compareValue="-1">
+			errorTimes
+		</isNotEqual>
+		<isNotEmpty property="planRunTime" prepend=" , ">
+			planRunTime
+		</isNotEmpty>
+		<isNotEmpty property="taskRunTime" prepend=" , ">
+			taskRunTime
+		</isNotEmpty>
+		<isNotEmpty property="deadTime" prepend=" , ">
+			deadTime
+		</isNotEmpty>
+		<isNotEmpty property="taskRuleDesc" prepend=" , ">
+			taskRuleDesc
+		</isNotEmpty>
+		<isNotEmpty property="taskDesc" prepend=" , ">
+			taskDesc
+		</isNotEmpty>
+		<isNotEmpty property="postUrl" prepend=" , ">
+			postUrl
+		</isNotEmpty>
+		<isNotEqual property="isReTry" prepend=" , " compareValue="-1">
+			isReTry
+		</isNotEqual>
+		<isNotEqual property="reTryTimes" prepend=" , " compareValue="-1">
+			reTryTimes
+		</isNotEqual>
+		<isNotEqual property="reTryInterval" prepend=" , " compareValue="-1">
+			reTryInterval
+		</isNotEqual>
+		<isNotEqual property="retTimeout" prepend=" , "
+			compareValue="-1">
+			retTimeout
+		</isNotEqual>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			inTime
+		</isNotEmpty>
+	</sql>
+
+	<sql id="Insert_value">
+		<isNotEmpty property="taskRpid">
+			#taskRpid#
+		</isNotEmpty>
+		<isNotEmpty property="taskId" prepend=" , ">
+			#taskId#
+		</isNotEmpty>
+		<isNotEqual property="state" prepend=" , " compareValue="-1">
+			#state#
+		</isNotEqual>
+		<isNotEqual property="sendType" prepend=" , " compareValue="-1">
+			#sendType#
+		</isNotEqual>
+		<isNotEmpty property="errorInf" prepend=" , ">
+			#errorInf#
+		</isNotEmpty>
+		<isNotEqual property="errorTimes" prepend=" , " compareValue="-1">
+			#errorTimes#
+		</isNotEqual>
+		<isNotEmpty property="planRunTime" prepend=" , ">
+			#planRunTime#
+		</isNotEmpty>
+		<isNotEmpty property="taskRunTime" prepend=" , ">
+			#taskRunTime#
+		</isNotEmpty>
+		<isNotEmpty property="deadTime" prepend=" , ">
+			#deadTime#
+		</isNotEmpty>
+		<isNotEmpty property="taskRuleDesc" prepend=" , ">
+			#taskRuleDesc#
+		</isNotEmpty>
+		<isNotEmpty property="taskDesc" prepend=" , ">
+			#taskDesc#
+		</isNotEmpty>
+		<isNotEmpty property="postUrl" prepend=" , ">
+			#postUrl#
+		</isNotEmpty>
+		<isNotEqual property="isReTry" prepend=" , " compareValue="-1">
+			#isReTry#
+		</isNotEqual>
+		<isNotEqual property="reTryTimes" prepend=" , " compareValue="-1">
+			#reTryTimes#
+		</isNotEqual>
+		<isNotEqual property="reTryInterval" prepend=" , " compareValue="-1">
+			#reTryInterval#
+		</isNotEqual>
+		<isNotEqual property="retTimeout" prepend=" , "
+			compareValue="-1">
+			#retTimeout#
+		</isNotEqual>
+		<isNotEmpty property="modTime" prepend=" , ">
+			#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			#inTime#
+		</isNotEmpty>
+	</sql>
+
+	<insert id="Insert" parameterClass="HFTaskMnt">
+		insert into umpay.t_hftask_mnt(
+		<include refid="Insert_column" />
+		)
+		values (
+		<include refid="Insert_value" />
+		)
+	</insert>
+
+	<update id="Update" parameterClass="HFTaskMnt">
+		update umpay.t_hftask_mnt
+		<dynamic prepend="set">
+			<isNotEmpty property="taskRpid" prepend=" , ">
+				taskRpid = #taskRpid#
+			</isNotEmpty>
+			<isNotEqual property="state" prepend=" , " compareValue="-1">
+				state = #state#
+			</isNotEqual>
+			<isNotEmpty property="errorInf" prepend=" , ">
+				errorInf = #errorInf#
+			</isNotEmpty>
+			<isNotEqual property="errorTimes" prepend=" , " compareValue="-1">
+				errorTimes=#errorTimes#
+			</isNotEqual>
+			<isNotEmpty property="planRunTime" prepend=" , ">
+				planRunTime = #planRunTime#
+			</isNotEmpty>
+			<isNotEmpty property="taskRunTime" prepend=" , ">
+				taskRunTime = #taskRunTime#
+			</isNotEmpty>
+			<isNotEmpty property="deadTime" prepend=" , ">
+				deadTime = #deadTime#
+			</isNotEmpty>
+			<isNotEmpty property="modTime" prepend=" , ">
+				modTime = #modTime#
+			</isNotEmpty>
+		</dynamic>
+		<include refid="key_find" />
+	</update>
+	
+	<statement id="loadTaskMntList" resultClass="HFTaskMnt">
+		<![CDATA[
+		select taskRpid,state,errorTimes,planRunTime,postUrl,isReTry,reTryTimes,reTryInterval,retTimeout,deadTime
+		from umpay.t_hftask_mnt
+		where (planRunTime>current timestamp - 5 MINUTES and planRunTime<current timestamp + 31 MINUTES and  
+				(state=0 or (state in (1,3,4)and isReTry=2 and errorTimes<=reTryTimes))) 
+				or( state=2 and deadtime<>'' and  to_date(deadtime,'yyyy-mm-dd hh24:mi:ss')>current timestamp - 5 MINUTES 
+				and to_date(deadtime,'yyyy-mm-dd hh24:mi:ss')<current timestamp + 31 MINUTES )
+		]]>
+	</statement>
+</sqlMap>

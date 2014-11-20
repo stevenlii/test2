@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 渠道银行管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/chnlbank/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/chnlbank/export.do</url>
+	</Option>
+	<!-- 禁用按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/chnlbank/disable.do</url>
+	</Option>
+	<!-- 启用按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/chnlbank/enable.do</url>
+	</Option>
+	<!-- 渠道银行配置按钮 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/chnlbank/update.do</url>
+	</Option>
+	<!-- 批量渠道银行配置按钮 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/chnlbank/batchupdate.do</url>
+	</Option>
+	
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/chnlbankaudit/auditPass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/chnlbankaudit/auditNotPass.do</url>
+	</Option>
+</Options>

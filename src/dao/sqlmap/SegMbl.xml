@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SegMbl">
+	<typeAlias alias="SegMbl" type="com.umpay.hfmng.model.SegMbl" />
+	<sql id="select_what">
+	 select mobileId,dealerName,cardType,areaCode,provName,areaName,provCode,dealerCode,cardName,netType
+	 from mobile.seg_mobile where 1=1 
+	</sql>
+	
+	<sql id="key_find">
+		<isNotEmpty	property="mobileId" prepend=" and ">mobileId = #mobileId#</isNotEmpty>	
+	</sql>
+	
+	<sql id="where_find">
+		<isNotEmpty	property="mobileId" prepend=" and ">mobileId = #mobileId#</isNotEmpty>
+		<isNotEmpty	property="dealerName" prepend=" and ">dealerName = #dealerName#</isNotEmpty>
+		<isNotEmpty	property="cardType" prepend=" and ">cardType = #cardType#</isNotEmpty>
+		<isNotEmpty	property="areaCode" prepend=" and ">areaCode = #areaCode#</isNotEmpty>
+		<isNotEmpty	property="provName" prepend=" and ">provName = #provName#</isNotEmpty>
+		<isNotEmpty	property="areaName" prepend=" and ">areaName = #areaName#</isNotEmpty>
+		<isNotEmpty	property="provCode" prepend=" and ">provCode = #provCode#</isNotEmpty>
+		<isNotEmpty	property="dealerCode" prepend=" and ">dealerCode = #dealerCode#</isNotEmpty>
+		<isNotEmpty	property="cardName" prepend=" and ">cardName = #cardName#</isNotEmpty>
+		<isNotEmpty	property="netType" prepend=" and ">netType = #netType#</isNotEmpty>
+	</sql>
+	
+	<statement id="Get" resultClass="SegMbl" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="SegMbl" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from mobile.seg_mobile
+		<include refid="where_find" />
+	</statement>
+   
+   	<statement id="Insert" resultClass="SegMbl">
+		insert into mobile.seg_mobile(
+			mobileId,dealerName,cardType,areaCode,provName,areaName,provCode,dealerCode,cardName
+			<isNotEmpty	property="netType" prepend=" , ">netType</isNotEmpty>
+		)values(
+			#mobileId#,#dealerName#,#cardType#,#areaCode#,#provName#,#areaName#,#provCode#,#dealerCode#,#cardName#
+			<isNotEmpty	property="netType" prepend=" , ">#netType#</isNotEmpty>
+		)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update mobile.seg_mobile set mobileId=#mobileId#
+			<isNotEmpty	property="dealerName" prepend=" , "> dealerName=#dealerName# </isNotEmpty>
+			<isNotEmpty	property="cardType" prepend=" , "> cardType=#cardType# </isNotEmpty>
+			<isNotEmpty	property="areaCode" prepend=" , "> areaCode=#areaCode# </isNotEmpty>
+			<isNotEmpty	property="provName" prepend=" , "> provName=#provName# </isNotEmpty>
+			<isNotEmpty	property="areaName" prepend=" , "> areaName=#areaName# </isNotEmpty>
+			<isNotEmpty	property="provCode" prepend=" , "> provCode=#provCode# </isNotEmpty>
+			<isNotEmpty	property="dealerCode" prepend=" , "> dealerCode=#dealerCode# </isNotEmpty>
+			<isNotEmpty	property="cardName" prepend=" , "> cardName=#cardName# </isNotEmpty>
+			<isNotEmpty	property="netType" prepend=" , "> netType=#netType# </isNotEmpty>
+		 where mobileId=#mobileId# 
+	</statement>
+	
+</sqlMap>

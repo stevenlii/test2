@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css"/>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/merbank.js"></script>
+<script type="text/javascript">
+  	var url="$request.contextPath/merbank/query.do";
+    jQuery(document).ready(function() {
+    	jQuery("#search_div").width(jQuery(window).width()-20);
+    	
+	    var optStr="${opts}";
+		var opts=optStr.split(',');
+	    jQuery('[code]').each(function () {
+	        var code=$(this).attr("code");
+	        for(var i=0;i<opts.length;i++){
+			   if(code==opts[i]){
+			        $(this).css('display','inline');
+					}
+	    		};
+			});
+	
+      jQuery('#grid').omGrid({
+            dataSource : "$request.contextPath/merbank/query.do?queryKey=merbank.allMerBanks",
+            width:'100%',
+        	height : 455,
+            limit : 15,
+            singleSelect : false,
+            rowClasses : function(rowIndex,rowData){
+				if(rowData.MODLOCK==1){
+					return "lock";
+				}else{
+					return "checkbox";
+				}
+			},
+            colModel : [ {header : '更新时间', name : 'MODTIME', align : 'left',renderer:function(value , rowData , rowIndex){
+				 				return "<a title='"+value+"'>"+value+"</a>";
+				 			}}, 
+                         {header : '商户名称', name : 'MERNAME', align : 'left',renderer:function(value , rowData , rowIndex){
+				 				return "<a title='"+value+"'>"+value+"</a>";
+				 			}},
+                         {header : '商户号', name : 'MERID', align : 'left',renderer:function(value , rowData , rowIndex){
+			     				return "<a title='"+value+"'>"+value+"</a>";
+			     			}},
+                         {header : '支付银行', name : 'BANKID', align : 'left', renderer:function(value , rowData , rowIndex){
+                         	var bankName=rowData.BANKNAME;
+                         	var bankId=rowData.BANKID;
+                         	var name = bankName + bankId;
+                         	return "<a title='"+name+"'>"+name+"</a>";
+                         }},
+                         {header : '运营负责人', name : 'OPERATOR', align : 'left',renderer:function(value , rowData , rowIndex){
+              				return "<a title='"+value+"'>"+value+"</a>";
+              			}},
+                         {header : '状态', name : 'STATE', align : 'left',renderer:function(value , rowData , rowIndex){
+                         	var state = rowData.STATE;
+                         	var name = "";
+                         	if(state==2){
+                         		name = "启用";
+                         	}else {
+                         		name = "禁用";
+	              			}
+	                     	return "<a title='"+name+"'>"+name+"</a>";
+                         }
+                         },
+                         {header : '操作', name:'oper', align : 'left',renderer:function(value , rowData , rowIndex){
+                         	var state = rowData.STATE;
+                         	var merId = rowData.MERID;
+                         	var bankId = rowData.BANKID;
+                         	var modLock = rowData.MODLOCK;
+                         	var res = "";
+                         	if(modLock == 0){
+                             	if(state==2){ //处于开通状态，可关闭
+                             		if(optStr.indexOf("003")!=-1){
+                             			res += "<input name='关闭' title='禁用' type='image' src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable(" + merId + ", &quot;" + bankId + "&quot;, " + modLock + ");'/>";
+                             		}
+                             		if(optStr.indexOf("004")!=-1){
+                             			res +="&nbsp;&nbsp;<input name='开通' title='启用' type='image' src='${request.contextPath}/profile/default/images/tool_Enable1.png' />";
+                             		}
+                             	}else if(state==4){  //处于关闭状态，可开通
+                             		if(optStr.indexOf("003")!=-1){
+                             			res += "<input name='关闭' title='禁用' type='image' src='${request.contextPath}/profile/default/images/tool_Disable1.png' />"
+                             		}
+                             		if(optStr.indexOf("004")!=-1){
+                             			res += "&nbsp;&nbsp;<input name='开通' title='启用' type='image' src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable(" + merId + ", &quot;" + bankId + "&quot;, " + modLock + ");'/>";
+                             		}
+                             	}
+                         	}else{
+                         		if(optStr.indexOf("003")!=-1){
+                         			res += "<input name='关闭' title='禁用' type='image' src='${request.contextPath}/profile/default/images/tool_Disable1.png' />"
+                         		}
+                         		if(optStr.indexOf("004")!=-1){
+                         			res += "&nbsp;&nbsp;<input name='开通' title='启用' type='image' src='${request.contextPath}/profile/default/images/tool_Enable1.png' />";
+                         		}
+                         	}
+                         	return res;
+                         }}
+                  ],
+                  autoFit : true
+        });
+        
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+         });
+ 
+      //初始化运营负责人列表
+        jQuery('#operator').omCombo({
+            dataSource : '$request.contextPath/option/operatorlist3.do',
+            width:'75px',
+            listMaxHeight:150,
+            emptyText:'全部 ' ,
+            valueField : 'id',
+            inputField : 'name',
+            optionField : function(data, index) {return data.name;},
+            onSuccess:function(data, textStatus, event){
+   	  			var tmp = $.parseJSON('{"id":"","name":"全部","initials":"qb"}');
+   	  			data.unshift(tmp);
+      		},
+      	  filterStrategy : function(value, data) {
+      			var initials=data.initials+"";
+      			var list=initials.split(",");
+      			for(var i=0;i<list.length;i++){
+      				if(list[i].indexOf(value) == 0)
+      					return true;
+      			}
+                  return false;
+            },
+            filterDelay : 100,
+      	  forceSelection : true
+        });
+       
+      //初始化支付银行列表
+      jQuery('#bankId').omCombo({
+            dataSource : '$request.contextPath/option/banklist.do',
+            width:'150px',
+            listMaxHeight:150,
+            emptyText:'全部 ' ,
+            onSuccess:function(data, textStatus, event){
+   	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+   	  			data.unshift(tmp);
+      		},
+      		forceSelection : true
+       });
+    //状态       
+  	  $('#state').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+          width:'85px',
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+    
+   });
+
+</script>
+
+</head>
+<body>
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+  <table width="100%">
+  <tr><td align="left">
+  <input name="禁用" type="image" style="display:none" code="003" src="${request.contextPath}/profile/default/images/btn_Disable.png" onclick="batchDisable()" />
+  &nbsp;&nbsp;
+  <input name="启用" type="image" style="display:none" code="004" src="${request.contextPath}/profile/default/images/btn_Enable.png" onclick="batchEnable()"/>
+  	<td align="right">
+  	<input name="商户银行配置" type="image" style="display:none" code="007" src="${request.contextPath}/profile/default/images/btn_shyh.PNG" onclick="openone()"/>
+  	&nbsp;&nbsp;
+  	<input name="批量商户银行配置" type="image" style="display:none" code="009" src="${request.contextPath}/profile/default/images/btn_plshyh.PNG" onclick="openBatchMer()"/>
+  	&nbsp;&nbsp;<input name="导出" type="image" style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expMerBank();"/>
+  	</td>
+  </tr>
+  </table>
+  </div>
+ <!--列表查询区-->
+ <div  id="search_div">
+ <div class="list_search">
+     <table width="100%" border="0">
+       <tr>
+         <th width="10%" height="30">商户名：</th>
+         <td width="13%">
+         	<input id="merName" name="merName" type="text" class="input1" />
+         </td>
+         <th width="10%">商户号：</th>
+         <td width="13%">
+         	<input id="merId" name="merId" type="text" class="input1" />
+		 </td>
+		 <th width="10%">支付银行：</th>
+         <td width="13%"><input id="bankId" name="bankId" class="input1"/></td><td>&nbsp;</td>
+         <td rowspan="2"><input id="query" title="查询" name="query" type="image" style="display:none" code="001" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"/></td>
+       </tr>
+       <tr>
+         <th>运营负责人：</th>
+         <td><input id="operator" name="operator" class="select1"/></td>
+         <th>状态：</th>
+         <td><input id="state" name="state" class="select1"/></td>
+         <th width="10%">&nbsp;</th>
+         <td width="13%">&nbsp;</td>
+       </tr>
+     </table>
+   </div>
+   </div>
+   <!--列表区-->
+       <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:100%" src="about:blank"></iframe>
+ </div>
+</body>
+</html>

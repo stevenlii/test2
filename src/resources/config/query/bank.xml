@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="bank"  >
+	<sql id="allBank"> 
+	<![CDATA[
+	select bankId,bankName,bankType,state,modUser,modTime from umpay.t_bank_inf where (bankType=3 or bankType=6 or bankType=61 or bankType=62) 
+		 #if( $bankId && $bankId!='' ) 
+		   and bankId = :bankId   
+		 #end 
+		 #if( $bankName && $bankName!='' ) 
+		   and bankName like '%$bankName%'   
+		 #end 
+		  #if( $state && $state!='' ) 
+		   and state=:state 
+		 #end
+		  #if( $bankType && $bankType!='' ) 
+		   and  bankType=:bankType
+		 #end
+		 order by modTime desc
+	  ]]>
+	</sql>
+	
+</mapper> 

@@ -1,0 +1,438 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="${request.contextPath}/js/ui/themes/default/om-all.css"
+	type="text/css">
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/goodsbank.js"></script>
+<script type="text/javascript">
+	jQuery(document)
+			.ready(
+					function() {
+
+						jQuery("#search_div")
+								.width(jQuery(window).width() - 20);
+						var optStr = "${opts}";
+						var opts = optStr.split(',');
+						jQuery('[code]').each(function() {
+							var code = $(this).attr("code");
+							for ( var i = 0; i < opts.length; i++) {
+
+								if (code == opts[i]) {
+									$(this).css('display', 'inline');
+								}
+							}
+							;
+						});
+						jQuery('#grid')
+								.omGrid(
+										{
+											dataSource : "$request.contextPath/merbank/query.do?queryKey=goodsbank.allgoodsbank",
+											width : '100%',
+											height : 455,
+											limit : 15,
+											colModel : [
+													{
+														header : '更新时间',
+														name : 'MODTIME',
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商户号',
+														name : 'MERID',
+														width : 60,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商户名称',
+														name : 'MERNAME',
+														width : 80,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商品号',
+														name : 'GOODSID',
+														width : 60,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商品名称',
+														name : 'GOODSNAME',
+														width : 80,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '支付银行',
+														name : 'BANKID',
+														width : 70,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															var result = rowData.BANKNAME
+																	+ "("
+																	+ rowData.BANKID
+																	+ ")";
+															return "<a title='"+result+"'>"
+																	+ result
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商品开通状态',
+														name : 'KSTATE',
+														width : 75,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															var KSTATE = rowData.KSTATE;
+															var name = "";
+															if (KSTATE == 11)
+																name = "只开通新增";
+															else if (KSTATE == 12) {
+																name = "只保留续费";
+															} else if (KSTATE == 13) {
+																name = "新增与续费全部开通";
+															} else if (KSTATE == 23) {
+																name = "新增与续费全部注销";
+															}
+															return "<a title='"+name+"'>"
+																	+ name
+																	+ "</a>";
+														}
+													},
+													{
+														header : '操作',
+														name : 'oper',
+														width : 50,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															var result = "";
+															var merId = rowData.MERID;
+															var goodsId = rowData.GOODSID;
+															var bankId = rowData.BANKID;
+															var modLock = rowData.MODLOCK;
+															var desc = rowData.DESC;
+															if (desc == 'null'
+																	|| desc == null) {
+																desc = '';
+															}
+															if (optStr
+																	.indexOf("004") != -1) {//有修改权限
+																if (modLock == 0) {
+																	result += " <input  name='修改' alt='修改'  title='修改' type='image' value='' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='showModifyDialog(&quot;"
+																			+ merId
+																			+ "&quot;,&quot;"
+																			+ goodsId
+																			+ "&quot;,&quot;"
+																			+ bankId
+																			+ "&quot;)'/> ";
+																} else {
+																	result += " <input  name='修改' alt='修改'  title='修改' type='image' value='' src='${request.contextPath}/profile/default/images/tool_modify1.png' /> ";
+																}
+															}
+															result += " <input name='详情' alt='详情' title='"
+																	+ desc
+																	+ "' type='image' value='ee' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetailDialog(&quot;"
+																	+ merId
+																	+ "&quot;,&quot;"
+																	+ goodsId
+																	+ "&quot;,&quot;"
+																	+ bankId
+																	+ "&quot; )' />";
+															return result;
+														}
+													} ],
+											autoFit : true
+										});
+						//初始化商户号列表  	
+						$('#merId')
+								.omCombo(
+										{
+											dataSource : '$request.contextPath/option/merlist.do',
+											width : '150px',
+											listMaxHeight : 150,
+											emptyText : '全部 ',
+											forceSelection : true,
+											onSuccess : function(data,
+													textStatus, event) {
+												var tmp = $
+														.parseJSON('{"value":"","text":"全部"}');
+												data.unshift(tmp);
+											},
+											onValueChange : function(target,
+													newValue, oldValue, event) {
+												getGoodsId(newValue);
+											}
+										});
+						//初始化银行列表
+						$('#bankId')
+								.omCombo(
+										{
+											dataSource : '$request.contextPath/option/banklist.do',
+											width : '140px',
+											emptyText : '全部 ',
+											listMaxHeight : 150,
+											onSuccess : function(data,
+													textStatus, event) {
+												var tmp = $
+														.parseJSON('{"value":"","text":"全部"}');
+												data.unshift(tmp);
+											}
+										});
+						//初始化商品号列表
+						$('#goodsId')
+								.omCombo(
+										{
+											//    dataSource : '$request.contextPath/option/goodslist.do',
+											dataSource : [ {
+												"value" : "",
+												"text" : ""
+											} ],
+											width : '150px',
+											emptyText : '全部 ',
+											listMaxHeight : 150,
+											onSuccess : function(data,
+													textStatus, event) {
+												var tmp = $
+														.parseJSON('{"value":"","text":"全部"}');
+												data.unshift(tmp);
+											}
+										});
+						//商品开通状态
+						$('#state').omCombo({
+							dataSource : [ {
+								"value" : "",
+								"text" : "全部"
+							}, {
+								"value" : "11",
+								"text" : "只开通新增"
+							}, {
+								"value" : "12",
+								"text" : "只保留续费"
+							}, {
+								"value" : "13",
+								"text" : "新增与续费全部开通"
+							}, {
+								"value" : "23",
+								"text" : "新增与续费全部注销"
+							} ],
+							width : '140px',
+							listMaxHeight : 150,
+							emptyText : '全部 ',
+							forceSelection : true
+						});
+
+						// 下发商品时间
+						$('#isRealTime').omCombo({
+							dataSource : [ {
+								"value" : "",
+								"text" : "全部"
+							}, {
+								"value" : "0",
+								"text" : "即时下发"
+							}, {
+								"value" : "1",
+								"text" : "智能网异步发货"
+							}, {
+								"value" : "2",
+								"text" : "BOSS异步发货"
+							}, {
+								"value" : "3",
+								"text" : "全部异步发货"
+							} ],
+							width : '140px',
+							listMaxHeight : 150,
+							emptyText : '全部 ',
+							forceSelection : true
+						});
+						
+						jQuery("#dialog").omDialog({
+							autoOpen : false
+						});
+					});
+	//添加弹出框
+	function add() {
+		$("#dialog").omDialog("option", "width", '750');
+		$("#dialog").omDialog("option", "title", '添加商品支付银行');
+		$("#dialog").omDialog("option", "height", '450');
+		$("#dialog").omDialog("option", "modal", true);
+		$("#dialog").omDialog('open');
+		var frameLoc = window.frames[0].location;
+		frameLoc.href = 'add.do';
+		$("#dialog").omDialog({
+			onClose : function(event) {
+				window.frames[0].location.href = '../wait.htm';
+			}
+		});
+		return false;
+	}
+	//批量修改弹出框
+	function batchMod() {
+		$("#dialog").omDialog("option", "width", '800');
+		$("#dialog").omDialog("option", "title", '批量配置商品支付银行');
+		$("#dialog").omDialog("option", "height", '540');
+		$("#dialog").omDialog("option", "modal", true);
+		$("#dialog").omDialog('open');
+		var frameLoc = window.frames[0].location;
+		frameLoc.href = 'batchMod.do';
+		$("#dialog").omDialog({
+			onClose : function(event) {
+				window.frames[0].location.href = '../wait.htm';
+			}
+		});
+		return false;
+	}
+	//搜索框列表根据商户号获取商品号
+	function getGoodsId(newValue) {
+		var merId = newValue;
+		if (merId != '') {
+			$.ajax({
+				url : '$request.contextPath/goodsbank/getgoodsids.do',
+				type : 'POST',
+				dataType : 'json',
+				data : {
+					'merId' : merId
+				},
+				success : function(goodsIdList) {
+					var data2 = $.parseJSON('{"text":"全部","value":""}');
+					goodsIdList.unshift(data2);
+					$('#goodsId').omCombo('setData', goodsIdList);
+				}
+			});
+		} else {
+			var data = $.parseJSON('{"text":"全部","value":""}');
+			$('#goodsId').omCombo('setData', data);
+		}
+	}
+</script>
+</head>
+<body>
+
+	<!--增 删 改按钮区-->
+	<div class="list_btntool">
+		<table border="0" width="100%">
+			<tr>
+				<td align="left"><input name="添加商品银行" title='添加商品银行' code="002"
+					style="display : none" type="image"
+					src="${request.contextPath}/profile/default/images/btn_Add.png"
+					onclick="add();" /> <input name="批量配置商品银行" title='批量配置商品银行'
+					code="006" style="display : none" type="image"
+					src="${request.contextPath}/profile/default/images/btn_plpz.png"
+					onclick="batchMod();" /></td>
+			</tr>
+		</table>
+	</div>
+	<!--列表查询区-->
+	<div id="search_div">
+		<div class="list_search">
+			<table width="90%" border="0">
+				<tr>
+					<td>
+						<form id="form" action="" method="post">
+							<table width="100%" border="0">
+								<tr>
+									<th width="10%">支付银行：
+									</td>
+									<td width="13%"><input id="bankId" name="bankId"
+										class="select1" />
+									</td>
+									<th width="7%">商户号：
+									</td>
+									<td width="13%"><input id="merId" name="merId"
+										class="select1" />
+									</td>
+									<th width="10%">下发商品时间：
+									</td>
+									<td width="13%"><input id="isRealTime" name="isRealTime"
+										class="select1" />
+									</td>
+								</tr>
+								<tr>
+									<th width="10%">商品开通状态：
+									</td>
+									<td width="13%"><input id="state" name="state"
+										class="select1" />
+									</td>
+									<th width="7%">商品号：
+									</td>
+									<td><input id="goodsId" name="goodsId" class="select1" />
+									</td>
+									<th></th><td></td>
+								</tr>
+							</table>
+						</form></td>
+					<td><input id="query" style="display:none" code='001'
+						name="query" type="image"
+						src="${request.contextPath}/profile/default/images/Search_bnt.png"
+						onclick="querygoodsbank()" /></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!--列表区-->
+	<div align="center">
+		<table align="left" id="grid"></table>
+	</div>
+	<div id="dialog">
+		<iframe frameborder="0" style="width:100%;height:99%"
+			src="about:blank"></iframe>
+	</div>
+</body>
+</html>

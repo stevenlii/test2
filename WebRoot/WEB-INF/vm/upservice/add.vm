@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/upService.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script>
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  		   
+  	 	 jQuery("#dataform").validate({
+  	 		 	onkeyup: false,
+                rules : {
+                    "serviceId" : {maxlength : 12, leng:true},
+                    "serviceName": {maxByte : 64},
+                    "serviceId1" : {maxlength : 12, leng:true},
+                    "serviceName1": {maxByte : 64},
+                    "serviceId2" : {maxlength : 12, leng:true},
+                    "serviceName2": {maxByte : 64},
+                    "merId": {required : true},
+                    "goodsId": {required : true},
+                    "gateId": {required : true},
+                    "amount": {required : true, digits : true}
+                },
+                messages : {
+                    "serviceId" : {maxlength : "代码不能大于12位"},
+                    "serviceId1" : {maxlength : "代码不能大于12位"},
+                    "serviceId2" : {maxlength : "代码不能大于12位"},
+                    "merId": {required : "请选择商户"},
+                    "goodsId" : {required : "请选择商品"},
+                    "gateId": {required : "请选择通道"},
+                    "amount": {required : "请输入金额", digits : "金额只能为正整数"}
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+                });
+          
+  	 	 //获取商户列表
+  	 	 $('#merId').omCombo({
+  	 		 dataSource : '$request.contextPath/option/merlist.do',
+  	 		 listMaxHeight:200,
+  	 		 width:'100px',
+  	 		 emptyText:'全部 ' ,
+  	 		 onSuccess:function(data, textStatus, event){
+	  	 		 var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	  	 		 data.unshift(tmp);
+	  	 	 },
+	  	 	 onValueChange : function(target,newValue, oldValue, event) {
+	  	 		 getGoodsId(newValue);
+	  	 	 },
+	  	 	 forceSelection : true
+  	 	 });
+  	 	 //初始化商品号列表
+  	 	 $('#goodsId').omCombo({
+  	 		 dataSource : [ {"value" : "","text" : ""} ],
+  	 		 emptyText : '全部 ',
+  	 		 width:'100px',
+  	 		 listMaxHeight : 200,
+	  	 	 forceSelection : true
+  	 	 });
+  	 	 
+  	 	 //初始化计费代码通道
+  	 	 $('#gateId').omCombo({
+  	 		 dataSource : '$request.contextPath/option/gateList.do',
+  	 		 width:'100px',
+  	 		 listMaxHeight:85,
+  	 		 emptyText:'全部 ',
+	  	 	 forceSelection : true
+  	 	 });
+            
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){ 
+                 return false;
+  	 	 	 }
+  	 	 	 if(!checkServiceId()){
+  	 	 		 return false;
+  	 	 	 }
+  	 	 	 jQuery(this).omAjaxSubmit({success:function(res){
+	  	 	 		 window.parent.showSimpleTip(res, true);
+	  	 	 		 window.parent.shuaxin();
+	  	 	 	 }
+  	 	 	 });
+  	 	 	 return false; 
+  	 	});
+  	 
+     });
+
+//搜索框列表根据商户号获取商品号
+function getGoodsId(newValue) {
+	var merId = newValue;
+	if (merId != '') {
+		$.ajax({
+			url : '$request.contextPath/goodsbank/getgoodsids.do',
+			type : 'POST',
+			dataType : 'json',
+			data : {
+				'merId' : merId
+			},
+			success : function(goodsIdList) {
+				goodsIdList.sort(function (a, b) { return a["value"] > b["value"] ? 1 : -1 });
+				$('#goodsId').omCombo('setData', goodsIdList);
+			}
+		});
+	} else {
+		var data = $.parseJSON('{"value" : "","text" : ""}');
+		$('#goodsId').omCombo('setData', data);
+	}
+}
+</script>  
+</head>
+<body>
+<div id="container">
+  <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/upservice/save.do">
+  <table width="100%" >
+  <tr><td>
+    <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+	    <tr>
+		    <th width="30%"><span>*</span>商户号：</th>
+		    <td class="td"><input id="merId" name="merId" class="select1"/></td>
+		    <td class="td"width="40%" ><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+		    <th><span>*</span>商品号：</th>
+		    <td class="td1"><input id="goodsId" name="goodsId" class="select1"/></td>
+		    <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+		    <th><span>*</span>支付通道：</th>
+		    <td class="td"><input id="gateId" name="gateId" class="select1"/></td>
+		    <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+		    <th><span>*</span>计费类型：</th>
+		    <td class="td1"><input type='radio' name='feeType' value='2' checked>按次</td>
+		    <td class="td1"></td>
+	    </tr>
+	    <tr>
+	    	<th>计费代码1：</th>
+		    <td class="td"><input id="serviceId" name="serviceId" type="text" maxlength="13" class="input1" /></td>
+		    <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+	    	<th>代码名称1：</th>
+		    <td class="td1"><input id="serviceName" name="serviceName" type="text" size="26" maxlength="65" class="input2"></td>
+		    <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+	    	<th>计费代码2：</th>
+		    <td class="td"><input id="serviceId1" name="serviceId1" type="text" maxlength="13" class="input1" /></td>
+		    <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+	    	<th>代码名称2：</th>
+		    <td class="td1"><input id="serviceName1" name="serviceName1" type="text" size="26" maxlength="65" class="input2"></td>
+		    <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+	    	<th>计费代码3：</th>
+		    <td class="td"><input id="serviceId2" name="serviceId2" type="text" maxlength="13" class="input1" /></td>
+		    <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+	    	<th>代码名称3：</th>
+		    <td class="td1"><input id="serviceName2" name="serviceName2" type="text" size="26" maxlength="65" class="input2"></td>
+		    <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+	    <tr>
+		    <th><span>*</span>金&nbsp;额：</th>
+		    <td class="td"><input name="amount" type="text" size="13" maxlength="13" class="input1">分</td>
+		    <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	    </tr>
+   </table>
+   </td></tr><tr><td>
+   <table width="100%" cellpadding="0" cellspacing="0">
+     <tr>
+        <td height="15"></td></tr>
+     <tr>
+        <td align="center"><input name="submit" type="submit" value="添加" class="popbtn"onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+        <input type="reset" value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+     </tr>
+   </table>
+  </td></tr>
+ <table>
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="secmerinf"  >
+	<sql id="all"> 
+	<![CDATA[
+		 SELECT I.SUBMERID,I.SUBMERNAME,I.STATE,I.OPERATOR,I.MODLOCK,I.MODTIME
+		 FROM UMPAY.T_SECMER_INF I 
+		 #if( $operator && $operator!='' ) 
+		    ,UMPAY.T_HFMER_OPER O 
+		 #end
+		 WHERE 1=1
+		 #if( $operator && $operator!='' ) 
+		   AND O.MER_ID=I.SUBMERID AND O.STATE=2 AND O.OPERATOR=:operator 
+		 #end
+		 #if( $subMerId && $subMerId!='' )
+		   AND I.SUBMERID=:subMerId   
+		 #end
+		 #if( $subMerName && $subMerName!='' ) 
+		   AND I.SUBMERNAME like '%$subMerName%'   
+		 #end 
+		 #if( $state && $state!='' ) 
+		   AND I.STATE=:state 
+		 #end
+		 ORDER BY I.MODTIME DESC
+	  ]]>
+	</sql>
+	
+	<sql id="exportInfWithCnf"> 
+	<![CDATA[
+		 SELECT i.SUBMERID,i.SUBMERNAME,i.STATE,i.OPERATOR,i.MODTIME,c.INFUNCODE,c.ORDERURL,c.NOTIFYURL 
+		 FROM UMPAY.T_SECMER_INF i FULL JOIN UMPAY.T_SECMER_CNF c ON i.SUBMERID=c.SUBMERID 
+		 #if( $operator && $operator!='' ) 
+		    JOIN UMPAY.T_HFMER_OPER O ON i.SUBMERID=O.MER_ID 
+		 #end
+		 WHERE 1=1
+		 #if( $operator && $operator!='' ) 
+		   AND O.STATE=2 AND O.OPERATOR=:operator 
+		 #end
+		 #if( $subMerId && $subMerId!='' )
+		   AND i.SUBMERID=:subMerId   
+		 #end
+		 #if( $subMerName && $subMerName!='' ) 
+		   AND i.SUBMERNAME like '%$subMerName%'   
+		 #end 
+		 #if( $state && $state!='' ) 
+		   AND i.STATE=:state 
+		 #end
+		 ORDER BY i.MODTIME DESC
+	  ]]>
+	</sql>
+</mapper> 

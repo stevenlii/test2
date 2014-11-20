@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid-standard.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/mergrade.js"></script>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		
+      jQuery('#grid').omGrid({
+            dataSource : "$request.contextPath/mergrade/modHistory.do?queryKey=operLog.allModHistory&dataId=$!{dataId}",
+            width: 600,
+            autoFit:true,
+            height : 310,
+            limit : 10,
+            colModel : [ {header : '修改时间', name : 'INTIME',width : 55, align : 'left',renderer:function(value , rowData , rowIndex){
+				  				return "<a title='"+value+"'>"+value+"</a>";
+				  			}}, 
+                         {header : '修改人', name : 'MODUSER', width : 30, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}}, 
+                         {header : '明细', name : 'DETAIL', width : 200 , align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}}, 
+                        ]
+               	});
+
+	});
+</script>
+</head>
+<body>
+   <!--列表区-->
+   <table width="100%" align="center">
+   <tr><td align="center">
+	    <table id="grid" align="left"></table>
+    </td></tr>
+    <tr><td align="center">
+    <input type="button"  value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+    </td></tr>
+    </table>
+</body>
+</html>

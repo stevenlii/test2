@@ -1,0 +1,135 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/couponinf.js"></script>
+<script>
+//关闭窗口方法
+function closeDialog() {
+    window.parent.fillBackAndCloseDialog("#dialog");
+}
+</script>
+</head>
+<body>
+<!--兑换券修改审核详情页面-->
+<form id ="dataform-mod" method="post" name="dataform-mod">
+   <div class="pop_list_sh" style="width:665">
+     <table border="0" cellspacing="0" cellpadding="0">
+       <tr>
+         <td width="300" valign="middle" class="td2">修改前</td>
+         <td width="10"></td>
+         <td width="300" class="td3">修改后</td>
+       </tr>
+       <tr>
+         <td height="10"></td>
+         <td ></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td valign="top">
+			<table cellpadding="0" cellspacing="0" class="infowrite" width="290">
+           <tr>
+			 <th width="80" >兑换券编号：</th>
+             <td class="td" ><label>
+               $!{useCouponInf.couponId}
+             </label></td>
+            </tr>
+           <tr>
+             <th>兑换券类型：</th>
+             <td class="td1">$!{useCouponInf.couponType}</td>
+            </tr>
+			<tr>
+             <th>启用状态：</th>
+             <td class="td">$!{useCouponInf.stateName}</td>
+            </tr>
+           <tr>
+             <th>兑换券名称：</th>
+             <td class="td1" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">$!{useCouponInf.couponName}</td>
+            </tr>
+           <tr>
+             <th>兑换券说明：</th>
+             <td class="td" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">$!{useCouponInf.remark}</td>
+            </tr>
+         </table></td>
+		 <td ></td>
+         <td valign="top"><table cellpadding="0" cellspacing="0" class="infowrite" width="290">
+           <tr>
+             <th width="80" >兑换券编号：</th>
+             <td class="td">$!{auditCouponInf.couponId}</td>
+           </tr>
+           <tr>
+             <th>兑换券类型：</th>
+             <td class="td1">
+             	#if($!{auditCouponInf.couponType} != $!{useCouponInf.couponType})
+             		<span>$!{auditCouponInf.couponType}</span>
+             	#else
+             		$!{auditCouponInf.couponType}
+             	#end
+             </td>
+           </tr>
+		    <tr>
+             <th>启用状态：</th>
+             <td class="td">
+             	#if(${auditCouponInf.stateName} != ${useCouponInf.stateName})
+             		<span>
+						${auditCouponInf.stateName}
+					</span>
+             	#else
+             		${auditCouponInf.stateName}
+             	#end
+             </td>
+           </tr>
+           <tr>
+             <th>兑换券名称：</th>
+             <td class="td1" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">
+             	#if($!{auditCouponInf.couponName.trim()} != $!{useCouponInf.couponName.trim()})
+             		<span>$!{auditCouponInf.couponName}</span>
+             	#else
+             		$!{auditCouponInf.couponName}
+             	#end
+             </td>
+           </tr>
+           <tr>
+             <th>兑换券说明：</th>
+             <td class="td" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">
+             	#if($!{auditCouponInf.remark} != $!{useCouponInf.remark})
+             		<span>$!{auditCouponInf.remark}</span>
+             	#else
+             		$!{auditCouponInf.remark}
+             	#end
+             </td>
+           </tr>
+         </table></td>
+       </tr>
+     </table>
+     <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goPass('$auditId','${auditCouponInf.couponId}')" id="btn_pass" />
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="拒绝" onclick="goNotPass('$auditId','${auditCouponInf.couponId}')" id="btn_nopass" />
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog(0)"/>
+	 </div>
+	 <div class="pop_btn_sh" style="width:665">
+	   <table class="infowrite" cellspacing="0" cellpadding="0" >
+    		<tr>
+             <th width="120">审核意见：</th>
+             <td class="td"><textarea id="resultDesc" name="resultDesc" rows="3" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%"></textarea></td>
+           </tr>
+    	</table>
+	 </div>
+	 
+   </div>
+ </form>
+ </body>
+ </html>

@@ -1,0 +1,76 @@
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/goodsaudit.js"></script>
+<!--审核后的商品银行详情页面-->
+<form id="dataform" method="post" name="dataform">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0"  style="width: 400px;" >
+		<tr>
+		    <th width="40%">所属商户号：</th>
+			<td class="td">$!{audit.merId}</td>
+		</tr>
+		<tr>
+		    <th >商&nbsp;品&nbsp;号：</th>
+			<td class="td1">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+		    <th >支付银行：</th>
+			<td class="td">$!{audit.bankName}($!{audit.bankId})</td>
+		</tr>
+		 <tr>
+              <th>商品金额：</th>
+              <td class="td1">$!{audit.amount}</td>
+         </tr>
+         <tr>
+		    <th>2次确认校验码：</th>
+			<td class="td">$!{audit.verifyTag}</td>
+		</tr>
+         <tr>
+              <th>商品最长计费天数：</th>
+              <td class="td1">$!{audit.checkDay}天</td>
+          </tr>
+         <tr>
+               <th>商品开通状态：</th>
+               <td class="td">
+                    #if ($!{audit.kState}==11) 
+                                                                     只开通新增 
+                    #elseif ($!{audit.kState}==12) 
+                                                                     只开通续费 
+                    #elseif ($!{audit.kState}==13) 
+                                                                           新增与续费全部开通  
+                    #else 新增与续费全部注销 
+                    #end 
+               </td>
+         </tr>
+         <tr>
+               <th>下发商品时间：</th>
+               <td class="td1">#if ($!{audit.isRealTime}==0)  即时下发 #elseif ($!{audit.isRealTime}==1) 智能网异步发货 
+               #elseif ($!{audit.isRealTime}==2) BOSS异步发货  #else 全部异步发货 #end </td>
+         </tr>
+	     <tr>
+		     <th>平台在机构商户号：</th>
+			 <td class="td">${audit.bankMerId}</td>      
+		 </tr>
+		<tr>
+		    <th >平台在机构终端号：</th>
+			<td class="td1">${audit.bankPosId}</td>      
+		</tr>
+	   
+		#if($!{resultDesc} == "")
+	     #else
+	      <tr>
+	        <th >审核意见：</th>
+	     	<td colspan="2" align="left" valign="bottom"><textarea id="resultDesc" rows="3" disabled="disabled" style="{width:100%;}">${resultDesc}</textarea>
+	     	</td>
+	      </tr>
+	     #end
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	 </div>
+</form>

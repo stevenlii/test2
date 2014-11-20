@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="merinter"  >
+	<sql id="allMerInter"> 
+	<![CDATA[
+		 SELECT MERID,INFUNCODE,INVERSION,PROTOCOL,STATE FROM UMPAY.T_MER_INTER WHERE 1=1 
+		 #if( $merId && $merId!='' )
+		   AND MERID=:merId 
+		 #end
+		 #if( $state && $state!='' ) 
+		   AND STATE=:state 
+		 #end
+		 ORDER BY MERID ASC
+	  ]]>
+	</sql>
+	
+</mapper> 

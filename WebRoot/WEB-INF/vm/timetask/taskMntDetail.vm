@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script> 
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+   
+   jQuery(document).ready(function() {
+	   $("#planRunTime").html("$!{taskMnt.planRunTime}".substring(0,19));
+	   $("#taskRunTime").html("$!{taskMnt.taskRunTime}".substring(0,19));
+   });
+</script>
+</head>
+<body>
+	<div>
+      <table class="infowrite" cellspacing="0" cellpadding="0" >
+       <tr >
+         <th width="100">任务流水：</th>
+         <th width="200" style="text-align:left;">$!{taskMnt.taskRpid}</th>
+         <th width="100">任务编号：</th>
+         <th width="200" style="text-align:left;">$!{taskMnt.taskId}</th>
+       </tr>
+	   <tr >
+         <th>任务说明：</th>
+         <td class="td" colspan="3">$!{taskMnt.taskDesc}</td>
+       </tr>
+       <tr>
+         <th>任务规则说明：</th>
+         <td class="td1" >$!{taskMnt.taskRuleDesc}</td>
+         <th>触发方式：</th>
+         <td class="td1">#if("1"=="$!{taskMnt.sendType}")自动#end#if("2"=="$!{taskMnt.sendType}")手动#end</td>
+       </tr>
+       <tr>
+         <th>触发地址：</th>
+         <td class="td" colspan="3">$!{taskMnt.postUrl}</td>
+       </tr>
+        <tr>
+         <th>计划触发时间：</th>
+         <td class="td1" ><label id="planRunTime"></label></td>
+         <th>实际触发时间：</th>
+         <td class="td1" >#if("0"=="$!{taskMnt.state}")--#else<label id="taskRunTime"></label>#end</td>
+       </tr>
+       <tr>
+         <th>任务执行状态：</th>
+         <td class="td" >$!{taskRunState}</td>
+         <th>错误是否重试：</th>
+         <td class="td" >#if("2"=="$!{taskMnt.isReTry}")是#end#if("4"=="$!{taskMnt.isReTry}")否#end</td>
+       </tr>
+       #if("2"=="$!{taskMnt.isReTry}")
+       <tr>
+         <th>异常次数：</th>
+         <td class="td1" >$!{taskMnt.errorTimes}次</td>
+         <th>重试次数：</th>
+         <td class="td1" >$!{taskMnt.reTryTimes}次</td>
+       </tr>
+       <tr>
+         <th>重试间隔时间：</th>
+         <td class="td">$!{taskMnt.reTryInterval}分钟</td>                         
+         <th>反馈超时阀值：</th>
+         <td class="td">$!{taskMnt.retTimeout}分钟</td>
+       </tr>
+       <tr>
+         <th>最后反馈时间：</th>
+         <td class="td">$!{taskMnt.deadTime}</td>                         
+         <th></th>
+         <td class="td"></td>
+       </tr>
+       #end
+       #if("1"=="$!{taskMnt.state}" or "4"=="$!{taskMnt.state}" or "5"=="$!{taskMnt.state}")
+       <tr>
+         <th>反馈信息：</th>
+         <td class="td" colspan="3">$!{taskMnt.errorInf}</td>                         
+       </tr>
+       #end
+     </table>
+   </div>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

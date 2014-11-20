@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商户银行管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/busiconf/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/busiconf/export.do</url>
+	</Option>
+	<!-- 禁用按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/busiconf/disable.do</url>
+	</Option>
+	<!-- 启用按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/busiconf/enable.do</url>
+	</Option>
+	<!-- 添加按钮 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/busiconf/save.do</url>
+	</Option>
+</Options>

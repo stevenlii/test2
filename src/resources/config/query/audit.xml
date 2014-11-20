@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="audit"  >
+	<sql id="allMerAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.ixdata2,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_MER_INF' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata = :ixData   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 #if( $ixData2 && $ixData2 != '' ) 
+		   and  audit.ixData2 = :ixData2 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allGoodsAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.ixdata2,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where tableName='UMPAY.T_GOODS_INF' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like '%$ixData%' 
+		 #end 
+		 #if( $state && $state!='' ) 
+		   and  audit.state=:state 
+		 #end
+		 #if( $creator && $creator!='' ) 
+		   and  audit.creator=:creator 
+		 #end
+		 #if( $modUser && $modUser!='' ) 
+		   and  audit.moduser=:modUser 
+		 #end
+		 #if( $auditType && $auditType!='' ) 
+		   and  audit.audittype = :auditType 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allMerBankAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.ixdata2,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_MER_BANK' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like '%$ixData%'   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.audittype = :auditType 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allCreators"> 
+	<![CDATA[
+		 select distinct creator from umpay.t_hfaudit order by creator
+	  ]]>
+	</sql>
+	<sql id="getByBatchId"> 
+	<![CDATA[
+		select intime,ixdata,moddata,auditType,state from umpay.t_hfaudit where batchId=:batchId
+	  ]]>
+	</sql>
+	<sql id="allGoodsBankAudits">
+		<![CDATA[
+			 select audit.id,audit.tableName,audit.ixdata,audit.ixdata2,audit.moddata,audit.auditType,
+			  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime,audit.desc 
+			  from umpay.t_hfaudit audit where tableName='UMPAY.T_GOODS_BANK' and batchId='' 
+			    #if( $ixData && $ixData!='' ) 
+		          and  audit.ixdata like '%$ixData%'   
+		        #end 
+				#if( $state && $state!='' ) 
+					and  audit.state=:state 
+				#end
+				#if( $creator && $creator!='' ) 
+					and  audit.creator=:creator 
+				#end
+				#if( $modUser && $modUser!='' ) 
+					and  audit.moduser=:modUser 
+				#end
+				#if( $auditType && $auditType!='' ) 
+					and  audit.audittype=:auditType 
+				#end
+				#if( $from && $from != '' && $to && $to != '') 
+					and  intime between '$from' and '$to' 
+				#end
+				order by audit.intime desc
+	  	]]>
+	</sql>
+	
+	<sql id="batchGoodsBankAudits">
+		<![CDATA[
+			 select distinct batchId,inTime,modTime,creator,modUser,state,desc from 
+			 umpay.t_hfaudit audit where tableName='UMPAY.T_GOODS_BANK' and batchId<>'' 
+			 #if( $state && $state!='' )  
+			   and  audit.state=:state 
+			 #end
+			 #if( $creator && $creator!='' ) 
+			   and  audit.creator=:creator 
+			 #end
+			 #if( $modUser && $modUser!='' ) 
+			   and  audit.moduser=:modUser 
+			 #end
+			 #if( $from && $from != '' && $to && $to != '') 
+			   and  intime between '$from' and '$to' 
+			 #end
+			 order by audit.intime desc
+	  	]]>
+	</sql>
+	<sql id="gradeAudits"> 
+	<![CDATA[
+		 select a.id,a.tableName,a.ixdata,a.ixdata2,a.moddata,a.state,a.creator,a.modTime,
+		  a.modUser,a.resultDesc,a.inTime,i.merName,e.operator,a.auditType,i.inTime 
+		  from umpay.t_hfaudit a,umpay.t_mer_inf i,umpay.t_hfmer_exp e
+		  #if( $operator && $operator!='' ) 
+		    ,umpay.t_hfmer_oper o 
+		  #end
+		  where a.tableName='UMPAY.T_HFMER_GRADE' and a.ixdata=i.merId and i.merId=e.merId 
+		 #if( $operator && $operator!='' ) 
+		   and o.mer_id=e.merId and o.state=2 and o.operator=:operator 
+		 #end
+		 #if( $merName && $merName!='' ) 
+		   and i.merName like '%$merName%' 
+		 #end
+		 #if( $ixData && $ixData!='' ) 
+		   and  a.ixData = :ixData 
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  a.state = :state 
+		 #end
+		 #if( $after && $after!='' ) 
+		   AND I.INTIME>=:after 
+		 #end
+		 #if( $befor && $befor!='' ) 
+		   AND I.INTIME<:befor 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  a.moduser = :modUser 
+		 #end
+		 order by a.intime desc
+	  ]]>
+	</sql>
+	<sql id="allChnlBankAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_HF_CHNL_BANK' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like '%$ixData%'   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allChnlAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_HF_CHNL_INF' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like '%$ixData%'   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 #if( $from && $from != '' && $to && $to != '') 
+		   and  intime between '$from' and '$to' 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allChnlGoodsAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_HF_CHNL_GOODS' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like '%$ixData%'   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allSecMerAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_SECMER_INF' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata = :ixData   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<!-- 代理商品审核查询  zhao -->
+	<sql id="allProxyGoodsAudits"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_PROXYGOODS' and audit.batchId=''
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like :ixData   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 #if( $from && $from != '' && $to && $to != '') 
+		   and  audit.intime between '$from' and '$to' 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<!-- 代理商品批量审核查询  zhao -->
+	<sql id="allBatchProxyGoodsAudits"> 
+	<![CDATA[
+		select distinct audit.batchId , audit.audittype, audit.state,audit.creator,audit.modUser,
+		audit.inTime, audit.modtime 
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_PROXYGOODS'  and audit.batchId<>'' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like :ixData   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $auditType && $auditType != '' ) 
+		   and  audit.auditType = :auditType 
+		 #end
+		 #if( $from && $from != '' && $to && $to != '') 
+		   and  audit.intime between '$from' and '$to' 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+	<sql id="allpayltdrollback"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.ixdata2,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.inTime,audit.desc
+		  from umpay.t_hfaudit audit where audit.tableName='MOBILE.TXEUSERLTD' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata = :ixData   
+		 #end 
+		 #if( $state && $state != '' ) 
+		   and  audit.state = :state 
+		 #end
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $modUser && $modUser != '' ) 
+		   and  audit.moduser = :modUser 
+		 #end
+		 #if( $ixData2 && $ixData2 != '' ) 
+		   and  audit.ixData2 like :ixData2 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+</mapper> 

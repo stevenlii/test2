@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="reportOpt">
+	<sql id="all">
+	<![CDATA[
+	 select
+	a.backup_oper_id as opid,
+	a.submit_time as sub_time,
+	a.ver_time as ver_time,
+	a.backup_time as bak_time,
+	a.add_user_id as sub_opr_id,
+	a.bank_id as bank_id,
+	a.mer_id as mer_id,
+    b.category as mer_category,
+    b.busi_attr as mer_busitype,
+	a.goods_id as goods_id,
+    c.category as goods_category,
+    c.busitype as goods_busitype,
+    c.amount as amount,
+    d.company_desc as com_desc,
+    d.mer_web as mer_web,
+    d.reg_capital as reg_cpt,
+    d.reg_tiem as reg_tiem,
+    d.year_profit as year_profit,
+    d.user_scale as user_scale,
+    d.busi_desc as busi_desc,
+    d.support as support,
+    d.sale_channel as sale_chn,
+    d.src_mer as src_mer,
+    d.shared_rate as shared_rate,
+	a.mod_user_id as opr_id,
+	a.backup_oper_stat as bak_stat,
+	a.oper_reason as reason,
+	a.batch_code as batch_code,
+	a.backup_type as backup_type,
+	a.is_valid as is_valid
+	from
+		umpay.t_report_opt a
+	left join umpay.t_hfmer_exp b on a.mer_id=b.merid
+	left join umpay.t_hfgoods_exp c on a.goods_id=c.goodsid  and a.mer_id = c.merid
+	left join umpay.t_hfmer_exp_attr d on a.mer_id=d.mer_id
+	where a.is_valid = 2
+	and a.backup_oper_stat !=0
+	#if( $startDate && $startDate!='' ) 
+	  	 and a.backup_time >= :startDate
+	 #end
+	 #if( $endDate && $endDate!='' ) 
+	   and a.backup_time <= :endDate
+	 #end
+	#if( $merId && $merId!='' ) 
+		 and a.mer_Id = :merId
+	#end
+	#if( $goodsId && $goodsId!='' ) 
+		 and a.goods_Id = :goodsId
+	#end
+	#if( $bak_stat && $bak_stat!='' ) 
+		 and a.backup_oper_stat = :bak_stat
+	#end
+	#if( !$bak_stat || $bak_stat=='' ) 
+		 and a.backup_oper_stat != 9
+		 and a.backup_oper_stat != 0
+	#end
+	#if( $bankId && $bankId!='' ) 
+		 and a.bank_Id = :bankId
+	#end
+	#if( $sub_opr_id && $sub_opr_id!='' ) 
+		 and a.add_user_id = :sub_opr_id
+	#end
+     order by a.updt_time desc
+	]]>
+	</sql>
+</mapper> 

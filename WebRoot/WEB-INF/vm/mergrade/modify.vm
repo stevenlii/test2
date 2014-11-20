@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head> 
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/mergrade.js"></script>
+<style type="text/css" >
+.input_text {
+    border: 1px solid #6D869E;
+    height: 17px;
+    vertical-align: middle;
+    width: 50%;
+}
+.errorMsg {
+    background: url("$request.contextPath/profile/validate/images/alert.png") center no-repeat white;
+	background-position: 5px 50%;
+	background-color: #FCEFE3;
+	text-align: left;
+	padding: 2px 2px 2px 25px;
+	border: 1px solid red;
+	display: none;
+	width: 120px;
+	margin-top: -18px;
+	margin-left: 18px;
+	position: absolute;
+	border-radius: 4px;
+	display ：block ;
+}
+.errorImg{
+    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    vertical-align: inherit;
+}
+</style>
+<script>
+var numRange = "0,100".split(",");
+var errMsg = '评分取值范围为0-100';
+$(document).ready(function() {
+    $('#dataform').validate({
+        rules : {
+    		turnoverIndex : {
+                range : numRange
+            },
+            riseRateIndex : {
+                range : numRange
+            },
+            falseTradeIndex : {
+            	range : numRange
+            },
+            complaintIndex : {
+                range : numRange
+            },
+            sysStabIndex : {
+                range : numRange
+            },
+            cooperateIndex : {
+                range : numRange
+            },
+            breachIndex : {
+                range : numRange
+            },
+            upgradeIndex : {
+                range : numRange
+            },
+            marketingIndex : {
+                range : numRange
+            },
+            supportIndex : {
+                range : numRange
+            }
+        },
+        messages : {
+        	turnoverIndex : {
+                range : errMsg
+            },
+            riseRateIndex : {
+                range : errMsg
+            },
+            falseTradeIndex : {
+            	range : errMsg
+            },
+            complaintIndex : {
+                range : errMsg
+            },
+            sysStabIndex : {
+                range : errMsg
+            },
+            cooperateIndex : {
+                range : errMsg
+            },
+            breachIndex : {
+                range : errMsg
+            },
+            upgradeIndex : {
+                range : errMsg
+            },
+            marketingIndex : {
+                range : errMsg
+            },
+            supportIndex : {
+                range : errMsg
+            }
+        },
+        errorPlacement : function(error, element) { 
+            if(error.html()){
+                $(element).parents().map(function(){
+                    if(this.tagName.toLowerCase()=='td'){
+                        var attentionElement = $(this).next().children().eq(0);
+                        attentionElement.css('display','block');
+	                    attentionElement.next().html(error);
+                    }
+                });
+            }
+        },
+        showErrors: function(errorMap, errorList) {
+            if(errorList && errorList.length > 0){
+                $.each(errorList,function(index,obj){
+                    var msg = this.message;
+                    $(obj.element).parents().map(function(){
+                        if(this.tagName.toLowerCase()=='td'){
+                            var attentionElement = $(this).next().children().eq(0);
+                            attentionElement.show();
+    	                    attentionElement.next().html(msg);
+                        }
+                    });
+                });
+            }else{
+                $(this.currentElements).parents().map(function(){
+                    if(this.tagName.toLowerCase()=='td'){
+                        $(this).next().children().eq(0).hide();
+                    }
+                });
+            }
+            this.defaultShowErrors();
+        },
+        submitHandler : function() {
+        	jQuery(this).submit();
+            return false;
+        }
+    });
+    
+ 	 jQuery('#dataform').submit(function() {
+		 		if (!jQuery("#dataform").valid()) {
+		 	 		return false;
+		        }
+		 		var turnoverIndex=$("input[name='turnoverIndex']").val();
+	  	 	  	var riseRateIndex=$("input[name='riseRateIndex']").val();
+	  	 	  	var falseTradeIndex=$("input[name='falseTradeIndex']").val();
+	  	 	  	var complaintIndex=$("input[name='complaintIndex']").val();
+	  	 	  	var sysStabIndex=$("input[name='sysStabIndex']").val();
+		  	 	var cooperateIndex=$("input[name='cooperateIndex']").val();
+		  	 	var breachIndex=$("input[name='breachIndex']").val();
+		  	 	var upgradeIndex=$("input[name='upgradeIndex']").val();
+		  	 	var marketingIndex=$("input[name='marketingIndex']").val();
+		  	 	var supportIndex=$("input[name='supportIndex']").val();
+	  	 	  	if("$!{merGrade.turnoverIndex}" == turnoverIndex && "$!{merGrade.riseRateIndex}" == riseRateIndex
+		  	 	  		&& "$!{merGrade.falseTradeIndex}" == falseTradeIndex && "$!{merGrade.complaintIndex}" == complaintIndex
+		  	 	  		&& "$!{merGrade.sysStabIndex}" == sysStabIndex && "$!{merGrade.cooperateIndex}" == cooperateIndex
+		  	 	  		&& "$!{merGrade.breachIndex}" == breachIndex && "$!{merGrade.marketingIndex}" == marketingIndex
+		  	 	  		&& "$!{merGrade.upgradeIndex}" == upgradeIndex && "$!{merGrade.supportIndex}" == supportIndex){
+		   			window.parent.$.omMessageBox.alert({
+		                content:'没有修改，不需提交'
+		            });
+		   			return false;
+		   		}
+		        jQuery(this).omAjaxSubmit({success:function(res){
+		        	if(res == 'yes'){
+		        		closeDialog();
+		        		window.parent.shuaxin();
+		        	}else{
+		        		window.parent.showSimpleTip(res);
+		        	}
+		     	}});
+		    	return false; 
+ 	 });
+    
+    $('.errorImg').bind('mouseover',function(){
+        $(this).next().css('display','block');
+    }).bind('mouseout',function(){
+        $(this).next().css('display','none');
+    });
+    
+});
+</script>
+</head>
+<body>
+<form id ="dataform" method="post" name="dataform" action="${request.contextPath}/mergrade/update.do">
+<input type="hidden" name="merId" value="$merGrade.merId">
+<input type="hidden" name="month" value="$merGrade.month">
+	<table align="center" style="width:100%">
+		<tr><td>
+			<table class="infowrite" cellspacing="0" cellpadding="0" style="width:100%" align="center" >
+				<caption><h2 style="height:25px">评分修改详情</h2></caption>
+				<tr>
+					<th width="20%">商户名称：</th><td class="td">$!{merGrade.merName}</td>
+					<th width="15%">商户号：</th><td width="10%" class="td">$!{merGrade.merId}</td>
+					<th width="20%">运营状态：</th><td width="10%" class="td">$!{merGrade.operState}</td>
+				</tr>
+			</table>
+		</td></tr>
+		<tr><td>
+			<br>
+			<table class="infowrite" cellspacing="0" cellpadding="0" style="width:100%" align="center" >
+				<caption><h3 style="height:20px">基本考核项</h3></caption>
+				<tr>
+					<th width="26%">交易额评分：</th>
+					<td width="14%" class="td"><input name="turnoverIndex" value="$!{merGrade.turnoverIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+					<th width="20%">交易额：</th><td class="td" width="25%"><span>$!{turnover}</span></td>
+				</tr>
+				<tr>
+					<th>增产率评分：</th>
+					<td class="td"><input name="riseRateIndex" value="$!{merGrade.riseRateIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+					<th>增产率：</th><td class="td">#if($!{merGrade.riseRate}==-99) #else <span>$!{merGrade.riseRate}%</span>#end</td>
+				</tr>
+				<tr>
+					<th>虚假交易评分：</th>
+					<td class="td"><input name="falseTradeIndex" value="$!{merGrade.falseTradeIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+					<th>虚假交易：</th><td class="td">#if($!{merGrade.reduceRate}==-99) #else <span>$!{merGrade.reduceRate}%</span> #end</td>
+				</tr>
+				<tr>
+					<th>客诉评分：</th>
+					<td class="td"><input name="complaintIndex" value="$!{merGrade.complaintIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+					<th>客诉笔数：</th><td class="td">#if($!{merGrade.complaintCount}==-99) #else <span>$!{merGrade.complaintCount}（笔）</span> #end</td>
+				</tr>
+				<tr>
+					<th>系统稳定性评分：</th>
+					<td class="td"><input name="sysStabIndex" value="$!{merGrade.sysStabIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+					<th>交易笔数：</th><td class="td">#if($!{merGrade.tradingCount}==-99) #else <span>$!{merGrade.tradingCount}（笔）</span> #end</td>
+				</tr>
+				<tr>
+					<th>配合力度评分：</th>
+					<td class="td"><input name="cooperateIndex" value="$!{merGrade.cooperateIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td" colspan="3"><span class="errorImg"></span><span class="errorMsg"></td>
+				</tr>
+			</table>
+		</td></tr>
+		<tr><td>
+			<br>
+			<table class="infowrite" cellspacing="0" cellpadding="0" style="width:100%" align="center" >
+				<caption><h3 style="height:20px">加减分项</h3></caption>
+				<tr>
+					<th width="26%">违约情况评分：</th>
+					<td width="14%" class="td"><input name="breachIndex" value="$!{merGrade.breachIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+				</tr>
+				<tr>
+					<th>重大投诉评分：</th>
+					<td class="td"><input name="upgradeIndex" value="$!{merGrade.upgradeIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+				</tr>
+				<tr>
+					<th>营销活动评分：</th>
+					<td class="td"><input name="marketingIndex" value="$!{merGrade.marketingIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+				</tr>
+				<tr>
+					<th>资源支持评分：</th>
+					<td class="td"><input name="supportIndex" value="$!{merGrade.supportIndex}" type="text" maxlength="5" class="input1"></td>
+					<td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+				</tr>
+				<tr>
+					<th>总 分：</th><td class="td" colspan="2">#if($!{merGrade.total}==-99) #else $!{merGrade.total}（分） #end</td>
+				</tr>
+			</table>
+		</td></tr>
+		<tr><td align="center">
+				<input name="submit" type="submit" value="修改" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+				<input name="关闭" value="关闭" type="button" class="popbtn" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+		</td></tr>
+	</table>
+</form>
+</body>
+</html>

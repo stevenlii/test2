@@ -1,0 +1,467 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-tabs.js"></script>
+<script src="$request.contextPath/js/ui/js/om-panel.js"></script>
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/goodsbank.js"></script>
+<style type="text/css" >
+.input_text {
+    border: 1px solid #6D869E;
+    height: 17px;
+    vertical-align: middle;
+    width: 50%;
+}
+.errorMsg {
+    background:   url("$request.contextPath/profile/validate/images/alert.png") center no-repeat white;
+	background-position: 5px 50%;
+	background-color: #FCEFE3;
+	text-align: left;
+	padding: 2px 2px 2px 25px;
+	border: 1px solid red;
+	display: none;
+	width: 140px;
+	margin-top: -18px;
+	margin-left: 18px;
+	position: absolute;
+	border-radius: 4px;
+	display ：block ;
+}
+.errorImg{
+    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    vertical-align: inherit;
+}
+</style>
+<script type="text/javascript">
+	var tree;
+	var setting = {
+		check: {enable: true},
+		data: {simpleData: {enable: true}}
+	};
+	var zNodes ;
+	function setCheck() {
+		var zTree = $.fn.zTree.getZTreeObj("tree");
+		zTree.setting.check.chkboxType =  { "Y" : "ps", "N" : "ps" };
+	}
+	
+	jQuery(document).ready(function() {
+	    $('#make-tab').omTabs({
+	    	 width: 765,
+            height: 480,
+            closable : false
+	    });
+	    
+	    //添加自定义的校验方法
+	    $.validator.addMethod("checkVerifytag", function(value) {
+            var regu = /^0$|^1$|^2$|^3$/; 
+            var reg = new RegExp(regu);
+            return reg.test(value);  // 二次确认校验码验证 值为  -1,0 ,1 ,2,3
+        }, '必须为0到3之间的整数');
+	    
+		jQuery("#dataform-page").validate({
+			onkeyup: false,
+            rules : {
+                "goodsId" : {required : true},
+                "verifyTag": {
+                    checkVerifytag : true,
+                    required : true ,
+                    maxlength : 1
+                },
+                "checkDay" : {
+                	required : true ,
+                	digits : true ,
+                	maxlength : 10
+                },
+                "kstate" : {required : true},
+                "isRealTime" :{required :true},
+                "bankMerId" : { maxlength : 32},
+                "bankPosId" : {maxlength : 32},
+		        "desc" : {required : true}
+            },
+            messages : {
+                "goodsId"  : {required : "请输入【商户号|商品号】"},
+                "verifyTag":{
+                	required : "请填写二次确认校验码" ,
+                	maxlength : "只能输入一位二次确认码"
+                },
+                "checkDay":{
+                	required : "请填写商品最长计费天数",
+                	digits    : "请填写数字" ,
+                	maxlength : "输入长度超过10位"
+                },
+                "kstate":{required : "请选择商品开通状态"},
+                "isRealTime" :{required : "请选择下发商品时间"},
+                "bankMerId"  : {maxlength : "长度不能超过32位"},
+                "bankPosId" : {maxlength :  "长度不能超过32位"},
+		        "desc" :{required : "请输入操作原因"}
+            },
+            errorPlacement : function(error, element) { 
+                if(error.html()){
+                    $(element).parents().map(function(){
+                        if(this.tagName.toLowerCase()=='td'){
+                            var attentionElement = $(this).next().children().eq(0);
+                            attentionElement.css('display','block');
+    	                    attentionElement.next().html(error);
+                        }
+                    });
+                }
+	        },
+	        showErrors: function(errorMap, errorList) {
+                if(errorList && errorList.length > 0){
+                    $.each(errorList,function(index,obj){
+                        var msg = this.message;
+                        $(obj.element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.show();
+	    	                    attentionElement.next().html(msg);
+	                        }
+	                    });
+                   });
+                }else{
+                    $(this.currentElements).parents().map(function(){
+                        if(this.tagName.toLowerCase()=='td'){
+                            $(this).next().children().eq(0).hide();
+                        }
+                    });
+                }
+                this.defaultShowErrors();
+            },          
+            submitHandler : function(){
+				jQuery(this).submit();
+                return false;
+            }
+		});
+		
+		jQuery("#dataform-file").validate({
+      		rules : {
+				"file" : {required : true},
+				"verifyTag": {
+		            checkVerifytag : true,
+		            required : true ,
+		            maxlength : 1
+		        },
+		        "checkDay" : {
+		        	required : true ,
+		        	digits : true ,
+		        	maxlength : 10
+		        },
+		        "kstate" : {required : true},
+		        "isRealTime" :{required :true},
+		        "bankMerId" : { maxlength : 32},
+		        "bankPosId" : {maxlength : 32},
+		        "desc" : {required : true}
+		    },
+		    messages : {
+		    	"file":{required : "请选择文本配置文件"},
+		        "verifyTag":{
+		        	required : "请填写二次确认校验码" ,
+		        	maxlength : "只能输入一位二次确认码"
+		        },
+		        "checkDay":{
+		        	required : "请填写商品最长计费天数",
+		        	digits    : "请填写数字" ,
+		        	maxlength : "输入长度超过10位"
+		        },
+		        "kstate":{required : "请选择商品开通状态"},
+		        "isRealTime" :{required : "请选择下发商品时间"},
+		        "bankMerId"  : {maxlength : "长度不能超过32位"},
+		        "bankPosId" : {maxlength :  "长度不能超过32位"},
+		        "desc" :{required : "请输入操作原因"}
+		    },
+			errorPlacement : function(error, element) { 
+                if(error.html()){
+                    $(element).parents().map(function(){
+                        if(this.tagName.toLowerCase()=='td'){
+                            var attentionElement = $(this).next().children().eq(0);
+                            attentionElement.css('display','block');
+    	                    attentionElement.next().html(error);
+                        }
+                    });
+                }
+	        },
+	        showErrors: function(errorMap, errorList) {
+                if(errorList && errorList.length > 0){
+                    $.each(errorList,function(index,obj){
+                        var msg = this.message;
+                        $(obj.element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.show();
+	    	                    attentionElement.next().html(msg);
+	                        }
+	                    });
+                   });
+                }else{
+                    $(this.currentElements).parents().map(function(){
+                        if(this.tagName.toLowerCase()=='td'){
+                            $(this).next().children().eq(0).hide();
+                        }
+                    });
+                }
+                this.defaultShowErrors();
+	        },          
+	        submitHandler : function(){
+				jQuery(this).submit();
+          		return false;
+	        }
+		});
+		
+		$('.errorImg').bind('mouseover',function(){
+			$(this).next().css('display','block');
+		}).bind('mouseout',function(){
+			$(this).next().css('display','none');
+		});
+				
+		jQuery('#dataform-page').submit(function() {
+  	 	 	if (!jQuery("#dataform-page").valid()) { 
+                return false;
+            }
+            if(!checkedNodes()){
+                return false;
+            }
+            $("input[name='submit']").attr("disabled","true");
+	         jQuery(this).omAjaxSubmit({success:function(res){
+		        	 $("input[name='submit']").removeAttr("disabled");
+		        	 window.parent.showSimpleTip(res);
+		        	 if(res == '1'){
+		        		 closeDialog();
+		        		 window.parent.shuaxin();
+		             }
+		         }
+		     });
+		     return false; 
+              
+        });  
+        
+        jQuery('#dataform-file').submit(function() {
+			if (!jQuery("#dataform-file").valid()) { 
+		        return false;
+		    }
+			$("input[name='submit']").attr("disabled","true");
+	    	jQuery(this).omAjaxSubmit({success:function(res){
+		    		 $("input[name='submit']").removeAttr("disabled");
+		    		 window.parent.showSimpleTip(res);
+		        	 if(res == '1'){
+		        		 closeDialog();
+		        		 window.parent.shuaxin();
+		             }
+	            }
+            });
+	        return false; 
+	    });
+		
+		var zNodes1="$!{zNodes}";
+		if(zNodes1!=''){
+			var zNodes=eval(zNodes1);
+		    tree=$.fn.zTree.init($("#tree"), setting, zNodes);
+			setCheck();
+		}
+  	 });
+ 
+	//关闭窗口方法
+	function closeDialog(){
+		window.parent.fillBackAndCloseDialog("#dialog"); 
+	}     
+
+   //获取树结构选取的节点内容
+	function checkedNodes(){
+		var checkedNodes = tree.getCheckedNodes();
+		if(checkedNodes.length==0){
+			alert("请选择支付银行");
+			return false;
+		}
+		else {
+			var relatedMenuIds = [];
+			for(var i = 0; i < checkedNodes.length; i++){
+				var node = checkedNodes[i];
+				relatedMenuIds[relatedMenuIds.length] = node.id;
+			}
+			var ids = relatedMenuIds.join(",");
+			$("#bankId").val(ids); 
+			return true;
+		}
+	}
+
+</script>
+</head>
+<body>
+	<div id="make-tab">
+	     <ul>
+	         <li>
+	             <a href="#tab1">手动填写</a>
+	         </li>
+	         <li>
+	             <a href="#tab2">上传配置文本</a>
+	         </li>
+	     </ul>
+	     <div id="tab1">
+		     <form id ="dataform-page" method="post" name="dataform-page" action="${request.contextPath}/upgoodsbank/batchUpdateFromPage.do">
+		     <table class="infowrite" cellspacing="0" cellpadding="0">
+		     <tr>
+			     <th width="25%"><span>*</span>商户号|商品号:</th>
+			     <td class="td1" width="20%">如：9000|900<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9996|901
+			    	<textarea id="goodsId" name="goodsId" rows="3" cols="30"></textarea>
+			     </td>
+			     <td  class="td1" width="10%"><span class="errorImg"></span><span class="errorMsg"></span></td>
+				 <td rowspan="8" class="td">
+					 <input id="bankId" name="bankId" type="hidden">
+					 <div><span>*</span><span style="color:#000000; font-weight:bold">选择银行：</span></div>
+			         <div style="width:250px;height:350px;text-align:left;overflow:auto;">
+				      	<ul id="tree" class="ztree"></ul>
+				      </div>
+					  <div style="clear:both; height:0;overflow:hidden;"></div>
+				 </td>
+			</tr>
+			<tr>
+		     	<th><span>*</span>2次确认校验码：</th>
+		     	<td class="td"><input name="verifyTag" type="text" class="input1" value="3" maxlength="2" /></td>        
+		     	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		    </tr>
+		    <tr>
+		     	<th><span>*</span>商品最长计费天数：</th>
+		     	<td class="td1" ><input id="checkDay" name="checkDay" value="10" class="input1"/></td>
+		     	<td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	     	</tr>
+	        <tr>
+	         	<th><span>*</span>商品开通状态：</th>
+	         	<td class="td" colspan="1">
+	         		<input type="radio" name="kState" value="11" />只开通新增<br/>
+	         		<input type="radio" name="kState" value="12" />只保留续费<br/>
+	         		<input type="radio" name="kState" value="13" checked="true"/>新增与续费全部开通<br/>
+		            <input type="radio" name="kState" value="23" />新增与续费全部注销<br/>
+	            </td>
+	            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	        </tr>
+		    <tr>
+		     	<th><span>*</span>下发商品时间：</th>
+		     	<td class="td1" colspan="1">
+		     		<input type="radio" name="isRealTime" value="0" checked="true" /> 即时下发<br/>
+			     	<input type="radio" name="isRealTime" value="1" disabled="disabled"/> 智能网异步发货<br/>
+			     	<input type="radio" name="isRealTime" value="2" disabled="disabled"/> BOSS异步发货<br/>
+			     	<input type="radio" name="isRealTime" value="3" /> 全部异步发货<br/>
+		     	</td>
+		     	<td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	     	</tr>
+		    <tr>
+		     	<th>平台在机构商户号：</th>
+		     	<td class="td"><input name="bankMerId" type="text" class="input2"  maxlength="32" /></td>
+		     	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	     	</tr>
+	     	<tr>
+		     	<th>平台在机构终端号：</th>
+		     	<td class="td1"><input name="bankPosId" type="text" class="input2"  maxlength="32" /></td>
+		     	<td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	     	</tr>
+	     	<tr>
+		     	<th><span>*</span>操作原因：</th>
+		     	<td class="td"><input name="desc" type="text" class="input2"  maxlength="32" /></td>
+		     	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	     	</tr>
+     	</table>
+     	<div class="pop_btn">
+     		<input name="submit" type="submit" class="popbtn" value="确认" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+     		<input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />
+ 		</div>
+ 		</form>
+     </div>
+     <div id="tab2">
+         <form id ="dataform-file" method="post" name="dataform-file"  action="${request.contextPath}/upgoodsbank/batchUpdateFromFile.do"  enctype="multipart/form-data">
+			<table class="infowrite" cellspacing="0" cellpadding="0">
+				<tr>
+					<th width="25%"><span>*</span>文本配置：</th>
+					<td width="30%" class="td"><input id="file" name="file" type="file" class="input2" style="width:180px" /></td>
+					<td width="5%" class="td"><span class="errorImg" align="left"></span><span class="errorMsg"></span></td>
+					<td width="40%" class="td" rowspan="8">
+		        		<br><br>
+		        		<a>提示：</a><br>
+		        		<a>&nbsp;&nbsp;1.文件必须小于10M</a><br>
+		        		<a>&nbsp;&nbsp;2.txt文件内容格式：</a><br>
+		        		<a>&nbsp;&nbsp;商户号|商品号|银行编号,银行编号</a><br>
+		        		<a>&nbsp;&nbsp;举例如下：</a><br>
+		        		<a>&nbsp;&nbsp;&nbsp;&nbsp;3011|300|BS010000,XE010000</a><br>
+		        		<a>&nbsp;&nbsp;&nbsp;&nbsp;3012|400|BS020000,XE030000,XE040000</a><br>
+		        		<br><br>
+		        	</td>
+				</tr>
+				<tr>
+			     	<th><span>*</span>2次确认校验码：</th>
+			     	<td class="td"><input name="verifyTag" type="text" class="input1" value="3" maxlength="2" /></td>        
+			     	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+			    </tr>
+			    <tr>
+			     	<th><span>*</span>商品最长计费天数：</th>
+			     	<td class="td1" ><input id="checkDay" name="checkDay" value="10" class="input1"/></td>
+			     	<td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		     	</tr>
+		        <tr>
+		         	<th><span>*</span>商品开通状态：</th>
+		         	<td class="td" colspan="1">
+		         		<input type="radio" name="kState" value="11" />只开通新增<br/>
+		         		<input type="radio" name="kState" value="12" />只保留续费<br/>
+		         		<input type="radio" name="kState" value="13" checked="true"/>新增与续费全部开通<br/>
+			            <input type="radio" name="kState" value="23" />新增与续费全部注销<br/>
+		            </td>
+		            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		        </tr>
+			    <tr>
+			     	<th><span>*</span>下发商品时间：</th>
+			     	<td class="td1" colspan="1">
+			     		<input type="radio" name="isRealTime" value="0" checked="true" /> 即时下发<br/>
+				     	<input type="radio" name="isRealTime" value="1" /> 智能网异步发货<br/>
+				     	<input type="radio" name="isRealTime" value="2" /> BOSS异步发货<br/>
+				     	<input type="radio" name="isRealTime" value="3" /> 全部异步发货<br/>
+			     	</td>
+			     	<td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		     	</tr>
+			    <tr>
+			     	<th>平台在机构商户号：</th>
+			     	<td class="td"><input name="bankMerId" type="text" class="input2"  maxlength="32" /></td>
+			     	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		     	</tr>
+		     	<tr>
+			     	<th>平台在机构终端号：</th>
+			     	<td class="td1"><input name="bankPosId" type="text" class="input2"  maxlength="32" /></td>
+			     	<td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		     	</tr>
+		     	<tr>
+			     	<th><span>*</span>操作原因：</th>
+			     	<td class="td"><input name="desc" type="text" class="input2"  maxlength="32" /></td>
+			     	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		     	</tr>
+	     </table>
+		 <div class="pop_btn">
+		   <input name="submit1" type="submit" class="popbtn" value="确认" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+		   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />
+		 </div>
+		 </form>
+     </div>
+     
+     <div id="tab3">
+    
+     </div>
+	     
+	     
+ </div>
+   
+</body>
+</html>

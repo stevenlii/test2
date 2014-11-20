@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="stats">
+	<sql id="merChannelStats">
+		<![CDATA[
+			select d.mydate as MD, d.CHANNELID, d.merid, d.mername, d.GOODSID, d.GOODSNAME, sum(scount) as salednum, CAST(sum(samt) as double) / 100 as saledSum
+from 
+(
+select a.merid, a.mername, a.GOODSID, a.GOODSNAME, #if($statsType && $statsType =='day') 
+								date(a.mydate) 
+							#end
+					 		#if($statsType && $statsType =='month') 
+								TO_CHAR(a.mydate, 'YYYY-MM')  
+							#end as mydate, a.state, case when a.state = 'saled' then count(*) else 0 end as scount, 
+    case when a.state = 'saled' then sum(price) else 0 end as samt, a.CHANNELID
+    from(    
+        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, c.saledtime as mydate, 'saled' as state, c.PRICE , 1 as scount, c.CHANNELID
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+            where c.state not in(-1, 0, 1) and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID
+            #if($type && $type!='') 
+				and c.merid =:type
+			#end
+			#if($goodstype && $goodstype!='') 
+				and c.GOODSID =:goodstype
+			#end
+			#if($channel && $channel!='') 
+				and c.CHANNELID =:channel
+			#end
+			#if($startDate && $startDate != '')
+				and c.saledtime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.saledtime <= timestamp('$endDate') 
+			#end 
+        ) a
+    where 1=1  group by a.CHANNELID, a.merid, a.mername, a.GOODSID, a.GOODSNAME, #if($statsType && $statsType =='day') 
+								date(a.mydate) 
+							#end
+					 		#if($statsType && $statsType =='month') 
+								TO_CHAR(a.mydate, 'YYYY-MM')  
+							#end, a.state 
+    ) d
+	where 1 = 1
+	group by d.merid, d.mername,d.GOODSID, d.GOODSNAME,d.mydate, d.CHANNELID
+	order by md desc
+		]]>
+	</sql>
+	
+	<sql id="couponRuleStats">
+		<![CDATA[
+			select d.ruleid, d.merid, d.mername, d.GOODSID, d.GOODSNAME, sum(scount) as salednum, CAST(sum(samt) as double) / 100 as saledSum, sum(ecount) as exchangednum, 
+			CAST(sum(eamt) as double) / 100 as exchangedsum, sum(ccount) as cancelnum, cast(sum(camt) as double) / 100 as cancelSum, sum(ocount) as overduenum, cast(sum(oamt) as double) / 100 as overdueSum
+			from 
+			(
+			select a.merid, a.mername, a.GOODSID, a.GOODSNAME, a.ruleid, a.state, case when a.state = 'saled' then count(*) else 0 end as scount, 
+			    case when a.state = 'saled' then sum(price) else 0 end as samt,case when a.state='exchanged' then count(*) else 0 end as ecount,
+			    case when a.state='exchanged' then sum(price) else 0 end as eamt, case when a.state = 'cancel' then count(*) else 0 end as ccount,
+			    case when a.state = 'cancel' then sum(price) else 0 end as camt, case when a.state = 'overdue' then count(*) else 0 end as ocount,
+			    case when a.state = 'overdue' then sum(price) else 0 end as oamt
+			    from(    
+			        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, r.RULEID, 'saled' as state, c.PRICE , 1 as scount
+			            from UMPAY.t_coupon_code c, UMPAY.T_COUPON_RULE r, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+			            where c.state not in(-1, 0, 1) and c.RULEID = r.RULEID and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID
+			            #if($type && $type!='') 
+							and c.merid =:type
+						#end
+						#if($goodstype && $goodstype!='') 
+							and c.GOODSID =:goodstype
+						#end
+						#if($ruleid && $ruleid!='') 
+							and c.RULEID =:ruleid
+						#end
+					union all
+			        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, r.RULEID, 'exchanged' as state, c.PRICE, 1 as scount
+			            from UMPAY.t_coupon_code c, UMPAY.T_COUPON_RULE r, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+			            where c.state=4 and c.RULEID = r.RULEID and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID
+			            #if($type && $type!='') 
+							and c.merid =:type
+						#end
+						#if($goodstype && $goodstype!='') 
+							and c.GOODSID =:goodstype
+						#end
+						#if($ruleid && $ruleid!='') 
+							and c.RULEID =:ruleid
+						#end
+			        union all
+			        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, r.RULEID, 'cancel' as state, c.PRICE , 1 as scount
+			            from UMPAY.t_coupon_code c, UMPAY.T_COUPON_RULE r, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+			            where c.state=9 and c.RULEID = r.RULEID and  c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID
+			            #if($type && $type!='') 
+							and c.merid =:type
+						#end
+						#if($goodstype && $goodstype!='') 
+							and c.GOODSID =:goodstype
+						#end
+						#if($ruleid && $ruleid!='') 
+							and c.RULEID =:ruleid
+						#end
+			        union all
+			        select i.merid, i.mername, g.GOODSID, g.GOODSNAME,r.RULEID, 'overdue' as state, c.PRICE , 1 as scount
+			            from UMPAY.t_coupon_code c, UMPAY.T_COUPON_RULE r, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+			            where c.state=5 and c.RULEID = r.RULEID and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID
+			            #if($type && $type!='') 
+							and c.merid =:type
+						#end
+						#if($goodstype && $goodstype!='') 
+							and c.GOODSID =:goodstype
+						#end
+						#if($ruleid && $ruleid!='') 
+							and c.RULEID =:ruleid
+						#end
+			        ) a
+			    where 1=1  group by a.merid, a.mername, a.GOODSID, a.GOODSNAME, a.ruleid, a.state 
+			    ) d
+				where 1 = 1
+				group by d.merid, d.mername,d.GOODSID, d.GOODSNAME,d.ruleid
+				order by ruleid desc
+		]]>
+	</sql>
+	
+	<sql id="goodsMonthDayStats">
+		<![CDATA[
+			select d.mydate as MD, d.merid, d.mername, d.GOODSID, d.GOODSNAME, sum(scount) as salednum, CAST(sum(samt) as double) / 100 as saledSum, sum(ecount) as exchangednum, 
+CAST(sum(eamt) as double) / 100 as exchangedsum, sum(ccount) as cancelnum, cast(sum(camt) as double) / 100 as cancelSum, sum(ocount) as overduenum, cast(sum(oamt) as double) / 100 as overdueSum
+from 
+(
+select a.merid, a.mername, a.GOODSID, a.GOODSNAME, #if($statsType && $statsType =='day') 
+								date(a.mydate) 
+							#end
+					 		#if($statsType && $statsType =='month') 
+								TO_CHAR(a.mydate, 'YYYY-MM')  
+							#end as mydate, a.state, case when a.state = 'saled' then count(*) else 0 end as scount, 
+    case when a.state = 'saled' then sum(price) else 0 end as samt,case when a.state='exchanged' then count(*) else 0 end as ecount,
+    case when a.state='exchanged' then sum(price) else 0 end as eamt, case when a.state = 'cancel' then count(*) else 0 end as ccount,
+    case when a.state = 'cancel' then sum(price) else 0 end as camt, case when a.state = 'overdue' then count(*) else 0 end as ocount,
+    case when a.state = 'overdue' then sum(price) else 0 end as oamt
+    from(    
+        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, c.saledtime as mydate, 'saled' as state, c.PRICE , 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+            where c.state not in(-1, 0, 1) and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID 
+            #if($startDate && $startDate != '')
+				and c.saledtime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.saledtime <= timestamp('$endDate') 
+			#end 
+			#if($type && $type!='') 
+				and c.merid =:type
+			#end
+			#if($goodstype && $goodstype!='') 
+				and c.GOODSID =:goodstype
+			#end
+		union all
+        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, c.exchangetime as mydate, 'exchanged' as state, c.PRICE, 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+            where c.state=4 and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID 
+            #if($startDate && $startDate != '')
+				and c.exchangetime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.exchangetime <= timestamp('$endDate') 
+			#end 
+			#if($type && $type!='') 
+				and c.merid =:type
+			#end
+			#if($goodstype && $goodstype!='') 
+				and c.GOODSID =:goodstype
+			#end
+        union all
+        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, c.modtime as mydate, 'cancel' as state, c.PRICE , 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+            where c.state=9 and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID 
+            #if($startDate && $startDate != '')
+				and c.modtime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.modtime <= timestamp('$endDate') 
+			#end 
+			#if($type && $type!='') 
+				and c.merid =:type
+			#end
+			#if($goodstype && $goodstype!='') 
+				and c.GOODSID =:goodstype
+			#end
+        union all
+        select i.merid, i.mername, g.GOODSID, g.GOODSNAME, c.modtime as mydate, 'overdue' as state, c.PRICE , 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i, UMPAY.T_GOODS_INF g
+            where c.state=5 and c.merid = i.merid and c.GOODSID = g.GOODSID and c.MERID = g.MERID 
+            #if($startDate && $startDate != '')
+				and c.modtime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.modtime <= timestamp('$endDate') 
+			#end 
+			#if($type && $type!='') 
+				and c.merid =:type
+			#end
+			#if($goodstype && $goodstype!='') 
+				and c.GOODSID =:goodstype
+			#end
+        ) a
+    where 1=1  group by a.merid, a.mername, a.GOODSID, a.GOODSNAME, #if($statsType && $statsType =='day') 
+								date(a.mydate) 
+							#end
+					 		#if($statsType && $statsType =='month') 
+								TO_CHAR(a.mydate, 'YYYY-MM')  
+							#end, a.state 
+    ) d
+	where 1 = 1
+	group by d.merid, d.mername,d.GOODSID, d.GOODSNAME,d.mydate
+	order by md desc
+		]]>
+	</sql>
+	
+    <sql id="couponMerDetailStats">
+		<![CDATA[
+			select d.mydate as MD, d.merid, d.mername, sum(scount) as salednum, CAST(sum(samt) as double) / 100 as saledSum, sum(ecount) as exchangednum, 
+CAST(sum(eamt) as double) / 100 as exchangedsum 
+from 
+(
+select a.merid, a.mername,  #if($statsType && $statsType =='day') 
+								date(a.mydate) 
+							#end
+					 		#if($statsType && $statsType =='month') 
+								TO_CHAR(a.mydate, 'YYYY-MM')  
+							#end as mydate, a.state, case when a.state = 'saled' then count(*) else 0 end as scount, 
+    case when a.state = 'saled' then sum(price) else 0 end as samt,case when a.state='exchanged' then count(*) else 0 end as ecount,
+    case when a.state='exchanged' then sum(price) else 0 end as eamt
+    from(    
+        select i.merid, i.mername, c.saledtime as mydate, 'saled' as state, c.PRICE , 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i
+            where c.state not in(-1, 0, 1) and c.merid = i.merid 
+				#if($startDate && $startDate != '')
+					and c.saledtime >= timestamp('$startDate') 
+				#end 
+				#if($endDate && $endDate != '')
+					and c.saledtime <= timestamp('$endDate') 
+				#end 
+						        union all
+        select i.merid, i.mername, c.exchangetime as mydate, 'exchanged' as state, c.PRICE, 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_mer_inf i
+            where c.state=4 and c.merid = i.merid
+				#if($startDate && $startDate != '')
+					and c.exchangetime >= timestamp('$startDate') 
+				#end 
+				#if($endDate && $endDate != '')
+					and c.exchangetime <= timestamp('$endDate') 
+				#end 
+						    ) a
+    where 1=1  group by a.merid, a.mername,#if($statsType && $statsType =='day') 
+								date(a.mydate) 
+							#end
+					 		#if($statsType && $statsType =='month') 
+								TO_CHAR(a.mydate, 'YYYY-MM')  
+							#end, a.state 
+    ) d
+	where 1 = 1
+	#if($type && $type!='') 
+		and d.merid =:type
+	#end
+	group by d.merid, d.mername,d.mydate
+	order by md desc
+		]]>
+	</sql>
+	
+    <sql id="couponMerGatherStats">
+		<![CDATA[
+			select  mi.merid, mi.mername, case when sum(m.n1) is null then 0 else sum(m.n1) end as saledNum, case when sum(m.c1) is null then 0 else CAST(sum(m.c1) as double) / 100 end as saledSum,
+			 case when sum(m.n2) is null then 0 else sum(m.n2) end as exchangedNum, case when sum(m.c2) is null then 0 else CAST(sum(m.c2) as double) / 100 end as exchangedSum
+			 from (
+			 	select a.merid, a.price, a.n1, a.c1, b.price, b.n2, b.c2
+			 	from (
+			 		select couponId, merid, price, count(*) as n1, price*count(*) as c1
+			 			from UMPAY.t_coupon_code 
+			 				where state not in (-1, 0, 1)
+			 				group by couponId, price, merid
+			 		 ) a 
+			 	left outer join (
+			 		select couponId, merid, price, count(*) as n2, price*count(*) as c2
+			  			from UMPAY.t_coupon_code 
+			  			where state=4
+			  			group by couponId, price, merid
+			  	) b
+			  	on a.couponId = b.couponId and a.price = b.price and a.merid = b.merid
+			) as m 
+			join UMPAY.t_mer_inf mi on m.merid = mi.merid 
+			where 1 = 1
+			#if($type && $type!='') 
+				and mi.merid =:type
+			#end
+			group by mi.merid, mi.mername
+		]]>
+	</sql>
+	
+    <sql id="couponDetailStats">
+		<![CDATA[
+			select date(c.exchangetime) as edate, c.couponid, c.merid, c.goodsid, c.paidmobileid, CAST(c.price as double) / 100 as total
+				from umpay.t_coupon_code  c where c.state=4
+				#if($type && $type!='') 
+					and c.couponid =:type
+				#end
+				#if($mertype && $mertype!='') 
+					and c.merid =:mertype
+				#end
+				#if($goodstype && $goodstype!='') 
+					and c.goodsid =:goodstype
+				#end
+				#if($phone && $phone != '') 
+					and c.paidmobileid =:phone
+				#end
+				#if($startDate && $startDate != '')
+ 					and c.exchangetime >= timestamp('$startDate') 
+ 				#end 
+ 				#if($endDate && $endDate != '')
+ 					and c.exchangetime <= timestamp('$endDate') 
+ 				#end 
+				order by edate desc
+		]]>
+	</sql>
+	<sql id="coupongetherStats">
+		<![CDATA[
+		select f.couponid, f.couponname, a.n1 as saledNum, CAST(a.c1 as double) / 100 as saledSum,
+		 case when b.n2 is null then 0 else b.n2 end as exchangedNum, case when b.c2 is null then 0 else CAST(b.c2 as double) / 100 end as exchangedSum
+			from (
+				select couponId, count(1) as n1, sum(price) as c1
+					from UMPAY.t_coupon_code 
+						where state not in(-1, 0, 1)
+						group by couponId
+				 ) a 
+			left outer join (
+				select couponId, count(1) as n2, sum(price) as c2
+					from UMPAY.t_coupon_code 
+					where state=4
+					group by couponId
+			) b
+			on a.couponId = b.couponId left join UMPAY.t_coupon_inf f on a.couponid = f.couponid 
+		where a.COUPONID <>''
+	    #if($type && $type!='') 
+			and f.couponid =:type
+		#end
+		order by a.couponid desc
+		]]>
+	</sql>
+	<sql id="couponMonthDayStats">
+		<![CDATA[
+			select d.mydate as MD, d.couponid, d.couponname, sum(scount) as salednum, CAST(sum(samt) as double) / 100 as saledSum, sum(ecount) as exchangednum, CAST(sum(eamt) as double) / 100 as exchangedsum from 
+(
+select a.couponid, a.couponname, #if($statsType && $statsType =='day') date(a.mydate) #end
+			 		#if($statsType && $statsType =='month') TO_CHAR(a.mydate, 'YYYY-MM') #end as mydate, a.state, case when a.state = 'saled' then count(*) else 0 end as scount, case when a.state = 'saled' then sum(price) else 0 end as samt,case when a.state='exchanged' then count(*) else 0 end as ecount,case when a.state='exchanged' then sum(price) else 0 end as eamt
+    from(    
+        select i.couponid, i.couponname, c.saledtime as mydate, 'saled' as state, c.PRICE , 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_coupon_inf i
+            where c.state not in(-1, 0, 1) and c.couponid = i.couponid
+			#if($startDate && $startDate != '')
+				and c.saledtime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.saledtime <= timestamp('$endDate') 
+			#end
+        union all
+        select i.couponid, i.couponname, c.exchangetime as mydate, 'exchanged' as state, c.PRICE, 1 as scount
+            from UMPAY.t_coupon_code c, UMPAY.t_coupon_inf i
+            where c.state=4 and c.couponid = i.couponid
+			#if($startDate && $startDate != '')
+				and c.exchangetime >= timestamp('$startDate') 
+			#end 
+			#if($endDate && $endDate != '')
+				and c.exchangetime <= timestamp('$endDate') 
+			#end
+    ) a
+    where 1=1 #if($type && $type!='') 
+				and a.couponid =:type
+			#end
+    group by a.couponid, a.couponname,a.mydate, a.state 
+    ) d
+	group by d.couponid, d.couponname,d.mydate
+	order by md desc
+		]]>
+	</sql>
+	
+	<!-- 兑换券渠道汇总统计 -->
+	<sql id="channelgatherstats">
+		<![CDATA[
+			select * from (
+				select #if( $statsType && $statsType=='month' )
+		                   to_char(saledTime, 'YYYY-MM') as statDate,
+			           #end
+			           #if( $statsType && $statsType=='day' )
+			               to_char(saledTime, 'YYYY-MM-DD') as statDate,
+			           #end
+		               channelId,
+		               sum(price/100.0) as saledSum,
+		               count(1) as saledNum
+		          from umpay.T_COUPON_CODE
+		         where state not in (-1, 0, 1) 
+		           #if( $statsType && $statsType=='month' )
+		               #if( $startDate && $startDate!='' )
+		                   and to_char(saledTime, 'YYYY-MM') >= '$startDate'
+		               #end
+		               #if( $endDate && $endDate!='' )
+		                   and to_char(saledTime, 'YYYY-MM') <= '$endDate'
+		               #end
+		           #end
+		           #if( $statsType && $statsType=='day' )
+		               #if( $startDate && $startDate!='' )
+		                   and (days(saledTime) - days('$startDate') >= 0)
+		               #end
+		               #if( $endDate && $endDate!='' )
+		                   and (days(saledTime) - days('$endDate') <= 0)
+		               #end
+		           #end
+		           #if( $channelId && $channelId!='' )
+				       and channelId = :channelId
+				   #end
+		         group by #if( $statsType && $statsType=='month' )
+			                  to_char(saledTime, 'YYYY-MM'),
+				          #end
+				          #if( $statsType && $statsType=='day' )
+				              to_char(saledTime, 'YYYY-MM-DD'),
+				          #end channelId) a
+			order by a.statDate desc
+		]]>
+	</sql>
+	
+	<!-- 兑换券分省份汇总统计 -->
+	<sql id="provgatherstats">
+		<![CDATA[
+			select md as statDate,
+			       value(provName, '未知') as provName,
+			       channelId,
+			       merId,
+			       goodsId,
+			       sum(saledNum) as saledNum,
+			       sum(saledSum) as saledSum,
+			       sum(exchangednum) as exchangednum,
+			       sum(exchangedsum) as exchangedsum
+			  from (select mydate as md,
+			               substr(paidMobileId, 1, 7) as paidMobileId,
+			               d.merid,
+			               goodsId,
+			               channelId,
+			               sum(scount) as salednum,
+			               CAST(sum(samt) as double) / 100 as saledSum,
+			               sum(ecount) as exchangednum,
+			               CAST(sum(eamt) as double) / 100 as exchangedsum
+			          from (select paidMobileId,
+			                       merid,
+			                       goodsId,
+			                       channelId,
+			                       #if( $statsType && $statsType=='month' )
+					                   to_char(mydate, 'YYYY-MM') as mydate,
+						           #end
+						           #if( $statsType && $statsType=='day' )
+						               to_char(mydate, 'YYYY-MM-DD') as mydate,
+						           #end
+			                       a.state,
+			                       case
+			                         when a.state = 'saled' then
+			                          count(*)
+			                         else
+			                          0
+			                       end as scount,
+			                       case
+			                         when a.state = 'saled' then
+			                          sum(price)
+			                         else
+			                          0
+			                       end as samt,
+			                       case
+			                         when a.state = 'exchanged' then
+			                          count(*)
+			                         else
+			                          0
+			                       end as ecount,
+			                       case
+			                         when a.state = 'exchanged' then
+			                          sum(price)
+			                         else
+			                          0
+			                       end as eamt
+			                  from (select paidMobileId,
+			                               merid,
+			                               goodsId,
+			                               channelId,
+			                               saledtime as mydate,
+			                               'saled' as state,
+			                               PRICE,
+			                               1 as scount
+			                          from UMPAY.t_coupon_code
+			                         where state not in (-1, 0, 1)
+			                        union all
+			                        select paidMobileId,
+			                               merid,
+			                               goodsId,
+			                               channelId,
+			                               exchangetime as mydate,
+			                               'exchanged' as state,
+			                               PRICE,
+			                               1 as scount
+			                          from UMPAY.t_coupon_code
+			                         where state = 4) a
+			                 where 1 = 1
+			                 	   #if( $statsType && $statsType=='month' )
+						               #if( $startDate && $startDate!='' )
+						                   and to_char(a.mydate, 'YYYY-MM') >= '$startDate'
+						               #end
+						               #if( $endDate && $endDate!='' )
+						                   and to_char(a.mydate, 'YYYY-MM') <= '$endDate'
+						               #end
+						           #end
+						           #if( $statsType && $statsType=='day' )
+						               #if( $startDate && $startDate!='' )
+						                   and (days(a.mydate) - days('$startDate') >= 0)
+						               #end
+						               #if( $endDate && $endDate!='' )
+						                   and (days(a.mydate) - days('$endDate') <= 0)
+						               #end
+						           #end
+			                 	   #if( $channelId && $channelId!='' )
+								       and channelId = :channelId
+								   #end
+								   #if( $merId && $merId!='' )
+								       and merId = :merId
+								   #end
+								   #if( $goodsId && $goodsId!='' )
+								       and goodsId = :goodsId
+								   #end
+			                 group by paidMobileId,
+			                          a.merid,
+			                          goodsId,
+			                          channelId,
+			                          #if( $statsType && $statsType=='month' )
+						                  to_char(a.mydate, 'YYYY-MM'),
+							          #end
+							          #if( $statsType && $statsType=='day' )
+							              to_char(a.mydate, 'YYYY-MM-DD'),
+							          #end
+			                          a.state) d
+			         where 1 = 1
+			         group by substr(paidMobileId, 1, 7),
+			                  merid,
+			                  goodsId,
+			                  channelId,
+			                  mydate) a
+			  left join mobile.SEG_MOBILE s
+			    on a.paidMobileId = s.mobileId
+			 group by md, provName, channelId, merId, goodsId
+			 order by md desc
+		]]>
+	</sql>
+</mapper> 

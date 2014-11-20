@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="couponbatch">
+	<sql id="all">
+	<![CDATA[
+		select batchId,
+		       ruleId,
+		       modTime,
+		       goodsSum,
+		       saledSum,
+		       sellStartDate,
+		       sellEndDate,
+		       useStartDate,
+		       useEndDate,
+		       modUser,
+		       inTime,
+		       state
+		  from umpay.T_COUPON_BATCH
+		 where ruleId = :ruleId
+		 #if( $state && $state!='' )
+		 	and  state = :state
+		 #end
+		 order by inTime
+	]]>
+	</sql>
+	
+	<sql id="queryimportlog">
+	<![CDATA[
+		select couponId, 
+			   merId, 
+			   batchname,
+			   goodsId,
+			   operdata,
+               moduser,
+               intime
+          from (select ixdata1 as couponId,
+                       ixdata2 as merId,
+                       ixdata3 as batchname,
+                       ixdata4 as goodsId,
+                       operdata,
+                       moduser,
+                       to_char(intime,'yyyy-MM-dd hh24:mi:ss') intime
+                    from umpay.T_COUPON_OPLOG
+                    where businessobject='umpay.T_COUPON_BATCH'
+                ) a where 1=1
+       #if( $couponId && $couponId!='' ) 
+           and couponId = :couponId
+       #end
+       #if( $merId && $merId!='' ) 
+           and merId = :merId
+       #end
+       #if( $goodsId && $goodsId!='' ) 
+           and goodsId = :goodsId
+       #end
+     order by intime desc
+	]]>
+	</sql>
+	
+	<sql id="queryimportoptlog">
+	<![CDATA[
+		select couponId, 
+			   merId, 
+			   batchname,
+			   goodsId,
+			   operdata,
+               moduser,
+               intime
+          from (select ixdata1 as couponId,
+                       ixdata2 as merId,
+                       ixdata3 as batchname,
+                       ixdata4 as goodsId,
+                       operdata,
+                       moduser,
+                       to_char(intime,'yyyy-MM-dd hh24:mi:ss') intime
+                    from umpay.T_COUPON_OPLOG
+                    where businessobject='umpay.BATCHCODE'
+                ) a where 1=1
+       #if( $couponId && $couponId!='' ) 
+           and couponId = :couponId
+       #end
+       #if( $merId && $merId!='' ) 
+           and merId = :merId
+       #end
+       #if( $goodsId && $goodsId!='' ) 
+           and goodsId = :goodsId
+       #end
+     order by intime desc
+	]]>
+	</sql>
+
+</mapper> 

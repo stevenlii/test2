@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ProxyGoods">
+	<typeAlias alias="ProxyGoods" type="com.umpay.hfmng.model.ProxyGoods" />
+	<sql id="select_what">
+	 select * from UMPAY.T_PROXYGOODS_INF where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="subMerId" prepend=" and ">
+			subMerId = #subMerId#
+		</isNotEmpty>
+		<isNotEmpty	property="goodsId" prepend=" and ">
+			goodsId = #goodsId#
+		</isNotEmpty>
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="subMerId" prepend=" and ">
+			subMerId = #subMerId# 
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="ProxyGoods" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="ProxyGoods" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from UMPAY.T_PROXYGOODS_INF
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Insert" resultClass="ProxyGoods">
+		insert into UMPAY.T_PROXYGOODS_INF(merId,subMerId,goodsId
+				<isNotEmpty	property="modLock" prepend=" , "> modLock </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+			) values(#merId#,#subMerId#,#goodsId#
+				<isNotEmpty	property="modLock" prepend=" , "> #modLock# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_PROXYGOODS_INF set modLock=0,modTime=CURRENT TIMESTAMP 
+			
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where merId=#merId# and subMerId=#subMerId# and goodsId=#goodsId# 
+	</statement>
+	
+	<statement id="updateLock" resultClass="integer">
+	   update UMPAY.T_PROXYGOODS_INF set modLock=#modLock#,modTime=CURRENT TIMESTAMP 
+	   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where merId=#merId# and subMerId=#subMerId# and goodsId=#goodsId# 
+	</statement>
+	
+	<statement id="isOrNotAble" resultClass="integer">
+		update UMPAY.T_PROXYGOODS_INF set state=#state#,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+			<isNotEmpty	property="modLock" prepend=" , "> modLock=#modLock# </isNotEmpty>
+		where merId=#merId# and subMerId=#subMerId# and goodsId=#goodsId# 
+	</statement>
+	
+	<statement id="setLock" resultClass="integer">
+	   update UMPAY.T_PROXYGOODS_INF set modLock=#modLock# where merId=#merId# and subMerId=#subMerId#  and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="findEnable" resultClass="ProxyGoods" >
+		<include refid="select_what" />
+		and merId=#merId# and goodsId=#goodsId# and state=2
+	</statement>
+	
+	<statement id="findEnableBySubMer" resultClass="ProxyGoods" >
+		select distinct(merId) from umpay.T_PROXYGOODS_INF where subMerId=#subMerId# and state=2
+	</statement>
+</sqlMap>

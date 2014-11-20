@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Para">
+	<typeAlias alias="Para" type="com.umpay.hfmng.model.Para" />
+	<statement id="insert" resultClass="Para">
+		insert into umpay.t_coupon_para( sysid, paratype, paracode, modtime,
+		paravalue, paradesc
+		<isNotEmpty property="modUser" prepend=" , "> moduser
+		</isNotEmpty>
+		) values( #sysId#, #paraType# ,
+		#paraCode#,
+		#modTime#,
+		#paraValue#,
+		#paraDesc#
+		<isNotEmpty property="modUser" prepend=" , "> #modUser#
+		</isNotEmpty>
+		)
+	</statement>
+
+	<statement id="getTypes" resultClass="Para">
+		SELECT distinct PARATYPE
+		FROM UMPAY.T_COUPON_PARA where sysid='coupon'
+		<isNotEmpty property="paraType" prepend=" and "> paraType like #paraType#||'%'
+		</isNotEmpty>
+	</statement>
+
+	<statement id="get" resultClass="Para">
+		SELECT PARATYPE, PARACODE,
+		MODTIME, PARAVALUE, PARADESC, MODUSER, INTIME
+		FROM UMPAY.T_COUPON_PARA
+		where SYSID='coupon' and paraType = #paraType# and paraCode =
+		#paraCode#
+	</statement>
+
+	<statement id="update" resultClass="Para">
+		UPDATE UMPAY.T_COUPON_PARA
+		SET MODTIME=#modTime#,
+		PARAVALUE=#paraValue#, PARADESC=#paraDesc#
+		<isNotEmpty property="modUser" prepend=" , "> moduser = #modUser#
+		</isNotEmpty>
+		WHERE PARATYPE= #paraType# and PARACODE = #paraCode# and
+		sysid='coupon'
+	</statement>
+
+	<statement id="all" resultClass="Para">
+		SELECT SYSID,
+		       PARATYPE,
+		       PARACODE,
+		       MODTIME,
+		       PARAVALUE,
+		       PARADESC,
+		       MODUSER,
+		       INTIME
+		  FROM UMPAY.T_COUPON_PARA
+		 WHERE SYSID = #sysId#
+	</statement>
+</sqlMap>

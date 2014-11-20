@@ -1,0 +1,739 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-mouse.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-draggable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-position.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-resizable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-dialog.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagetip.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js">
+        </script>
+        <script src="$request.contextPath/js/busi/reportopt.js">
+        </script>
+        <style>
+            .input_text { border: 1px solid #6D869E; height: 17px; vertical-align:
+            middle; width: 50%; } .errorMsg { background: url("$request.contextPath/profile/validate/images/alert.png)
+            center no-repeat white; background-position: 5px 50%; background-color:
+            #FCEFE3; text-align: left; padding: 2px 2px 2px 25px; border: 1px solid
+            red; display: none; width: 100px; margin-top: -18px; margin-left: 18px;
+            position: absolute; border-radius: 4px; } .errorImg{ background: url("$request.contextPath/profile/validate/images/invalid.png")
+            no-repeat scroll 0 0 transparent; height: 16px; width: 16px; cursor: pointer;
+            vertical-align: inherit; } /*自定义图标，样式前加上om-messageTip，提高其优先级*/ .om - messageTip.om
+            - messageTip - image - aomsdk { background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+            } .none_underline a{text-decoration:none;} .none_underline a:hover{ text-decoration:underline;}
+            }
+        </style>
+        <script type="text/javascript">
+            jQuery(document).ready(function() {
+                // 按钮权限控制
+                var optStr = "${opts}";
+                //初始化商户列表
+                $('#merId').omCombo({
+                    dataSource: '$request.contextPath/option/couponmerinflist.do',
+                    width: '150px',
+                    emptyText: '全部',
+                    listAutoWidth: true,
+                    onValueChange: function(target, newValue, oldValue, event) {
+                        var merId = $('#merId').omCombo('value');
+                        // 连级更新商品列表
+                        $('#goodsId').omCombo({
+                            dataSource: '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+                            width: '150px',
+                            emptyText: '全部',
+                            listAutoWidth: true,
+                            forceSelection: true,
+                            onSuccess: function(data, textStatus, event) {
+                                var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                                data.unshift(tmp);
+                            }
+                        });
+                    },
+                    forceSelection: true,
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    }
+                });
+
+                //初始化商品列表
+                $('#goodsId').omCombo({
+                    dataSource: [],
+                    width: '150px',
+                    emptyText: '全部',
+                    listAutoWidth: true,
+                    forceSelection: true,
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    }
+                });
+                //初始化支付银行列表
+                $('#bankId').omCombo({
+                    dataSource: '$request.contextPath/option/xebanklist.do',
+                    width: '150px',
+                    listMaxHeight: 150,
+                    emptyText: '全部 ',
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    },
+                    forceSelection: true
+                });
+                //初始化报备操作状态
+                $('#bak_stat').omCombo({
+                    dataSource: [{
+                        text: '全部',
+                        value: ''
+                    },
+                    {
+                        text: '提交',
+                        value: '1'
+                    },
+                    {
+                        text: '通过',
+                        value: '2'
+                    },
+                    {
+                        text: '不通过',
+                        value: '4'
+                    },
+                    {
+                        text: '拒绝',
+                        value: '5'
+                    },
+                    {
+                        text: '已报备',
+                        value: '6'
+                    }],
+                    //dataSource: '$request.contextPath/stl/listSettStatus.do',
+                    width: '150px',
+                    emptyText: '全部',
+                    forceSelection: true
+                });
+                //初始化提交人
+                $('#sub_opr_id').omCombo({
+                    dataSource: '$request.contextPath/option/creatorlist.do',
+                    width: '150px',
+                    listMaxHeight: 150,
+                    emptyText: '全部 ',
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    },
+                    forceSelection: true
+                });
+                jQuery('#grid').omGrid({
+                    dataSource: "$request.contextPath/reportOpt/query.do?queryKey=reportOpt.all",
+                    width: '100%',
+                    height: 400,
+                    limit: 15,
+                    singleSelect: false,
+                    rowClasses: function(rowIndex, rowData) {
+                        return "checkbox";
+                    },
+                    colModel: [{
+                        header: '提交时间',
+                        name: 'sub_time',
+                        width: 120,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.SUB_TIME + "'>" + rowData.SUB_TIME + "</a>";
+                        }
+                    },
+                    {
+                        header: '审核时间',
+                        name: 'ver_time',
+                        width: 120,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.VER_TIME + "'>" + rowData.VER_TIME + "</a>";
+                        }
+                    },
+                    {
+                        header: '报备时间',
+                        name: 'bak_time',
+                        width: 120,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.BAK_TIME + "'>" + rowData.BAK_TIME + "</a>";
+                        }
+                    },
+                    {
+                        header: '提交人',
+                        name: 'sub_opr_id',
+                        width: 50,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.SUB_OPR_NAME != null) {
+                                return "<a title='" + rowData.SUB_OPR_NAME + "'>" + rowData.SUB_OPR_NAME + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '支付银行',
+                        name: 'bank_id',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.BANK_NAME != null) {
+                                return "<a title='" + rowData.BANK_NAME + "'>" + rowData.BANK_NAME + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商户号',
+                        name: 'mer_id',
+                        width: 50,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.MER_ID != null) {
+                                return "<a title='" + rowData.MER_ID + "'>" + rowData.MER_ID + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商户名称',
+                        name: 'mer_name',
+                        width: 100,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.MER_NAME != null) {
+                                return "<a title='" + rowData.MER_NAME + "'>" + rowData.MER_NAME + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商户分类',
+                        name: 'mer_category',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.MER_CATEGORY != null) {
+                                return "<a title='" + rowData.MER_CATEGORY + "'>" + rowData.MER_CATEGORY + "</a>&nbsp;";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '业务属性',
+                        name: 'mer_busitype',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.MER_BUSITYPE != null) {
+                                return "<a title='" + rowData.MER_BUSITYPE + "'>" + rowData.MER_BUSITYPE + "</a>&nbsp;";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商品号',
+                        name: 'goods_id',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.GOODS_ID != null) {
+                                return "<a title='" + rowData.GOODS_ID + "'>" + rowData.GOODS_ID + "</a>&nbsp;";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商品名称',
+                        name: 'goods_name',
+                        width: 120,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.GOODS_NAME != null) {
+                                return "<a title='" + rowData.GOODS_NAME + "'>" + rowData.GOODS_NAME + "</a>&nbsp;";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商品分类',
+                        name: 'goods_category',
+                        width: 80,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.GOODS_CATEGORY != null) {
+                                return "<a title='" + rowData.GOODS_CATEGORY + "'>" + rowData.GOODS_CATEGORY + "</a>&nbsp;";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+
+                    {
+                        header: '服务类型',
+                        name: 'goods_busitype',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.GOODS_BUSITYPE != null) {
+                                return "<a title='" + rowData.GOODS_BUSITYPE + "'>" + rowData.GOODS_BUSITYPE + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '价格（分）',
+                        name: 'amount',
+                        width: 70,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.AMOUNT != null) {
+                                return "<a title='" + rowData.AMOUNT + "'>" + rowData.AMOUNT + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '公司介绍',
+                        name: 'com_desc',
+                        width: 150,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.COM_DESC != null) {
+                                return "<a title='" + rowData.COM_DESC + "'>" + rowData.COM_DESC + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商户网址',
+                        name: 'mer_web',
+                        width: 100,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.MER_WEB != null) {
+                                return "<a title='" + rowData.MER_WEB + "'>" + rowData.MER_WEB + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '注册资本（万元）',
+                        name: 'reg_cpt',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.REG_CPT != null) {
+                                return "<a title='" + rowData.REG_CPT + "'>" + rowData.REG_CPT + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '公司成立时间',
+                        name: 'reg_tiem',
+                        width: 100,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.REG_TIEM != null) {
+                                return "<a title='" + rowData.REG_TIEM + "'>" + rowData.REG_TIEM + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '年收益（万元）',
+                        name: 'year_profit',
+                        width: 50,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.YEAR_PROFIT != null) {
+                                return "<a title='" + rowData.YEAR_PROFIT + "'>" + rowData.YEAR_PROFIT + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '用户数（人）',
+                        name: 'user_scale',
+                        width: 50,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.USER_SCALE != null) {
+                                return "<a title='" + rowData.USER_SCALE + "'>" + rowData.USER_SCALE + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '业务介绍',
+                        name: 'busi_desc',
+                        width: 150,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.BUSI_DESC != null) {
+                                return "<a title='" + rowData.BUSI_DESC + "'>" + rowData.BUSI_DESC + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '运营支撑（人）',
+                        name: 'support',
+                        width: 80,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.SUPPORT != null) {
+                                return "<a title='" + rowData.SUPPORT + "'>" + rowData.SUPPORT + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '自有渠道',
+                        name: 'sale_chn',
+                        width: 100,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.SALE_CHN != null) {
+                                return "<a title='" + rowData.SALE_CHN + "'>" + rowData.SALE_CHN + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '商户来源',
+                        name: 'src_mer',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.SRC_MER != null) {
+                                return "<a title='" + rowData.SRC_MER + "'>" + rowData.SRC_MER + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '分成比例',
+                        name: 'shared_rate',
+                        width: 120,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.SHARED_RATE != null) {
+                                return "<a title='" + rowData.SHARED_RATE + "'>" + rowData.SHARED_RATE + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '操作人',
+                        name: 'opr_id',
+                        width: 50,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            if (rowData.OPR_NAME != null) {
+                                return "<a title='" + rowData.OPR_NAME + "'>" + rowData.OPR_NAME + "</a>";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        header: '报备状态',
+                        name: 'bak_stat',
+                        width: 60,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.BAK_STAT + "'>" + rowData.BAK_STAT_NAME + "</a>";
+                            /**
+                	if(rowData.BAK_STAT==0){
+                		return "<a title='未报备'>未报备</a>";
+                	}else if(rowData.BAK_STAT==1){
+                		return "<a title='提交'>提交</a>";
+                    }else if(rowData.BAK_STAT==2){
+                		return "<a title='审核通过'>审核通过</a>";
+                    }else if(rowData.BAK_STAT==4){
+                		return "<a title='审核不通过'>审核不通过</a>";
+                    }else if(rowData.BAK_STAT==5){
+                		return "<a title='审核拒绝'>审核不拒绝</a>";
+                    }else if(rowData.BAK_STAT==6){
+                		return "<a title='已报备'>已报备</a>";
+                    }else{
+                        return "<a title='异常状态'>异常状态</a>";
+                    }
+                    */
+                        }
+                    },
+                    {
+                        header: '操作',
+                        name: 'operation',
+                        width: 100,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            var btn;
+                            if (rowData.BAK_STAT == 1) {
+                                btn = '<input type="image" title="通过" onclick="doOPT(\'' + rowData.OPID + '\', 2);return false;" src="${request.contextPath}/profile/default/images/tick.png"/>&nbsp;&nbsp;';
+                                btn += '<input type="image" title="不通过" onclick="doOPTWithComments(\'' + rowData.OPID + '\', 4);return false;" src="${request.contextPath}/profile/default/images/cross.png"/>&nbsp;&nbsp;';
+                                btn += '<input type="image" title="拒绝" onclick="return false;" src="${request.contextPath}/profile/default/images/minus-circle02.png" />&nbsp;&nbsp;';
+                                btn += '<input type="image" title="报备" onclick="return false;" src="${request.contextPath}/profile/default/images/auction-hammer-gavel02.png"/>';
+                            } else if (rowData.BAK_STAT == 2) {
+                                btn = '<input type="image" title="通过" onclick="return false;" src="${request.contextPath}/profile/default/images/tick02.png" />&nbsp;&nbsp;';
+                                btn += '<input type="image" title="不通过" onclick="return false;" src="${request.contextPath}/profile/default/images/cross02.png" />&nbsp;&nbsp;';
+                                btn += '<input type="image" title="拒绝" onclick="doOPTWithComments(\'' + rowData.OPID + '\', 5);return false;" src="${request.contextPath}/profile/default/images/minus-circle.png"/>&nbsp;&nbsp;';
+                                btn += '<input type="image" title="报备" onclick="doOPT(\'' + rowData.OPID + '\', 6);return false;" src="${request.contextPath}/profile/default/images/auction-hammer-gavel.png"/>';
+                            } else {
+                                btn = '<input type="image" title="通过" onclick="return false;" src="${request.contextPath}/profile/default/images/tick02.png"/>&nbsp;&nbsp;';
+                                btn += '<input type="image" title="不通过" onclick="return false;" src="${request.contextPath}/profile/default/images/cross02.png"/>&nbsp;&nbsp;';
+                                btn += '<input type="image" title="拒绝" onclick="return false;" src="${request.contextPath}/profile/default/images/minus-circle02.png"/>&nbsp;&nbsp;';
+                                btn += '<input type="image" title="报备" onclick="return false;" src="${request.contextPath}/profile/default/images/auction-hammer-gavel02.png"/>';
+                            }
+                            return btn;
+                        }
+                    },
+                    {
+                        header: '操作原因',
+                        name: 'reason',
+                        width: 150,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.REASON + "'>" + rowData.REASON + "</a>";
+                        }
+                    }]
+                });
+
+                jQuery("#dialog").omDialog({
+                    autoOpen: false
+                });
+
+                $('.errorImg').bind('mouseover',
+                function() {
+                    $(this).next().css('display', 'block');
+                }).bind('mouseout',
+                function() {
+                    $(this).next().css('display', 'none');
+                });
+
+                jQuery('#dataform').submit(function() {
+                    if (!jQuery("#dataform").valid()) return false;
+                    jQuery(this).omAjaxSubmit({
+                        success: function(res) {
+                            showSimpleTip(res);
+                            close();
+                        }
+                    });
+
+                    return false;
+                });
+            });
+
+            //查询方法
+            function query() {
+                var startDate = jQuery('#startDate').val();
+                var endDate = jQuery('#endDate').val();
+                var merId = jQuery('#merId').val();
+                var goodsId = jQuery('#goodsId').val();
+                var bak_stat = jQuery('#bak_stat').val();
+                var bankId = jQuery('#bankId').val();
+                var sub_opr_id = jQuery('#sub_opr_id').val();
+                var key = "query.do?queryKey=reportOpt.all";
+                if (startDate != "") {
+                    key = key + '&startDate=' + encodeURI(startDate).replace("-", "").replace("-", "");
+                }
+                if (endDate != "") {
+                    key = key + '&endDate=' + encodeURI(endDate).replace("-", "").replace("-", "");
+                }
+                if (merId != "") {
+                    key = key + '&merId=' + encodeURI(merId);
+                }
+                if (goodsId != "") {
+                    key = key + '&goodsId=' + encodeURI(goodsId);
+                }
+                if (bak_stat != "") {
+                    key = key + '&bak_stat=' + encodeURI(bak_stat);
+                }
+                if (bankId != "") {
+                    key = key + '&bankId=' + encodeURI(bankId);
+                }
+                if (sub_opr_id != "") {
+                    key = key + '&sub_opr_id=' + encodeURI(sub_opr_id);
+                }
+                $('#grid').omGrid("setData", key);
+            }
+            /*导出按钮触发*/
+            function exportUG() {
+                var startDate = jQuery('#startDate').val();
+                var endDate = jQuery('#endDate').val();
+                var merId = jQuery('#merId').val();
+                var goodsId = jQuery('#goodsId').val();
+                var bak_stat = jQuery('#bak_stat').val();
+                var bankId = jQuery('#bankId').val();
+                var sub_opr_id = jQuery('#sub_opr_id').val();
+                var key = "export.do?queryKey=reportOpt.all";
+                if (startDate != "") {
+                    key = key + '&startDate=' + encodeURI(startDate).replace("-", "").replace("-", "");
+                }
+                if (endDate != "") {
+                    key = key + '&endDate=' + encodeURI(endDate).replace("-", "").replace("-", "");
+                }
+                if (merId != "") {
+                    key = key + '&merId=' + encodeURI(merId);
+                }
+                if (goodsId != "") {
+                    key = key + '&goodsId=' + encodeURI(goodsId);
+                }
+                if (bak_stat != "") {
+                    key = key + '&bak_stat=' + encodeURI(bak_stat);
+                }
+                if (bankId != "") {
+                    key = key + '&bankId=' + encodeURI(bankId);
+                }
+                if (sub_opr_id != "") {
+                    key = key + '&sub_opr_id=' + encodeURI(sub_opr_id);
+                }
+                document.location.href = key;
+            }
+        </script>
+        <script>
+        </script>
+    </head>
+    
+    <body>
+        <!--列表查询区-->
+        <div class="list_search" style="height: 90px;">
+            <table width="100%" border="0">
+                <tr>
+                    <td>
+                        <form id="form" action="" method="post">
+                            <table width="100%" border="0">
+                                <tr height="30px">
+                                    <td colspan="3">
+                                        <input id="batchPass" name="batchPass" type="image" value="ee" src="${request.contextPath}/profile/default/images/bnt_pass.png"
+                                        onclick="batchPass();return false;" />
+                                        <input id="batchNoPass" name="batchNoPass" type="image" value="ee" src="${request.contextPath}/profile/default/images/bnt_no_pass.png"
+                                        onclick="batchNotPass();return false;" />
+                                        <input id="batchRefuse" name="batchRefuse" type="image" value="ee" src="${request.contextPath}/profile/default/images/batch_refuse.png"
+                                        onclick="batchDecline();return false;" />
+                                        <input id="batchReport" name="batchReport" type="image" value="ee" src="${request.contextPath}/profile/default/images/batch_report.png"
+                                        onclick="batchReport();return false;" />
+                                    </td>
+                                </tr>
+                                <tr height="30px">
+                                    <th width="5%">
+                                        	商户名称：
+                                    </th>
+                                    <td>
+                                        <input id="merId" name="merId" type="text" class="input2" />
+                                    </td>
+                                    <th width="5%">
+                                        	商品名称：
+                                    </th>
+                                    <td>
+                                        <input id="goodsId" name="goodsId" type="text" class="input2" />
+                                    </td>
+                                    <th width="5%">
+                                        	报备状态：
+                                    </th>
+                                    <td>
+                                        <input id="bak_stat" name="bak_stat" type="text" class="input2" />
+                                    </td>
+                                </tr>
+                                <tr height="30px">
+                                    <th width="5%">
+                                        	支付银行：
+                                    </th>
+                                    <td>
+                                        <input id="bankId" name="bankId" type="text" class="input2" />
+                                    </td>
+                                    <th width="5%">
+                                        	提交人：
+                                    </th>
+                                    <td>
+                                        <input id="sub_opr_id" name="sub_opr_id" type="text" class="input2" />
+                                    </td>
+                                    <th width="5%">
+                                        	报备时间：
+                                    </th>
+                                    <td>
+                                        <input id="startDate" name="startDate" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',vel:'noticeDate',maxDate: new Date()});"
+                                        class="input1" />
+                                        	至
+                                        <input id="endDate" name="endDate" readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',vel:'noticeDate',maxDate: new Date()});"
+                                        class="input1" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                    <td>
+                        <input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png"
+                        onclick="query()" />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input name="导出" type="image" value="ee" src="${request.contextPath}/profile/default/images/btn_Export.png"
+                        onclick="exportUG()" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!--列表查询区-->
+        <div align="center">
+            <table align="left" id="grid">
+            </table>
+        </div>
+        <div id="dialog">
+            <iframe id="dialog_iframe" name="dialog_iframe" frameborder="0" style="width:100%;height:99%"
+            src="about:blank">
+            </iframe>
+            <form id="dialog_form" name="dialog_form" method="POST" target="dialog_iframe">
+            </form>
+        </div>
+    </body>
+
+</html>

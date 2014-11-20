@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="proxygoods"  >
+	<sql id="all"> 
+	<![CDATA[
+		 SELECT I.MERID,I.SUBMERID,I.GOODSID,G.GOODSNAME,I.STATE,G.SERVTYPE,I.MODLOCK,I.MODTIME,L.DAYLIMIT,L.ALARMLIMIT 
+		 FROM UMPAY.T_PROXYGOODS_INF I,UMPAY.T_PROXYGOODS_LIMIT L,UMPAY.T_GOODS_INF G 
+		 WHERE I.SUBMERID=L.SUBMERID AND I.GOODSID=L.GOODSID AND I.MERID=G.MERID AND I.GOODSID=G.GOODSID 
+		 #if( $merId && $merId!='' )
+		   AND I.MERID=:merId   
+		 #end
+		 #if( $subMerId && $subMerId!='' )
+		   AND I.SUBMERID=:subMerId   
+		 #end
+		 #if( $goodsId && $goodsId!='' )
+		   AND I.GOODSID=:goodsId   
+		 #end
+		 #if( $goodsName && $goodsName!='' ) 
+		   AND G.GOODSNAME like '%$goodsName%'   
+		 #end 
+		 #if( $state && $state!='' ) 
+		   AND I.STATE=:state 
+		 #end
+		 #if( $servType && $servType!='' ) 
+		   AND  G.SERVTYPE=:servType
+		 #end
+		 ORDER BY I.MODTIME DESC
+	  ]]>
+	</sql>
+</mapper> 

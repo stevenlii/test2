@@ -1,0 +1,224 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/couponinf.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+		
+  	 	jQuery(document).ready(function() {
+		
+			//初始化兑换券类型列表
+            $('#couponType').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponInfTypes',
+                width: '150px',
+                emptyText: '请选择..',
+                forceSelection: true
+            });
+			
+			jQuery("#dataform").validate({
+                rules: {
+                    "couponType": {
+						required: true
+                    },
+                    "couponName": {
+                        required: true,
+						maxlength: 32
+                    },
+                    "remark": {
+						maxlength: 64
+                    }
+                },
+                messages: {
+                    "couponType": {
+                        required: "请选择兑换券类型"
+                    },
+                    "couponName": {
+                        required: "请输入兑换券名称",
+						maxlength: "超出最大长度"
+                    },
+                    "remark": {
+						maxlength: "超出最大长度"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_add").attr("disabled", "disabled");
+            jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					if(res == '1'){
+    					window.parent.showSimpleTip(res);
+             			closeDialog();
+    					window.parent.shuaxin();
+             		}else if(res == '0'){
+             			window.parent.showSimpleTip(res);
+             		}else{
+             			window.parent.$.omMessageBox.alert({
+        		    		type:'error',
+        		            title : '操作提示',
+        		            content : res
+        		        });
+             		}
+                }
+            });
+            return false;
+        });});
+	
+  	 	function showResponse(responseText, statusText) {
+            var result = eval("(" + responseText + ")");
+            if (result.code == '0') {
+                window.parent.fillBackAndCloseDialog(result.msg);
+            }
+        }
+       
+        function checkAll() {
+            if (!checkServMonth()) {
+                return false;
+            }
+            if (!checkconMode()) {
+                return false;
+            }
+            if (!checkInterval()) {
+                return false;
+            }
+            return true;
+        }
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+        function isNotEmpty(v) {
+            if (!v) {
+                return false;
+            }
+            if (v == '') {
+                return false;
+            }
+            return true;
+        }
+
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/couponinf/save.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="15%"><span>*</span>兑换券类型：</th>
+         <td width="60%" class="td"><input id="couponType" name="couponType" /></td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span>
+         </td>
+       </tr>
+       <tr>
+         <th ><span>*</span>兑换券名称：</th>
+         <td  class="td1"><input id="couponName" name="couponName" type="text" class="input2" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th>说    明：</th>
+         <td class="td" ><textarea style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:80%" id="remark" name="remark" rows="5"></textarea></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+
+     </table>
+
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="添加" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+	   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html>

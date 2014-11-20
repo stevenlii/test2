@@ -1,0 +1,265 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/couponbatch.js"></script>
+
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 110px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+		
+		$.validator.addMethod("Check4",
+        function() {
+			var useStartDate = $('#useStartDate').val();
+			var useEndDate = $('#useEndDate').val();
+			if ( useStartDate >= useEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		$.validator.addMethod("Check5",
+        function() {
+			var sellStartDate = $('#sellStartDate').val();
+			var sellEndDate = $('#sellEndDate').val();
+			if ( sellStartDate >= sellEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		// 判断[兑换码销售有效期]截止时间必须小于等于[兑换码使用有效期]截止时间
+		$.validator.addMethod("Check6",
+        function() {
+			var useEndDate = $('#useEndDate').val();
+			var sellEndDate = $('#sellEndDate').val();
+			if ( sellEndDate > useEndDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+		
+		// 判断[兑换码销售有效期]开始时间必须小于等于[兑换码使用有效期]开始时间
+		$.validator.addMethod("Check7",
+        function() {
+			var useStartDate = $('#useStartDate').val();
+			var sellStartDate = $('#sellStartDate').val();
+			if ( sellStartDate > useStartDate ) {
+            	return false;
+            }
+            return true;
+        }, '');
+	 	
+  	 	jQuery(document).ready(function() {
+			jQuery("#dataform").validate({
+                rules: {
+					"useStartDate": {
+                        required: true,
+						Check4: true,
+						Check7: true
+                    },
+					"useEndDate": {
+                        required: true,
+						Check4: true,
+						Check6: true
+                    },
+					"sellStartDate": {
+                        required: true,
+						Check5: true,
+						Check7: true
+                    },
+					"sellEndDate": {
+                        required: true,
+						Check5: true,
+						Check6: true
+                    }
+                },
+                messages: {
+                    "useStartDate": {
+                        required: "请选择有效期",
+						Check4: "开始时间必须小于结束时间",
+						Check7: "销售开始应小于等于使用开始"
+                    },
+                    "useEndDate": {
+                        required: "请选择有效期",
+						Check4: "开始时间必须小于结束时间"
+						Check6: "销售截止应小于等于使用截止"
+                    },
+                    "sellStartDate": {
+                        required: "请选择销售期",
+						Check5: "开始时间必须小于结束时间",
+						Check7: "销售开始应小于等于使用开始"
+                    },
+                    "sellEndDate": {
+                        required: "请选择销售期",
+						Check5: "开始时间必须小于结束时间",
+						Check6: "销售截止应小于等于使用截止"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			
+			// 设置按钮不可用，防止重复提交
+			$("#btn_modify").attr("disabled", "disabled");
+			//记录修改日志
+			if($("#useStartDate").val()!='$!{couponBatch.useStartDate}'){
+				$("#optdata").val($("#optdata").val()+" 使用起始日期由 $!{couponBatch.useStartDate} 修改为:"+$("#useStartDate").val()+";");
+			};
+			if($("#useEndDate").val()!='$!{couponBatch.useEndDate}'){
+				$("#optdata").val($("#optdata").val()+" 使用结束日期由  $!{couponBatch.useEndDate} 修改为:"+$("#useEndDate").val()+";");
+			};
+			if($("#sellStartDate").val()!='$!{couponBatch.sellStartDate}'){
+				$("#optdata").val($("#optdata").val()+" 销售起始日期由 $!{couponBatch.sellStartDate} 修改为:"+$("#sellStartDate").val()+";");
+			};
+			if($("#sellEndDate").val()!='$!{couponBatch.sellEndDate}'){
+				$("#optdata").val($("#optdata").val()+" 销售结束日期由 $!{couponBatch.sellEndDate} 修改为:"+$("#sellEndDate").val()+";");
+			};
+			if($("#optdata").val()==""){
+				$("#optdata").val("无修改内容");
+			}
+			
+			jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					window.parent.showSimpleTip1(res);
+					if( res == '1' ){
+						closeDialog();
+						window.parent.shuaxin();
+					}
+                }
+            });
+            return false;
+        });});
+		
+		
+		//关闭窗口方法
+        function  closeDialog(){
+        	window.parent.fillBackAndCloseDialog("#subdialog");
+        }
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/couponbatch/update.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr >
+         <th width="110">批次名称：</th>
+         <td width="45%" class="td" >
+			 $!{batchName}
+			 <input id="batchId" name="batchId" value="$!{couponBatch.batchId}" type="hidden"  />
+			 <input id="batchName" name="batchName" value="$!{batchName}" type="hidden"  />
+		 </td>
+		 <td  class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>兑换码有效期：</th>
+         <td width="45%" class="td1">
+			<input value="$!{couponBatch.useStartDate}" type="text" id="useStartDate" name="useStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+     		至
+			<input value="$!{couponBatch.useEndDate}" type="text" id="useEndDate" name="useEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th ><span>*</span>兑换券销售期：</th>
+         <td class="td">
+			<input value="$!{couponBatch.sellStartDate}" type="text" id="sellStartDate" name="sellStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+     		至
+			<input value="$!{couponBatch.sellEndDate}" type="text" id="sellEndDate" name="sellEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span><input type="hidden" id="optdata" name="optdata"/></td>
+       </tr>
+     </table>
+	 <div class="pop_btn">
+       <input name="Submit" type="submit" class="popbtn"  value="修改" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_modify" />
+       <input name="close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html> 

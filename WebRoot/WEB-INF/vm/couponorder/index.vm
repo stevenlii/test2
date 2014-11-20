@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+	<script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/couponorder.js"></script>
+ 	<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/couponorder/query.do?queryKey=couponorder.query";
+        jQuery(document).ready(function() {
+        	jQuery( "#dialog").omDialog({
+	            autoOpen: false
+	        });
+        	jQuery("#search_div").width(jQuery(window).width());
+          	jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/couponorder/query.do?queryKey=couponorder.query",
+                width:'100%',
+                height : 455,
+                limit : 15,
+				errorMsg : '取数据出错',
+				loadingMsg : '正在加载数据, 请稍后...',
+				emptyMsg : '没有数据',
+                autoFit : true,
+                colModel : [ 
+    				 {header : '订单编号', name : 'ORDERID',width : 240, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.ORDERID + "'>" + rowData.ORDERID + "</a>";
+						}}, 
+                     {header : '手机号', name : 'PAIDMOBILEID',width : 120, align : 'center' },
+					 {header : '订单金额(元)', name : 'PAIDAMT',width : 120, align : 'right',
+							 renderer:function(value, rowData, rowIndex) {
+            							 var val = rowData.PAIDAMT + "";
+            							 var index = val.indexOf(".");
+            							 if(index > 0){
+            							 	var sub = val.substring(index + 1);
+            								if(sub.length < 2){
+            									return val + "0&nbsp;&nbsp;";
+            								}
+            							 	return val + "&nbsp;&nbsp;";
+            							 }
+            							 return rowData.PAIDAMT + ".00&nbsp;&nbsp;";
+            		                }
+	                 },
+                     {header : '商户编号', name : 'MERID',width : 80, align : 'center' },
+					 {header : '商户名称', name : 'MERNAME',width : 100, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.MERNAME + "'>" + rowData.MERNAME + "</a>";
+						}}, 
+                     {header : '商品编号', name : 'GOODSID',width : 80, align : 'center' },
+                     {header : '商品名称', name : 'GOODSNAME', width : 120, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.GOODSNAME + "'>" + rowData.GOODSNAME + "</a>";
+						}},
+                     {header : '兑换劵名称', name : 'COUPONNAME', width : 100, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.COUPONNAME + "'>" + rowData.COUPONNAME + "</a>";
+						}},
+                     {header : '下单方式', name : 'ACCESSTYPE', width : 80, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.ACCESSTYPE + "'>" + rowData.ACCESSTYPE + "</a>";
+						}},
+                     {header : '支付状态', name : 'TRANSTATE', width : 80, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								if(rowData.TRANSTATE == null){
+									return "--";
+								}
+								return "<a title='" + rowData.TRANSTATE + "'>" + rowData.TRANSTATE + "</a>";
+						}},
+                     {header : '订单状态', name : 'STATE', width : 80, align : 'center' },
+                     {header : '支付时间', name : 'TRANSACTIME', width : 100, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								if(rowData.TRANSACTIME == null){
+									return "--";
+								}
+								return "<a title='" + rowData.TRANSACTIME + "'>" + rowData.TRANSACTIME + "</a>";
+						}},
+                     {header : '订单时间', name : 'INTIME', width : 100, align : 'center',
+					 	renderer:function(value, rowData, rowIndex) {
+								return "<a title='" + rowData.INTIME + "'>" + rowData.INTIME + "</a>";
+						}},
+					 {header : '操作', name : 'ORDERID',width : 60, align : 'center',
+							 renderer: function(value, rowData, rowIndex) {
+							 return "<img title='详情' src='${request.contextPath}/profile/default/images/tool_details.png' onmouseover='cursor:hander' onclick='showOrderDetailDialog(\"" + rowData.ORDERID + "\"," + rowData.ORDERSTATE + ")' />";
+		                }
+	                }
+                ]
+            });
+            
+			 $('#type').omCombo({
+                dataSource: '$request.contextPath/option/couponinflist.do',
+	            emptyText: '全部',
+	            width: '150px',
+	            forceSelection: true,
+	            filterStrategy : 'anywhere',
+				onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+			$('#mertype').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+	            emptyText: '全部',
+	            width: '150px',
+				onValueChange: function(target, newValue, oldValue, event) {
+    				var merId = $('#mertype').omCombo('value');
+                    // 连级更新商品列表
+    				$('#goodstype').omCombo({
+                        dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+                        emptyText: '全部',
+        	            forceSelection: true,
+        	            onSuccess:function(data, textStatus, event){
+        			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+        			      	  data.unshift(tmp);
+        		   		}
+                    });
+                },
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+			$('#goodstype').omCombo({
+                dataSource: [],
+	            emptyText: '全部',
+	            width: '150px',
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+            
+            //初始化订单状态列表
+	        $('#state').omCombo({
+	            dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponOrderStates',
+	            emptyText: '全部',
+	            width: '150px',
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+	        });
+            //初始化订单状态列表
+	        $('#paystate').omCombo({
+	            dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponTransStates',
+	            emptyText: '全部',
+	            width: '100px',
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+	        });
+       });
+</script>
+
+</head>
+<body>
+	<!--列表查询区-->
+	<div id="search_div">
+	    <div class="list_search" style="height:80px;">
+	        <table width="100%" border="0">
+	            <tr>
+	                <td>
+	                    <form id="form" action="" method="post">
+	                        <table width="100%" border="0">
+	                            <tr>
+	                                <td colspan="6">
+	                                    &nbsp;
+	                                </td>
+	                            </tr>
+	                            <tr height="30">
+	                                <th width="8%">
+	                                    	订单编号：
+	                                </th>
+	                                <td>
+	                                    <input id="orderid" name="orderid" class="input2" type="text" />
+	                                </td>
+	                                <th width="5%">
+	                                    	手机号：
+	                                </th>
+	                                <td>
+	                                    <input id="phone" name="phone" class="input2" />
+	                                </td>
+	                                <th width="5%">
+	                                    	订单状态：
+	                                </th>
+	                                <td>
+	                                    <input id="state" name="state" type="text" />
+	                                </td>
+	                                <th width="5%">
+	                                    	支付状态：
+	                                </th>
+	                                <td>
+	                                    <input id="paystate" name="paystate" />
+	                                </td>
+	                            </tr>
+	                            <tr height="30">
+	                                <th>
+	                                    	兑换劵：
+	                                </th>
+	                                <td>
+	                                    <input id="type" name="type" />
+	                                </td>
+	                                <th>
+	                                    	商户：
+	                                </th>
+	                                <td>
+	                                    <input id="mertype" name="mertype" />
+	                                </td>
+	                                <th>
+	                                    	商品：
+	                                </th>
+	                                <td>
+	                                    <input id="goodstype" name="goodstype" />
+	                                </td>
+	                                <td>
+	                                </td>
+	                            </tr>
+	                        </table>
+	                    </form>
+	                </td>
+	                <td>
+	                    <input id="query" title="查询" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png"
+	                    onclick="doQuery('query.do?queryKey=couponorder.query');" />
+	                </td>
+	            </tr>
+	        </table>
+	    </div>
+	</div>
+	<!--列表区-->
+	<div>
+	    <table id="grid" align="left">
+	    </table>
+	</div>
+	<div id="dialog">
+	    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank">
+	    </iframe>
+	</div>
+</body>
+</html>

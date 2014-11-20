@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid-standard.js"></script>
+
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid-roweditor.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+
+<script src="$request.contextPath/js/busi/codeMng.js"></script>
+
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		
+      jQuery('#grid').omGrid({
+            dataSource : "detail.do?queryKey=operLog.allFeeCodeLog&dataId=$!{serviceId}",
+            width: 580,
+            autoFit:true,
+            height : 310,
+            limit : 10,
+            colModel : [ {header : '时间', name : 'INTIME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				  				return "<a title='"+value+"'>"+value+"</a>";
+				  			}}, 
+                         {header : '操作', name : 'TYPE', width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+                         			var operType=rowData.OPERTYPE;
+                         			var name = "";
+                         			if(operType==1){
+                         				name = "创建";
+                         			}else if(operType==2){
+                         				name = "修改";
+                         			}else if(operType==5){
+                         				name = "启用";
+                         			}else if(operType==6){
+                         				name = "禁用";
+                         			}
+    		                     	return "<a title='"+name+"'>"+name+"</a>";
+                         }},
+                         {header : '操作人', name : 'MODUSER', width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}}, 
+                         {header : '明细/备注', name : 'DETAIL', width : 150 , align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}}, 
+                        ]
+               	});
+//       var serviceId=jQuery('#serviceId').val();
+//       $('#grid').omGrid("setData", "detail.do?queryKey=operLog.allFeeCodeLog&dataId=$!{serviceId}");
+
+	});
+</script>
+</head>
+<body>
+   <!--列表区-->
+   <table width="100%" align="center">
+   <tr><td align="center">
+	    <table id="grid" align="left"></table>
+	    <input type="hidden" id="serviceId" name="serviceId" value="$!{serviceId}">
+    </td></tr>
+    <tr><td align="center">
+    <input type="button"  value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+    </td></tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/codeMng.js"></script>
+<script type="text/javascript">
+
+ 	  var url="$request.contextPath/code/query.do?queryKey=code.allCodeMngs";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+        	
+			    var optStr="${opts}";
+					var opts=optStr.split(',');
+			    jQuery('[code]').each(function () {
+			        var code=$(this).attr("code");
+			        for(var i=0;i<opts.length;i++){
+					   if(code==opts[i]){
+						   $(this).css('display','inline');
+					   }
+		    		};
+				});
+		
+          jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/code/query.do?queryKey=code.allCodeMngs",
+                width:'100%',
+                height : 455,
+                limit : 15,
+                autoFit:true,
+                singleSelect : false,
+                colModel : [ {header : '代码', name : 'SERVICEID',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}}, 
+                             {header : '代码名称', name : 'DETAIL',width : 70, align : 'left',renderer:function(value , rowData , rowIndex){
+		              				return "<a title='"+value+"'>"+value+"</a>";
+		              			}},
+                             {header : '类型', name : 'FEETYPE',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var feeType = rowData.FEETYPE;
+                             	var name = "";
+                             	if(feeType==2){
+                             		name = "按次";
+                             	}else {
+                             		name = "包月";
+		              			}
+		                     	return "<a title='"+name+"'>"+name+"</a>";
+                             } },
+                             {header : '分类', name : 'CATEGORY',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                   				return "<a title='"+value+"'>"+value+"</a>";
+                   			}}, 
+                             {header : '金额(分)', name : 'AMOUNT',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+                   				return "<a title='"+value+"'>"+value+"</a>";
+                   			}},  
+                             {header : '更新时间', name : 'MODTIME',width : 80,align : 'left',renderer:function(value , rowData , rowIndex){
+                   				return "<a title='"+value+"'>"+value+"</a>";
+                   			}},
+                             {header : '状态', name : 'STATE',width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	var name = "";
+                             	if(state==2){
+                             		name = "启用";
+                             	}else {
+                             		name = "禁用";
+	                   			}
+		                     	return "<a title='"+name+"'>"+name+"</a>";
+                            }},
+                             {header : '操作', name:'oper',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	var result="";
+                             	if(optStr.indexOf("007")!=-1){//有修改权限
+                             		result+=" <input name='修改' title='修改' type='image' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='modify(&quot;"+rowData.SERVICEID+"&quot;)'/> ";
+                             	}
+                         		if(state==2){ //处于启用状态
+                         			if(optStr.indexOf("004")!=-1){
+                         				result+="<input name='启用' title='启用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Enable1.png'/> ";
+                         			}
+                         			if(optStr.indexOf("003")!=-1){
+                         				result+="<input name='禁用' title='禁用' type='image'  src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable(&quot;"+rowData.SERVICEID+"&quot;,"+rowData.STATE+")'/> ";
+                         			}
+                         		}else{ //处于禁用状态
+                         			if(optStr.indexOf("004")!=-1){
+                         				result+="<input name='启用' title='启用' type='image' src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable(&quot;"+rowData.SERVICEID+"&quot;, "+ rowData.STATE +" )' /> ";
+                         			}
+                         			if(optStr.indexOf("003")!=-1){
+                         				result+="<input name='禁用' title='禁用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Disable1.png' /> ";
+                         			}
+                         		}
+                     			result+="<input name='操作记录' title='操作记录' type='image' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetailDialog(&quot;"+rowData.SERVICEID+"&quot;)' />";
+                             	return result;	
+                             }}]
+            });
+            
+            var dialog = $("#dialog-upload").omDialog({
+      			title:'批量导入',
+	            width: 420,
+                autoOpen : false,
+                modal : true,
+                resizable : false
+	      });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+       		
+       		jQuery('#ipForm').submit(function() {
+	            var file = document.getElementById("file").value;
+	            if(file == ""){
+	            	alert("请输入文件路径！");
+	            	return false;
+	            }
+	            closeDialog();
+	            jQuery(this).omAjaxSubmit({
+	            		dataType : 'json',
+	            		success:function(res){
+	            			if(res.result=='yes'){
+	            				$.omMessageBox.alert({
+				    	        	type:'success',
+				    	            title : '操作提示',
+				    	            content : '操作成功！'
+				    	        }); 
+	            				shuaxin();
+	            			}else if(res.result=='no'){
+	            				shuaxin();
+	            				$.omMessageBox.confirm({
+	            	                title:'下载确认',
+	            	                content:'部分数据导入失败，是否要查看失败列表？',
+	            	                onClose:function(value){
+	            	                    if(value){
+	            	                    	window.location.href = "$request.contextPath/code/download.do?fileName="+res.fileName;
+	            	                    }
+	            	                }
+	            	            });
+	            			}else{
+	            				$.omMessageBox.alert({
+	            					type:'error',
+	            					title : '操作提示',
+	            					content : res.result
+	            				});           
+	            			}
+	                    }
+	             });	             
+                 return false; 
+            });
+       		
+       	 //初始化计费代码分类列表
+       	   $('#category').omCombo({
+               dataSource : '$request.contextPath/option/feecategory.do',
+               width:'85px',
+               listMaxHeight:150,
+               emptyText:'全部 ' ,
+               onSuccess:function(data, textStatus, event){
+      	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+      	  			data.unshift(tmp);
+         		},
+         		forceSelection : true
+             });
+       	   //类型列表
+       	$('#feeType').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+            width:'100px',
+            forceSelection : true,
+            emptyText:'全部 '
+        });
+       	
+       	//状态列表
+       	$('#state').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+            width:'100px',
+            forceSelection : true,
+            emptyText:'全部 '
+        });
+       		     
+       });
+
+function openUpload(){
+	var file = document.getElementById("file");
+	file.outerHTML=file.outerHTML.replace(/(value=\").+\"/i,"$1\"");  //初始化file控件为空值
+	$("#dialog-upload").omDialog("open");
+}
+</script>
+
+</head>
+<body>
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+     
+      <table border="0" width="100%">
+        <tr>
+        <td align="left">
+             <input name="禁用" type="image" title='禁用' style="display:none" code="003" src="${request.contextPath}/profile/default/images/btn_Disable.png" onclick="batchstop();"/>
+             <input name="启用" type="image" title='启用' style="display:none" code="004" src="${request.contextPath}/profile/default/images/btn_Enable.png" onclick="batchstart();"/></td>
+		<td align="right">
+		     <input name="添加代码" type="image" title='添加代码' style="display:none" code="005" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="addCode();"/>
+      	     <input name="导入" type="image" title='导入' style="display:none" code="010" src="${request.contextPath}/profile/default/images/btn_Import.png" onclick="openUpload();"/>
+      	     <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expFeeCode();"/></td>
+         </tr>
+        </table>
+     </div>
+  
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="100%" border="0">
+       <tr>
+        <td  align="left" width="80%">
+          <!--查询块区 start--> 
+           <form id="form" method="post"> 
+            <table width="100%" border="0">
+              <tr>
+                 <th width="10%" height="30">类型：</th>
+		         <td width="15%"><input id="feeType" name="feeType" class="select1" /></td>
+		         <th width="10%" height="30">分类：</th>
+		         <td width="15%"><input id="category" name="category" class="select1"/></td>
+		         <th width="10%" height="30">金额：</th>
+		         <td width="15%"><input id="amount" name="amount" type="text" class="input1" /></td>
+		         </tr>
+		   <tr>
+		         <th>状态：</th>
+		         <td><input id="state" name="state" class="select1"/></td>
+		         <th>代码：</th>
+		         <td><input id="serviceId" name="serviceId" type="text" class="input1" size="10" /></td>
+		         <th>代码名称：</th>
+		         <td><input id="detail" name="detail" type="text" class="input1" /></td>
+          </tr>
+        </table>
+        </form> 
+       </td>
+         <td align="left"><input id="query" title="查询" name="submit" type="image" style="display:none" code="001" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+     </div>
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+ 	<div id="dialog-upload" style="display:none;">
+        <form id="ipForm" method="post" action="$request.contextPath/code/batchImport.do" enctype="multipart/form-data">
+	        <table style="width:390px;">
+	            <tr>
+	                <th width="78px"><span style="color:red;">*</span>文件路径：</th>
+	                <td><input id="file" name="file" type="file" style="width: 295px" class="input2" /></td>
+	            </tr>
+	            <tr><td>&nbsp;</td></tr>
+	        </table>
+	        <div align='center'>
+	            	<input name="Submit" type="submit" class="popbtn" value="提交" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	     			<input name="close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	     	</div>
+        </form>
+    </div>
+</body>
+</html>

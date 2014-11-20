@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商户银行管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/merbank/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/merbank/export.do</url>
+	</Option>
+	<!-- 禁用按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/merbank/disable.do</url>
+	</Option>
+	<!-- 启用按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/merbank/enable.do</url>
+	</Option>
+	<!-- 商户银行配置按钮 -->
+	<Option>
+		<code>007</code>
+		<url>hfMngBusi/merbank/update.do</url>
+	</Option>
+	<!-- 批量商户银行配置按钮 -->
+	<Option>
+		<code>009</code>
+		<url>hfMngBusi/merbank/batchupdate.do</url>
+	</Option>
+	
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/merbankaudit/auditPass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/merbankaudit/auditNotPass.do</url>
+	</Option>
+</Options>

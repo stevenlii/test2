@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-itemselector.js"></script>
+<script>
+    function perRequest(formData, jqForm, options) {
+        return true;
+    }
+	
+    function showResponse(responseText, statusText, xhr, $form) {
+        var res = ('status: ' + statusText + '\n\nresponseText: \n'
+                + responseText);
+        var json = eval('(' + responseText + ')');
+		var msg = json.msg;                
+        $("#result").html(msg);
+		window.parent.reloadData();
+        $( "#dialog-modal").omDialog('open');
+    }
+	function perRequest1(formData, jqForm, options) {
+        return true;
+    }
+	
+    function showResponse1(responseText, statusText, xhr, $form) {
+        var json = eval('(' + responseText + ')');
+    }
+	var url = "$request.contextPath/mersetswitch/initsource.do";
+	var valueArr = new Array();
+	$(document).ready(function() {
+        $('#selector').omItemSelector({
+			availableTitle : '未配置账单商户',
+			selectedTitle : '已配置账单商户',
+			width : '500px',
+			dataSource : url,
+			clientFormatter  : function(itemData,index){
+				return itemData.value + '-' + itemData.text;
+			},
+			onSuccess:function(data, textStatus, event){
+				for(var i = 0; i < data.length; i++){
+					var temp = data[i];
+					if(temp.ischecked == 1){
+						valueArr.push(temp.value);
+					}
+				}
+				$('#selector').omItemSelector("value",valueArr);
+			}
+		});
+		var options = {
+            beforeSubmit : perRequest, 
+            success : showResponse
+        };
+		var options1 = {
+            beforeSubmit : perRequest1, 
+            success : showResponse1
+        };
+        $('#formID').submit(function() {
+            $(this).omAjaxSubmit(options);
+            return false;
+        });
+		$('#formID1').submit(function() {
+            $(this).omAjaxSubmit(options1);
+            return false;
+        });
+		$( "#dialog-modal").omDialog({
+			autoOpen: false,
+			height: 80,
+			resizable: false,
+			modal: true
+		});
+    });
+	function postForm(){
+   		$("#merid").val($('#selector').omItemSelector("value"));
+   		$('#formID').submit();
+    }
+	function postForm1(){
+		var time = new Date().getTime();
+		var u = "$request.contextPath/mersetswitch/filtration.do?merId=" + encodeURI($('#mername').val()) + "&time=" + time;
+		var op = {
+			availableTitle : '未配置账单商户',
+			selectedTitle : '已配置账单商户',
+			width : '500px',
+			height: '300px',
+			dataSource : u,
+			clientFormatter  : function(itemData,index){
+				return itemData.value + '-' + itemData.text;
+			}
+		};
+		$('#selector').omItemSelector("query", op);
+    }
+</script>
+</head>
+<body>
+	<div>
+		<table cellpadding="0" cellspacing="0" class="infowrite" style="float:none;width:100%" >
+				<tr>
+					<td style="text-align:right;width:60px;;padding-top:5px;padding-bottom:5px">
+	                	商户名称：
+	                </td>
+	                <td style="padding-top:5px;padding-bottom:5px">
+	                	 <input type="text" id="mername" class="input2" />
+	                	 <input title="查询" type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="查询" onclick="postForm1();"/>
+	                </td>
+                </tr>
+                <tr>
+	                <td colspan="2">
+	                	<div id="selector" ></div>
+	                </td>
+                </tr>
+				<tr>
+					<td  style="text-align:center;padding-top:5px" colspan="2">
+						<input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="保存" onclick="postForm();"/>
+					</td>
+				</tr>
+            </table>
+	</div>
+    <div id="dialog-modal" title="提示窗口">
+        <p id="result"></p>
+    </div>
+   <form id="formID" action="config.do" method="post">
+        <input type="hidden" name="merid" id="merid"/>
+   </form>
+   <form id="formID1" action="filtration.do" method="post">
+        <input type="hidden" name="merid" id="merid"/>
+   </form>
+</body>
+</html>
+ 

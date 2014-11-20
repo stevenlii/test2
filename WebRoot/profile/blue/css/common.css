@@ -1,0 +1,267 @@
+/*======默认CSS属性设置 START=========*/
+body,form{
+	background:#FFF;
+	text-align:center;
+	margin:0; 
+	padding:0; 
+	border:none; 
+	
+	scrollbar-arrow-color:#B2E3FF;
+	scrollbar-face-color:#E2EDF9;
+	scrollbar-darkshadow-color:#B2E3FF;
+	scrollbar-shadow-color:#E2EDF9;
+	scrollbar-3dlight-color:#B2E3FF;
+	scrollbar-highlight-color:#E2EDF9;
+	scrollbar-track-color:#E2EDF9;
+}
+
+input,select,textarea {
+	border:1 solid #CACACA;
+	font-size: 12px; 
+}
+a{
+  text-decoration: none
+}
+a:link {
+	color: #000;
+}
+a:visited {
+	color: #333;
+}
+a:hover {
+	color: #06C;
+}
+/*checkbox的无边框设置*/
+.checkbox {
+	border:0px;
+}
+/*按钮属性设置*/
+.btn2char, .btn4char, .btn6char{
+	height:23px;
+	border:none;
+	color:#FFF;
+	margin:0px 3px;
+}
+/*两个字按钮背景贴图*/
+.btn2char {
+	width:60px;
+	background: url(../images/btn_2char.gif) center top no-repeat;
+}
+/*四个字按钮背景贴图*/
+.btn4char {
+	width:70px;
+	background: url(../images/btn_4char.gif) center top no-repeat;
+}
+/*六个字按钮背景贴图*/
+.btn6char {
+	width:100px;
+	background: url(../images/btn_6char.gif) center top no-repeat;
+}
+/*======默认CSS属性设置 END========*/
+
+/*======登录页 START===============*/
+/*大背景图设置*/
+#login{
+	width:1004px;
+	height:680px;
+	margin:0px;
+	background: url(../images/login_bg.jpg) center top no-repeat;
+	text-align:left;
+}
+/*小背景图设置*/
+#login form{
+	position:relative;
+	height:500px;
+	margin:80px auto 0px auto;
+	padding:297px 0px 0px 420px;
+	background:none;
+}
+/*INPUT文本输入框设置*/
+#login input{
+	width:120px;
+}
+/*版权信息设置*/
+#login #copyright{
+	height:120px;
+	margin:10px 0px 0px 380px;
+}
+/*======登录页 END=================*/
+
+
+/*======头部页 START===============*/
+/*banner容器设置：如背景图片*/
+#banner{
+	position:relative;
+	background: url(../images/banner_bg.jpg);
+	text-align:left;
+}
+/*banner图片*/
+#banner div{
+	width:1004px;
+	height:94px;
+	background: url(../images/banner.jpg) no-repeat;
+}
+/*banner上字体的样式*/
+#banner h1{
+	margin:0;
+	padding:30px 0 0 30px;
+	color:#FFF;
+	font:bold 30px "黑体";
+	/*display:none;*/
+}
+
+/*头页面导航条容器设置*/
+#topnav{
+	height:33px;
+	background: url(../images/topnav_bg.jpg);
+}
+/*头页面导航条的字体样式*/
+#topnav table td{
+	color:#333;
+	font-size:14px;
+}
+/*头页面导航条链接的样式*/
+#topnav a:link, #topnav a:visited{
+	color:#333;
+	text-decoration:none;
+}
+#topnav a:hover{
+	color:#0676B6;
+	text-decoration:none;
+}
+/*======头部页 END=================*/
+
+
+/*======左导航页 START=============*/
+/*左导航字体样式*/
+#leftnav{
+	width:200px;
+	text-align:left;
+	vertical-align:top;
+}
+/*左导航上部字体设置*/
+#leftnav h3 {
+ 	height:27px;
+	margin:0;
+	padding:8px 0 0 20px;
+	background: url(../images/leftnav_top_bg.jpg) no-repeat;
+	color:#FFF;
+	font:bold;
+}
+/*左导航下部目录树样式设置(元素级设置请修改xtree自身的CSS)*/
+#leftnav table{
+	margin:8px 0px 0px 20px;
+}
+/*======左导航页 END=================*/
+
+/*======业务页面 START===============*/
+/*业务页面容器设置*/
+#container{
+	margin:5px;
+}
+/*表头业务名称栏属性设置：如背景图片*/
+#container .header {
+	height:28px;
+	background:#219CEA url(../images/container_header_bg.jpg);
+}
+/*表头业务名称栏左侧图片设置（圆角效果）*/
+#container .header_left {
+	width:44px;
+	height:28px;
+	background:url(../images/container_header_left.jpg) no-repeat;
+}
+/*表头业务名称栏文字样式*/
+#container h3 {
+	margin:0px;
+	padding:3px 0 0 2px;
+	color:#FFF;
+	font:bold;
+}
+/*表头业务名称栏右侧图片设置（圆角效果）*/
+#container .header_right {
+	width:20px;
+	background: url(../images/container_header_right.jpg);
+}
+/*业务名称栏链接的样式*/
+#container .header a{
+	color:#FFF;
+	font:normal;
+	text-decoration: none;
+}
+/*业务表内容容器设置：如背景图，边框等*/
+#container .content {
+	padding:5px;
+	border:1px solid #219CEA;
+	border-top:none;
+	background: url(../images/container_content_bg.jpg) repeat-x;
+}
+#container .content table{
+	margin:3px 0px;
+	width:100%;
+}
+/*业务内容表设置*/
+#container .list {
+	 border-collapse:collapse;
+}
+/*业务内容表表头th样式*/
+#container .list th{
+	height:25px;
+	background: #BEE2FF;
+	border:1px solid #CCC;
+	padding:3px;
+    color:#111;
+	font:normal;
+	vertical-align:bottom;
+}
+/*业务内容表表td样式*/
+#container .list td{
+	height:25px;
+	border:1px solid #CCC;
+	padding:3px;
+}
+/*业务内容表注释说明的字体样式*/
+#container .list span{
+	color: #DC2C2C;
+}
+/*业务内容表数据被选中时的背景颜色*/
+.selected_color{
+	background:#E6E6FA;
+}
+/*======业务页面 END=================*/
+
+/*======左侧导航显隐控制页面 START===*/
+#hiddenleft table{
+	width:10px;
+	height:100%;
+	background:url(../images/hiddenleft_bg.jpg);
+	cursor:pointer;
+}
+/*======左侧导航显隐控制页面 END=====*/
+
+/*======底部页面 START===============*/
+#bottom table{
+	width:100%;
+	height:40px;
+	background: #EEE;
+	text-align:center;
+}
+/*======底部页面 END===============*/
+#container ul{
+	text-align:left;
+    list-style:none;
+	padding:0px; margin:0px;
+}
+#container ul li{
+	background:url(../images/container_link_icon.gif) no-repeat 0px 6px;
+	padding:2px 3px 5px 8px; 
+	margin:0px;
+}
+#container .a12px{
+	font:12px "宋体";
+}
+#container .a12px:link, #container .a12px:visited{
+	color:#666;
+}
+#container .a12px:hover{
+	color:#333;
+}

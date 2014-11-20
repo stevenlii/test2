@@ -1,0 +1,117 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/goodsaudit.js"></script>
+</head>
+<body>
+<!--审核后的商品详情页面-->
+<form id="dataform" method="post" name="dataform">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0"  style="width: 400px;" >
+		<tr>
+		    <th width="30%">所属商户：</th>
+			<td class="td" colspan="2">$!{audit.merId} - $!{audit.merName}</td>
+		</tr>
+		<tr>
+		    <th >商&nbsp;品&nbsp;号：</th>
+			<td class="td1" colspan="2">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+		    <th >商品名称：</th>
+			<td class="td" colspan="2">$!{audit.goodsName}</td>
+		</tr>
+		<tr>
+		    <th >业务覆盖：</th>
+			<td class="td1" colspan="2">$!{audit.busiType}</td>
+		</tr>
+		<tr>
+		    <th >商品分类：</th>
+			<td class="td" colspan="2">$!{audit.category}</td>
+		</tr>
+		<tr>
+		    <th >风控分类：</th>
+			<td class="td1" colspan="2">$!{audit.goodsType}</td>
+		</tr>
+		
+		<tr>
+		    <th >服务类型：</th>
+			<td class="td" colspan="2">$!{audit.servType}</td>
+		</tr>
+		#if($!{audit.servType} == "包月商品")
+			<tr>
+			     <th>服务月份：</th>
+				<td class="td1" colspan="2">$!{audit.servMonth}</td>
+			</tr>
+			<tr>
+			    <th >续费方式：</th>
+				<td class="td" colspan="2">
+				#if(${audit.conMode} == 0)
+					正向续费
+				#elseif(${audit.conMode} == 1)
+					反向续费
+				#elseif(${audit.conMode} == 2)
+					取消续费
+				#end
+				</td>
+			</tr>
+			<tr>
+			    <th >间隔周期：</th>
+				<td class="td1" colspan="2"> $!{audit.interval}</td>      
+			</tr>
+		#end
+	    <tr>
+		    <th >价格模式：</th>
+			<td class="td">
+			#if(${audit.priceMode} == 0)
+				定价模式 $!{audit.amount}分
+			#elseif(${audit.priceMode} == 1)
+				非定价模式
+			#end
+			</td>
+			#if(${auditType}==3)
+				<td width="35%" class="td" rowspan="2"><h2>禁用-><span style="color:red">启用</span><h2></td>
+			#elseif(${auditType}==4)
+				<td width="35%" class="td" rowspan="2"><h2>启用-><span style="color:red">禁用</span><h2></td>
+			#else
+				<td class="td1"></td>
+			#end
+		</tr>
+		<tr>
+		    <th >商品信息：</th>
+			<td class="td1">
+				#if($!{audit.pushInf} == 0)
+        			仅下发商品描述
+                #elseif($!{audit.pushInf} == 1)
+                	#if($!{audit.mtNum} == 1)
+                		仅下发商品信息
+                	#elseif($!{audit.mtNum} == 2)
+                		下发描述+信息
+                	#end
+                #end
+			</td>
+			#if(${auditType}==1 || ${auditType}==2)
+				<td class="td"></td>
+			#end
+		</tr>
+	   <tr>
+		    <th >商品描述：</th>
+			<td class="td" colspan="2">$!{audit.goodsDesc} </td>      
+		</tr>
+	   <tr>
+		    <th >客服电话：</th>
+			<td class="td1" colspan="2"> $!{audit.cusPhone}</td>      
+		</tr>
+		#if($!{resultDesc} == "")
+	     #else
+	     	<tr><td height="63" colspan="3" align="left" valign="bottom"><textarea id="resultDesc" rows="3" disabled="disabled" style="{width:100%;}">${resultDesc}</textarea></td></tr>
+	     #end
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	 </div>
+</form>
+</body>
+</html>

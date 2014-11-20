@@ -1,0 +1,66 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/proxygoodsaudit.js"></script>
+
+</head>
+<body>
+<div>	
+<!--审核时的新增代理商详情页面-->
+<form id="dataform" method="post" name="dataform">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0" width="100%" >
+		<tr>
+		    <th width="125">二级商户号：</th>
+			<td class="td" colspan="2">${audit.subMerId}</td>
+		</tr>
+		<tr>
+		    <th >二级商户名称：</th>
+			<td class="td1" colspan="2">$!{subMerName}</td>
+		</tr>
+		<tr>
+		    <th width="125">代理商户号：</th>
+			<td class="td" colspan="2">$!{audit.merId}</td>
+		</tr>
+		<tr>
+		    <th>代理商品号：</th>
+			<td class="td1" colspan="2">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+			<th>代理商品名称：</th>
+			<td class="td" colspan="2">$!{goodsName}</td>
+	    </tr>
+	    <tr>
+	    	<th>商品天销售数量：</th>
+			<td class="td1" colspan="2">$!{audit.dayLimit}</td>
+		</tr>
+		<tr>
+			<th>预警数：</th>
+			<td class="td" colspan="2">$!{audit.alarmLimit}</td>
+		</tr>
+		<tr>
+			<th>预警短信号码：</th>
+			<td class="td1" colspan="2">$!{audit.alarmTel}</td>
+		</tr>
+	
+		#if(${resultDesc} == "")
+	     #else
+	     	<tr><th>审核意见：</th><td height="63" colspan="3" align="left" valign="bottom"><textarea id="resultDesc1" rows="3" disabled="disabled" style="{width:100%;}">$!{resultDesc}</textarea></td></tr>
+	     #end
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	 </div>
+</form>
+</div>
+</body>
+</html>

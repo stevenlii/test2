@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponGcOrder">
+	<typeAlias alias="CouponGcOrder" type="com.umpay.hfmng.model.CouponGcOrder" />
+	<sql id="select_what">
+		select orderId,
+		       orderDate,
+		       merOrderId,
+		       merOrderDate,
+		       channelId,
+		       couponId,
+		       ruleId,
+		       state,
+		       merId,
+		       goodsId,
+		       goodsSum,
+		       amount,
+		       merCheck,
+		       mobileId,
+		       to_char(modTime, 'yyyy-mm-dd hh24:mi:ss') as modTime,
+		       to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime
+		  from umpay.T_COUPON_GCORDER
+	</sql>
+
+	<sql id="key_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="orderId" prepend=" and ">
+				orderId=#orderId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<statement id="get" resultClass="CouponGcOrder">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+
+
+
+</sqlMap>

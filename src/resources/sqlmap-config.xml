@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig
+PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings useStatementNamespaces="true"
+		cacheModelsEnabled="true"
+		enhancementEnabled="true"
+		lazyLoadingEnabled="true"
+		maxRequests="64"		
+		maxSessions="20"
+		maxTransactions="10"/>
+	<sqlMap resource="sqlmap/Demo.xml" />
+	<sqlMap resource="sqlmap/GoodsInfo.xml" />
+	<sqlMap resource="sqlmap/MerInfo.xml" />
+	<sqlMap resource="sqlmap/MerCnf.xml" />
+	<sqlMap resource="sqlmap/MerInter.xml" />
+	<sqlMap resource="sqlmap/Audit.xml" />
+	<sqlMap resource="sqlmap/GoodsType.xml" />
+	<sqlMap resource="sqlmap/MerBank.xml" />
+	<sqlMap resource="sqlmap/GoodsBank.xml" />
+	<sqlMap resource="sqlmap/Bank.xml" />
+	<sqlMap resource="sqlmap/FeeCode.xml" />
+	<sqlMap resource="sqlmap/GoodsFeeCode.xml" />
+	<sqlMap resource="sqlmap/FeeCodeCount.xml" />
+	<sqlMap resource="sqlmap/OperLog.xml" />
+	<sqlMap resource="sqlmap/Huadan.xml" />
+	<sqlMap resource="sqlmap/CouponInf.xml" />
+	<sqlMap resource="sqlmap/CouponRule.xml" />
+	<sqlMap resource="sqlmap/CouponBatch.xml" />
+	<sqlMap resource="sqlmap/CouponCode.xml" />
+	<sqlMap resource="sqlmap/Para.xml" />
+	<sqlMap resource="sqlmap/CouponLog.xml" />
+	<sqlMap resource="sqlmap/CouponOrder.xml" />
+	<sqlMap resource="sqlmap/HFTask.xml" />
+	<sqlMap resource="sqlmap/HFTaskMnt.xml" />
+	<sqlMap resource="sqlmap/ChannelInf.xml" />
+	<sqlMap resource="sqlmap/CouponGcOrder.xml" />
+	<sqlMap resource="sqlmap/ChnlInf.xml" />
+	<sqlMap resource="sqlmap/ChnlBank.xml" />
+	<sqlMap resource="sqlmap/ChnlGoods.xml" />
+	<sqlMap resource="sqlmap/CouponMerTel.xml" />
+	<sqlMap resource="sqlmap/SecMerInf.xml" />
+	<sqlMap resource="sqlmap/SecMerCnf.xml" />
+	<sqlMap resource="sqlmap/ProxyGoods.xml" />
+	<sqlMap resource="sqlmap/ProxyGoodsLimit.xml" />
+	<sqlMap resource="sqlmap/CouponRMG.xml" />
+	<sqlMap resource="sqlmap/SegMbl.xml" />
+	<sqlMap resource="sqlmap/MerBusiConf.xml" />
+	<sqlMap resource="sqlmap/HfMerOper.xml" />
+	<sqlMap resource="sqlmap/report.xml" />
+	<sqlMap resource="sqlmap/BackUp.xml" />
+	<sqlMap resource="sqlmap/UPService.xml" />
+</sqlMapConfig>

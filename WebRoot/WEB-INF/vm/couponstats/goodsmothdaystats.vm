@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+    <script src="$request.contextPath/js/ui/jquery.min.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/couponstats.js"></script>
+ 	<script type="text/javascript">
+
+        jQuery(document).ready(function() {
+        	jQuery( "#dialog-modal").omDialog({
+    			autoOpen: false,
+    			height: 80,
+				resizable: false,
+    			modal: true
+    		});
+          	jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/couponstats/goodsMonthDayStats.do?queryKey=stats.goodsMonthDayStats",
+                width:'100%',
+                height : 460,
+                limit : 15,
+				title : '统 计 信 息 列 表',
+				errorMsg : '取数据出错',
+				loadingMsg : '正在加载数据, 请稍后...',
+				emptyMsg : '没有数据',
+                autoFit : true,
+                colModel : [ 
+                	 {header : '日期(日/月)', name : 'MD',width : 70, align : 'center'}, 
+    				 {header : '商户编号', name : 'MERID',width : 60, align : 'center'}, 
+                     {header : '商户名称', name : 'MERNAME',width : 100, align : 'center' },
+                     {header : '商品编号', name : 'GOODSID',width : 60, align : 'center'}, 
+                     {header : '商品名称', name : 'GOODSNAME',width : 180, align : 'center' },
+                     {header : '售出数量', name : 'SALEDNUM', width : 50, align : 'center' },
+                     {header : '售出总金额 (元)', name : 'SALEDSUM', width : 90, align : 'right',
+							 renderer: function(value, rowData, rowIndex) {
+        							 var val = rowData.SALEDSUM + "";
+        							 var index = val.indexOf(".");
+        							 if(index > 0){
+        							 	var sub = val.substring(index + 1);
+        								if(sub.length < 2){
+        									return val + "0&nbsp;&nbsp;";
+        								}
+        							 	return val + "&nbsp;&nbsp;";
+        							 }
+        							 return rowData.SALEDSUM + ".00&nbsp;&nbsp;";
+        		                }
+	                 },
+                     {header : '兑换数量', name : 'EXCHANGEDNUM', width : 50, align : 'center' },
+    				 {header : '兑换总金额 (元)', name : 'EXCHANGEDSUM', width : 90, align : 'right',
+							 renderer: function(value, rowData, rowIndex) {
+            							 var val = rowData.EXCHANGEDSUM + "";
+            							 var index = val.indexOf(".");
+            							 if(index > 0){
+            							 	var sub = val.substring(index + 1);
+            								if(sub.length < 2){
+            									return val + "0&nbsp;&nbsp;";
+            								}
+            							 	return val + "&nbsp;&nbsp;";
+            							 }
+            							 return rowData.EXCHANGEDSUM + ".00&nbsp;&nbsp;";
+            		                }
+	                 },
+                     {header : '注销数量', name : 'CANCELNUM', width : 50, align : 'center' },
+    				 {header : '注销总金额 (元)', name : 'CANCELSUM', width : 90, align : 'right',
+							 renderer: function(value, rowData, rowIndex) {
+            							 var val = rowData.CANCELSUM + "";
+            							 var index = val.indexOf(".");
+            							 if(index > 0){
+            							 	var sub = val.substring(index + 1);
+            								if(sub.length < 2){
+            									return val + "0&nbsp;&nbsp;";
+            								}
+            							 	return val + "&nbsp;&nbsp;";
+            							 }
+            							 return rowData.CANCELSUM + ".00&nbsp;&nbsp;";
+            		                }
+	                 },
+                     {header : '过期数量', name : 'OVERDUENUM', width : 50, align : 'center' },
+    				 {header : '过期总金额 (元)', name : 'OVERDUESUM', width : 90, align : 'right',
+							 renderer: function(value, rowData, rowIndex) {
+            							 var val = rowData.OVERDUESUM + "";
+            							 var index = val.indexOf(".");
+            							 if(index > 0){
+            							 	var sub = val.substring(index + 1);
+            								if(sub.length < 2){
+            									return val + "0&nbsp;&nbsp;";
+            								}
+            							 	return val + "&nbsp;&nbsp;";
+            							 }
+            							 return rowData.OVERDUESUM + ".00&nbsp;&nbsp;";
+            		                }
+	                 }
+                ]
+            });
+            
+			 $('#type').omCombo({
+                dataSource: '$request.contextPath/option/couponmerinflist.do',
+	            width: '155px',
+	            emptyText: '全部',
+	            onValueChange: function(target, newValue, oldValue, event) {
+					var merId = $('#type').omCombo('value');
+	                // 连级更新商品列表
+	                $('#goodstype').omCombo('setData', []);
+					$('#goodstype').omCombo({
+	                    dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+	                    emptyText: '全部',
+	    				forceSelection: true,
+	    	            onSuccess:function(data, textStatus, event){
+	    			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	    			      	  data.unshift(tmp);
+	    		   		}
+	                });
+	            },
+	            forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+            $('#goodstype').omCombo({
+                dataSource: [],
+	            width: '155px',
+	            emptyText: '全部',
+				forceSelection: true,
+	            onSuccess:function(data, textStatus, event){
+			      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+			      	  data.unshift(tmp);
+		   		}
+            });
+			$('#startDate').omCalendar({
+				dateFormat:'yy-mm-dd',
+				maxDate: new Date(),
+				onSelect : function(date,event) {
+					var d = new Date(date);
+					d.setDate(d.getDate()-1);
+					$('#endDate').omCalendar({minDate : d});
+				}
+			});
+			$('#endDate').omCalendar({
+				dateFormat:'yy-mm-dd',
+				maxDate: new Date(),
+				onSelect : function(date,event) {
+					$('#startDate').omCalendar({maxDate : date});
+				}
+			});
+       });
+		function setFormat(type){
+			$('#startDate').val('');
+			$('#endDate').val('');
+			if(type == 1){
+				$('#startDate').omCalendar("option", "dateFormat", "yy-mm");
+				$('#endDate').omCalendar("option", "dateFormat", "yy-mm");
+			}else{
+				$('#startDate').omCalendar("option", "dateFormat", "yy-mm-dd");
+				$('#endDate').omCalendar("option", "dateFormat", "yy-mm-dd");
+			}
+		}
+</script>
+
+</head>
+<body>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search" style="height:80px;">
+     <table width="100%" border="0">
+	   <tr>
+	    <td>
+	      <form id="form" action="" method="post"> 
+			<table width="100%" border="0">
+              <tr height="50">
+                <th width="5%">商户：</th>
+                <td width="13%"><input id="type" name="type"/></td>
+                <th width="10%">商品：</th>
+	            <td><input id="goodstype" name="goodstype"/></td>
+	          </tr>
+	          <tr>
+               	<th width="10%">统计类型：</th>
+                <td width="17%">
+					<input id="radio1" name="statsType" class="radio" value="day" onclick="setFormat(0);" type="radio" checked/>&nbsp;按日统计&nbsp;&nbsp;
+            		<input id="radio2" name="statsType" type="radio" class="radio"  value="month" onclick="setFormat(1);"/>&nbsp;按月统计
+				</td>
+    		   	<th width="13%">统计时间：</th>
+                <td>
+					<input id="startDate" style="width:90px" name="startDate"/>&nbsp;至&nbsp;
+					<input id="endDate" style="width:90px" name="endDate"/>
+				</td>
+             </tr>
+            </table>
+	         </form> 
+	       </td>
+	        <td>
+				<input title="查询" name="query" type="image" code="001"  src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="doQuery('goodsMonthDayStats.do?queryKey=stats.goodsMonthDayStats');"/>
+				<input code="002" type="image" value="导出" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="doExport('expGoodsMonthDayReport.do?queryKey=stats.goodsMonthDayStats');"/>
+	        </td>
+	       </tr>
+        </table>
+</div>    
+    </div>			      
+ <!--列表区-->
+  <div align="center">
+       <table id="grid" align="left"></table>
+  <div>
+  <div id="dialog-modal" title="提示窗口">
+    <p id="result"></p>
+  </div>
+</body>
+</html>

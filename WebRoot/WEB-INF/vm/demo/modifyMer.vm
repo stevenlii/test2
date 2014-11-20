@@ -1,0 +1,168 @@
+<link rel="stylesheet" href="${request.contextPath}/profile/blue/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<style type="text/css">
+
+       label.error{
+
+        background: #fff6bf url(${request.contextPath}/images/alert.png) center no-repeat;
+
+		background-position: 5px 50%;
+
+		text-align: left;
+
+		padding: 2px 20px 2px 25px;
+
+		border: 1px solid #ffd324;
+
+		display: none;
+
+		width: 150px;
+
+		margin-left: 10px;
+
+       }
+
+    </style>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+  <script>
+   		var options = {
+                success : showResponse
+        };
+  	 jQuery(document).ready(function() {
+  	 	  jQuery("#dataform").validate({
+                rules : {
+                    "mer.merId" : {
+                    	required : true
+                    },
+                    "mer.merName": {
+                        required : true
+                    },
+                    "mer.timeLtd": {
+                        required : true
+                    },
+                    "mer.postal": {
+                        required : true
+                    },
+                    "mer.address": {
+                        required : true
+                    }
+                },
+                messages : {
+                    "mer.merId"  : {
+                        required : "请输入商户编号"
+                    },
+
+                    "mer.merName": {
+                        required : "请输入商户名称"
+                    },
+                     "mer.timeLtd"  : {
+                        required : "请输入次限额(分)"
+                    },
+
+                     "mer.postal"  : {
+                        required : "请输入邮编"
+                    },
+
+                    "mer.address": {
+                        required : "请输入地址"
+                    }
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	 jQuery('#dataform').submit(function() {
+  	 	  	if (!jQuery("#dataform").valid()) 
+                 return false;
+            jQuery(this).omAjaxSubmit(options);
+             	return false; 
+            });
+            
+            $(document).ready(function() {
+            $('#combo1').omCombo({
+                dataSource : [ {text : '中国', value : 'China/PRC'}, 
+                               {text : '美国', value : 'America/USA'}, 
+                               {text : '英国', value : 'the United Kingdom/UK'}, 
+                               {text : '日本', value : 'Japan/JPN'} ]
+            });
+            $('#combo1').omCombo('value','$myCountry');
+            
+            
+        });
+            
+  	 });
+  	 function showResponse(responseText, statusText) {
+        var result = eval("("+responseText+")");
+          if(result.code=='0'){
+          	window.parent.fillBackAndCloseDialog(result.msg);
+          }
+        }
+  </script>  
+<div id="container">
+                  <form id ="dataform" method="post" name="dataform" id="dataform" action="${request.contextPath}/mer/save.action">
+                  
+                  <input type="hidden" name="mer.id" value="$mer.id">
+                    <table width="100%" cellpadding="0" cellspacing="0" class="list">
+                      <tr>
+                            <th width="18%" align="left"><span>*</span>商户编号：</th>
+                            <td><input id="combo1" /><input  name="mer.merId"  value="$!{mer.merId}" type="text"  size="30" maxlength="30"></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left"><span>*</span>商户名称：</th>
+                            <td><input  name="mer.merName" type="text"  value="$!{mer.merName}"  size="30" maxlength="30" ></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left">商户拓展商：</th>
+                            <td><input  name="mer.exMerId" type="text"  value="$!{mer.exMerId}"  size="30" maxlength="30" ></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left"><span>*</span>商户类型：</th>
+                            <td><select name="mer.merType">
+                            <option value="-1">请选择</option>
+                            <option value="0">请选择</option>
+                            <option value="1">请选择</option>
+                            </select></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left"><span>*</span>次限额(分)：</th>
+                            <td><input  name="mer.timeLtd" type="text"  value="$!{mer.timeLtd}"  size="30" maxlength="30" ></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left"><span>*</span>商户标识：</th>
+                            <td>	<input type='radio' name='mer.isSpecial' value='1'>特殊商户<input type='radio' name='mer.isSpecial' value='0' checked>普通商户
+                            </td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left"><span>*</span>邮编：</th>
+                            <td><input  name="mer.postal" value="$!{mer.postal}"  type="text"  size="30" maxlength="30" ></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left"><span>*</span>地址：</th>
+                            <td><input  name="mer.address" value="$!{mer.address}"  type="text"  size="30" maxlength="30" ></td>
+                      </tr>
+                        <tr>
+                            <th width="18%" align="left">客服电话：</th>
+                            <td><input  name="mer.cusPhone" value="$!{mer.cusPhone}"  type="text"  size="30" maxlength="30" ></td>
+                      </tr>
+                       <tr>
+                            <th width="18%" align="left">是否开通：</th>
+                            <td><input type='checkbox' name='state' value='2'></td>
+                      </tr>
+                        </table>
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td height="15"></td>
+                          </tr>
+                          <tr>
+                            <td align="center"><input id="submit" name="submit" type="submit"   value="保 存" class="btn2char"/>
+                            <input id="add_button2" name="add_button2" type="reset"  value="重 置" class="btn2char"/>
+                          </tr>
+                        </table>
+                  </form>
+</div>

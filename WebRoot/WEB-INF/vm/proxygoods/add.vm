@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/busi/proxygoods.js"></script>
+<script>
+var setting = {
+	check: {
+		enable: true,
+		chkStyle: "radio"
+	},
+	data: {
+		simpleData: {
+			enable: true
+		}
+	}
+};
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  		 
+  		 var zNodes1="${zNodes}";		
+  		 var zNodes=eval(zNodes1);
+  		 tree=$.fn.zTree.init($("#tree"), setting, zNodes);
+  		 setCheck();
+  	     
+  	 	 jQuery("#dataform").validate({
+                rules : {
+		  	 		"subMerId" : {
+			        	 required : true
+			        },
+			        "merId" : {
+			        	 required : true
+			        },
+                    "dayLimit" : {
+                    	 required : true,
+                    	 zhengshu : true
+                    },
+                    "alarmLimit": {
+                        required : true,
+                        zhengshu : true,
+                        isEqual1 : true,
+                        compareVal : true
+                    },
+                   "alarmTel": {
+                    	isEmpty : true,
+                    	mobile : true,
+                        maxlength : 254
+                   }
+                },
+                messages : {
+                	"subMerId"  : {
+	                    required : "请选择二级商户"
+	                },
+	                "merId"  : {
+	                    required : "请选择代理商户"
+	                },
+                    "dayLimit"  : {
+                        required : "请输入日销量",
+                    },
+                    "alarmLimit": {
+                        required : "请输入预警值"
+                    },
+                    "alarmTel": {
+                    	maxlength : "号码最多254个字"
+                    }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){
+  	 	 		 return false;
+  	 	 	 }
+  	 	 	if(!checkedNodes()){
+  	 	        return false;
+  	 	    }
+              jQuery(this).omAjaxSubmit({success:function(res){
+            	  		window.parent.showSimpleTip(res);
+                   		if(res =='1') {
+            			   closeDialog();
+            			   window.parent.shuaxin();
+            		    }
+               		}
+	             
+               }); 
+        	   
+              return false; 
+            });
+  	 	 
+	  	 	 //获取启用状态的二级商户列表
+	  	 	 $('#subMerId').omCombo({
+	  	 		 dataSource : '$request.contextPath/option/enablesubmeridlist.do',
+	  	 		 listMaxHeight:80,
+	  	 		 forceSelection:true,
+	  	 		 emptyText:'请选择..',
+	  	 		 width:'100px',
+	  	 		 onValueChange : function(target, newValue, oldValue, event) {
+ 		 			 getMerIdAndTree(newValue);
+	             }
+	  	 	 });
+	  	 	 
+	  	 	 //获取商户列表
+	  	 	 $('#merId').omCombo({
+	  	 		 dataSource : '',
+	  	 		 listMaxHeight:80,
+	  	 		 forceSelection:true,
+	  	 		 width:'100px',
+	  	 		 onValueChange : function(target, newValue, oldValue, event) {
+ 		 			 getTree(newValue, false);
+	             }
+	  	 	 });
+	  	 	 
+  	     });       
+       
+  </script>  
+  </head>
+  <body>
+<div id="container">
+          <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/proxygoods/save.do">
+          <table width="100%" >
+          <tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+              <tr>
+                <th width="25%"><span>*</span>二级商户：</th>
+                <td width="190px" class="td1"><input id="subMerId" name="subMerId" type="text" class="select1" /></td>
+                <td width="180px" class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+              </tr>
+              <tr>
+                <th>二级商户名称：</th>
+                <td class="td"><div id="subMerName"></div></td>
+                <td class="td"></td>
+              </tr>
+            <tr>
+                <th><span>*</span>代理商户：</th>
+                <td class="td1"><input id="merId" name="merId" class="select1" /></td>
+                <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+	            <th><span>*</span>绑定商品：</th>
+	            <td class="td" colspan="2">
+	             	<input id="goodsId" name="goodsId" type="hidden">
+	             	<div style="width:100%;height:240px;text-align:left;overflow:scroll;">
+	             		<ul id="tree" class="ztree"></ul>
+			      	</div>
+	             </td>
+	        </tr>
+	        <tr>
+	            <th><span>*</span>商品日销量：</th>
+	            <td class="td1"><input id="dayLimit" name="dayLimit" type="text" maxlength="7" class="input1" /></td>
+	            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+            </tr>
+            <tr>
+	            <th><span>*</span>预警数：</th>
+	            <td class="td"><input id="alarmLimit" name="alarmLimit" type="text" maxlength="7" class="input1" /></td>
+	            <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	        </tr>
+	        <tr>
+	            <th>预警短信号码：</th>
+	            <td class="td1"><textarea id="alarmTel" name="alarmTel" rows="3" style="width:200px;"></textarea></td>
+	            <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	        </tr>
+            </table>
+        </td></tr><tr><td>
+	        <table width="100%" cellpadding="0" cellspacing="0">
+	             <tr>
+	                <td height="15"></td></tr>
+	             <tr>
+	                <td align="center"><input id="add_button1" name="submit" type="submit" value="添加" class="popbtn"onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	                <input id="add_button2" name="add_button2" type="reset"  value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+	              </tr>
+	         </table>
+         </td></tr>
+         <table>
+      </form>
+                  
+</div>
+</body>
+</html>

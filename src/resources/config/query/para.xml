@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="para">
+	<sql id="all">
+	<![CDATA[SELECT SYSID, PARATYPE, PARACODE, MODTIME, PARAVALUE, PARADESC, MODUSER, INTIME 
+    FROM UMPAY.T_COUPON_PARA WHERE SYSID = 'coupon'
+    #if( $paraType && $paraType!='' ) 
+		   and  paraType like '$paraType%'
+	#end
+	#if( $paraCode && $paraCode!='' ) 
+		   and  paraCode = :paraCode
+	#end
+    ]]>
+	</sql>
+
+</mapper> 

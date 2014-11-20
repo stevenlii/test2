@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="goodsbank">
+	<sql id="allgoodsbank"> 
+		<![CDATA[
+			select a1.*, b2.desc
+			  from (select tgb.merid,
+			               tgb.goodsid,
+			               tgb.bankid,
+			               ltrim(rtrim(tgb.merid)) || '-' || ltrim(rtrim(tgb.goodsid)) || '-' || ltrim(rtrim(tgb.bankid)) as ixdata,
+			               tgb.kstate,
+			               tgb.modlock,
+			               tgb.modtime,
+			               tgb.isRealTime,
+			               tgb.amount,
+			               tgb.verifyTag,
+			               tgb.checkDay
+			          from umpay.t_goods_bank tgb, umpay.t_bank_inf bank
+			         where tgb.bankid = bank.bankid
+			           and (bank.banktype = 3 or bank.banktype = 6)
+			           #if( $bankId && $bankId!='' ) 
+					       and  tgb.bankId = :bankId   
+					   #end 
+				       #if( $merId && $merId!='' ) 
+						   and  tgb.merId= :merId   
+					   #end 
+					   #if( $state && $state!='' ) 
+						   and tgb.kstate = :state   
+					   #end 
+					   #if( $goodsId && $goodsId!='' ) 
+						   and  tgb.goodsId = :goodsId   
+					   #end
+					   #if( $isRealTime && $isRealTime!='' ) 
+						   and  tgb.isRealTime = :isRealTime   
+					   #end
+			         ) a1
+			  left join (select a2.id, a2.IXDATA, a2.desc
+			               from umpay.t_hfaudit a2
+			              inner join (select max(id) as auditId, ixdata
+			                           from umpay.T_HFAUDIT
+			                          where tableName = 'UMPAY.T_GOODS_BANK'
+			                            and state = 2
+			                          group by ixData) b1
+			                 on a2.id = b1.auditid) b2
+			    on a1.ixdata = b2.IXDATA
+			  order by a1.modtime desc
+	  	]]>
+	</sql>
+	<sql id="allupgoodsbank"> 
+		<![CDATA[
+			select a1.*, b2.desc
+			  from (select tgb.merid,
+			               tgb.goodsid,
+			               tgb.bankid,
+			               ltrim(rtrim(tgb.merid)) || '-' || ltrim(rtrim(tgb.goodsid)) || '-' || ltrim(rtrim(tgb.bankid)) as ixdata,
+			               tgb.kstate,
+			               tgb.modlock,
+			               tgb.modtime,
+			               tgb.isRealTime,
+			               tgb.amount,
+			               tgb.verifyTag,
+			               tgb.checkDay
+			          from umpay.t_goods_bank tgb, umpay.t_bank_inf bank
+			         where tgb.bankid = bank.bankid
+			           and (bank.banktype = 6 or bank.banktype = 61 or bank.banktype = 62)
+			           #if( $bankId && $bankId!='' ) 
+					       and  tgb.bankId = :bankId   
+					   #end 
+				       #if( $merId && $merId!='' ) 
+						   and  tgb.merId= :merId   
+					   #end 
+					   #if( $state && $state!='' ) 
+						   and tgb.kstate = :state   
+					   #end 
+					   #if( $goodsId && $goodsId!='' ) 
+						   and  tgb.goodsId = :goodsId   
+					   #end
+					   #if( $isRealTime && $isRealTime!='' ) 
+						   and  tgb.isRealTime = :isRealTime   
+					   #end
+			         ) a1
+			  left join (select a2.id, a2.IXDATA, a2.desc
+			               from umpay.t_hfaudit a2
+			              inner join (select max(id) as auditId, ixdata
+			                           from umpay.T_HFAUDIT
+			                          where tableName = 'UMPAY.T_GOODS_BANK'
+			                            and state = 2
+			                          group by ixData) b1
+			                 on a2.id = b1.auditid) b2
+			    on a1.ixdata = b2.IXDATA
+			  order by a1.modtime desc
+	  	]]>
+	</sql>
+	<!-- 2014-04-16 wanyong modify <sql id="allgoodsbank"> <![CDATA[ select tgb.merid,tgb.goodsid,tgb.bankid,tgb.kstate,tgb.modlock,tgb.modtime, 
+		tgb.isRealTime,tgb.amount,tgb.verifyTag,tgb.checkDay from umpay.t_goods_bank tgb,umpay.t_bank_inf bank where tgb.bankid = 
+		bank.bankid and (bank.banktype = 3 or bank.banktype = 6) #if( $bankId && $bankId!='' ) and tgb.bankId = :bankId #end #if( 
+		$merId && $merId!='' ) and tgb.merId= :merId #end #if( $state && $state!='' ) and tgb.kstate = :state #end #if( $goodsId 
+		&& $goodsId!='' ) and tgb.goodsId = :goodsId #end order by tgb.modtime desc ]]> </sql> -->
+	<sql id="henangoodsbank"> 
+	<![CDATA[
+		select merid,goodsid,bankid,kstate,amttype from umpay.t_goods_bank where bankid = 'XE371000'  
+         #if( $merId && $merId!='' ) 
+		   and  merId= :merId   
+		 #end 
+		 #if( $kstate && $kstate!='' ) 
+		   and kstate = :kstate   
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   and  goodsId = :goodsId   
+		 #end 
+		 order by merid,goodsid 
+	  ]]>
+	</sql>
+	<sql id="optlog">
+		<![CDATA[
+			select audit.id,
+			       audit.tableName,
+			       audit.ixdata,
+			       audit.ixdata2,
+			       audit.moddata,
+			       audit.auditType,
+			       audit.state,
+			       audit.creator,
+			       audit.modTime,
+			       audit.modUser,
+			       audit.resultDesc,
+			       audit.inTime,
+			       audit.desc
+			  from umpay.t_hfaudit audit
+			 where tableName = 'UMPAY.T_GOODS_BANK'
+			   and batchId = ''
+			   and state = 2
+			   #if( $timeCheckFlag && $timeCheckFlag=='1' ) 
+		           and audit.inTime +6 month - current timestamp >= 0 
+		       #end 
+			   #if( $ixData && $ixData!='' ) 
+		           and  audit.ixdata like '%$ixData%'   
+		       #end 
+		       #if( $ixData2 && $ixData2!='' ) 
+		           and  audit.ixdata2 like '%$ixData2%'   
+		       #end 
+			   #if( $creator && $creator!='' ) 
+			       and  audit.creator=:creator 
+			   #end
+			   #if( $from && $from != '' && $to && $to != '') 
+			       and  intime between '$from' and '$to' 
+			   #end
+			 order by audit.intime desc
+	  	]]>
+	</sql>
+	<sql id="batchoptlog">
+		<![CDATA[
+			select distinct batchId, inTime, modTime, creator, modUser, state, desc
+			  from umpay.t_hfaudit audit
+			 where tableName = 'UMPAY.T_GOODS_BANK'
+			   and batchId <> ''
+			   and state = 2
+			   #if( $timeCheckFlag && $timeCheckFlag=='1' ) 
+		           and audit.inTime +6 month - current timestamp >= 0 
+		       #end 
+			   #if( $creator && $creator!='' ) 
+			       and  audit.creator=:creator 
+			   #end
+			   #if( $from && $from != '' && $to && $to != '') 
+			       and  intime between '$from' and '$to' 
+			   #end
+			 order by audit.intime desc
+	  	]]>
+	</sql>
+	<sql id="exportbatchoptlog">
+		<![CDATA[
+			select audit.id,
+			       audit.tableName,
+			       audit.ixdata,
+			       audit.ixdata2,
+			       audit.moddata,
+			       audit.auditType,
+			       audit.state,
+			       audit.creator,
+			       audit.modTime,
+			       audit.modUser,
+			       audit.resultDesc,
+			       audit.inTime,
+			       audit.batchId,
+			       audit.desc
+			  from umpay.t_hfaudit audit
+			 where tableName = 'UMPAY.T_GOODS_BANK'
+			   and batchId <> ''
+			   and state = 2
+			   #if( $timeCheckFlag && $timeCheckFlag=='1' ) 
+		           and audit.inTime +6 month - current timestamp >= 0 
+		       #end 
+			   #if( $creator && $creator!='' ) 
+			       and  audit.creator=:creator 
+			   #end
+			   #if( $from && $from != '' && $to && $to != '') 
+			       and  intime between '$from' and '$to' 
+			   #end
+			 order by audit.intime desc
+	  	]]>
+	</sql>
+</mapper> 

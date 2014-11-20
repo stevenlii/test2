@@ -1,0 +1,77 @@
+BODY {
+	FONT-SIZE: 9pt; FONT-FAMILY: sans-serif; margin:0px;
+}
+.divFrame{
+	background:#fff;
+	font-size:12px;
+	filter:progid:DXImageTransform.Microsoft.Shadow(Color=#ff666666, Strength=5, Direction=135);
+	border-bottom:1px solid #999999;
+	border-right:1px solid #999999;
+	border-left:1px solid #999999; 
+	overflow:visible;
+	background-color:#eeeeee;
+	width:97%;
+}
+TABLE.Mtable   td   {   
+      BORDER-BOTTOM:   #888AA4   1px   solid;   
+      BORDER-TOP:   #FBFFFF   1px   solid;   
+      BORDER-LEFT:   #FBFFFF   1px   solid;   
+      BORDER-RIGHT:   #888AA4   1px   solid;   
+      padding:   0px;   
+  }   
+TABLE.Mtable{
+  height: 20px;
+	width: 90%;   
+      margin:   1px;   
+      BORDER-BOTTOM:   #FBFFFF   1px   solid;   
+      BORDER-TOP:   #888AA4   1px   solid;   
+      BORDER-LEFT:   #888AA4   1px   solid;   
+      BORDER-RIGHT:   #FBFFFF   1px   solid;   
+      padding:   0px;
+	  background-color: #ffffff;   
+  } 
+.miniButton{
+	background-image: url(images/button001.gif);
+	height: 20px;
+	width: 40px;
+	font-size: 12px;
+	background-repeat: no-repeat;
+	color: #333333;
+	background-color: #F4F4F2;
+	border-top: 1px solid #E4E4E4;
+	border-right: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	border-left: 1px solid #E4E4E4;
+	cursor: hand;
+	line-height: normal;
+	text-decoration: none;
+}
+.miniInput{
+	font-size: 12px;
+	font-style: normal;
+	line-height: 120%;
+	color: #666666;
+	text-decoration: none;
+	background-color: #FEF9E2;
+	height: 16px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #666666;
+	border-right-color: #E4E4E4;
+	border-bottom-color: #E4E4E4;
+	border-left-color: #666666;
+}
+.t3 {
+	font-size: 12px;
+	text-decoration: none;
+
+	line-height: 1.5;
+	background-position: center;
+	color: #333333;
+}

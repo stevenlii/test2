@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ChnlInf">
+	<typeAlias alias="ChnlInf" type="com.umpay.hfmng.model.ChnlInf" />
+	<sql id="select_what">
+	 select * from umpay.t_hf_chnl_inf where 1=1 
+	</sql>
+	
+	<sql id="key_find">
+		<isNotEmpty	property="channelId" prepend=" and ">
+			channelId = #channelId#
+		</isNotEmpty>	
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="channelId" prepend=" and ">
+			channelId = #channelId# 
+		</isNotEmpty>
+	</sql>
+	
+	<statement id="Get" resultClass="ChnlInf" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="ChnlInf" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_hf_chnl_inf
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="checkFromChnls" resultClass="ChnlInf">
+	     select channelId,channelName from umpay.t_hf_chnl_inf where 1=1
+	  <isNotEmpty property="channelId" prepend=" and ">
+		 channelId=#channelId#
+	  </isNotEmpty>
+	  <isNotEmpty property="channelName" prepend=" and ">
+		 channelName=#channelName#
+	  </isNotEmpty>	
+    </statement>
+   
+   	<statement id="insertChnlInf" resultClass="ChnlInf">
+		insert into umpay.t_hf_chnl_inf(channelId,channelName,state
+				<isNotEmpty	property="service_user" prepend=" , "> service_user </isNotEmpty>
+				<isNotEmpty	property="contact" prepend=" , "> contact </isNotEmpty>
+				<isNotEmpty	property="linkTel" prepend=" , "> linkTel </isNotEmpty>
+				<isNotEmpty	property="email" prepend=" , "> email </isNotEmpty>
+			) values(#channelId#, #channelName#, 2
+				<isNotEmpty	property="service_user" prepend=" , "> #service_user# </isNotEmpty>
+				<isNotEmpty	property="contact" prepend=" , "> #contact# </isNotEmpty>
+				<isNotEmpty	property="linkTel" prepend=" , "> #linkTel# </isNotEmpty>
+				<isNotEmpty	property="email" prepend=" , "> #email# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="updateChnlInf" resultClass="ChnlInf">
+		update umpay.t_hf_chnl_inf set modLock=0,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="channelName" prepend=" , "> channelName=#channelName# </isNotEmpty>
+			<isNotEmpty	property="service_user" prepend=" , "> service_user=#service_user# </isNotEmpty>
+			<isNotEmpty	property="contact" prepend=" , "> contact=#contact# </isNotEmpty>
+			<isNotEmpty	property="linkTel" prepend=" , "> linkTel=#linkTel# </isNotEmpty>
+			<isNotEmpty	property="email" prepend=" , "> email=#email# </isNotEmpty>
+		 where channelId=#channelId# 
+	</statement>
+	
+	<statement id="isOrNotAble" resultClass="ChnlInf">
+		update umpay.t_hf_chnl_inf set state=#state#,modTime=CURRENT TIMESTAMP 
+		where channelId=#channelId#
+	</statement>
+	
+	<statement id="updateChnlLock" resultClass="integer">
+	   update umpay.t_hf_chnl_inf set modLock=#modLock#,modTime=CURRENT TIMESTAMP 
+	   where channelId=#channelId# 
+	</statement>
+	
+	<statement id="updateConf" resultClass="ChnlInf">
+		update umpay.t_hf_chnl_inf set modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="notifyUrl" prepend=" , "> notifyUrl=#notifyUrl# </isNotEmpty>
+			<isNotEmpty	property="orderUrl" prepend=" , "> orderUrl=#orderUrl# </isNotEmpty>
+			<isNotEmpty	property="merCert" prepend=" , "> merCert=#merCert# </isNotEmpty>
+		 where channelId=#channelId# 
+	</statement>
+	
+	<!-- 修改渠道信息时验证渠道名称唯一性 -->
+	<statement id="checkModChnlName" resultClass="ChnlInf">
+	     select channelName from umpay.t_hf_chnl_inf where channelId!=#channelId# 
+		<isNotEmpty property="channelName" prepend=" and ">
+			channelName=#channelName# 
+		</isNotEmpty>	
+   </statement>
+</sqlMap>

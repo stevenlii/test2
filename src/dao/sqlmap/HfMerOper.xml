@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="HfMerOper">
+	<typeAlias alias="HfMerOper" type="com.umpay.hfmng.model.HfMerOper" />
+	
+	<statement id="Find" resultClass="HfMerOper" >
+		select mer_id merId,operator,state,add_user_id creator,in_time inTime,mod_user_id modUser
+			,mod_time modTime from umpay.t_hfmer_oper where 1=1 
+			<isNotEmpty property="merId" prepend=" and ">
+				mer_id=#merId# 
+			</isNotEmpty>
+			order by operator
+	</statement>
+	
+	<statement id="batchInsert" parameterClass="java.util.List">
+		insert into umpay.t_hfmer_oper(mer_id,operator,state,add_user_id,mod_user_id) values 
+		<iterate conjunction=",">
+	    	(#merOperList[].merId#,#merOperList[].operator#,#merOperList[].state#
+	    	,#merOperList[].creator#,#merOperList[].modUser#)
+	  	</iterate>
+	</statement>
+	<statement id="batchUpdate" resultClass="integer">
+		update umpay.t_hfmer_oper set state=#state#,mod_user_id=#modUser#
+			,mod_time=CURRENT TIMESTAMP where 
+		<iterate property="list" open="(" close=")" conjunction="or" >
+			mer_id=#list[].merId# and operator=#list[].operator#
+		</iterate>
+	</statement>
+</sqlMap>

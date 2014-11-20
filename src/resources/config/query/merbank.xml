@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="merbank"  >
+	<sql id="allMerBanks"> 
+	<![CDATA[
+		 select mer.merId,mer.bankId,inf.merName,mer.modTime,exp.operator,mer.state,mer.modLock 
+		 from umpay.t_mer_bank mer, umpay.t_hfmer_exp exp, umpay.t_mer_inf inf,umpay.t_bank_inf b
+		 #if( $operator && $operator!='' ) 
+		   ,umpay.t_hfmer_oper o 
+		 #end
+		 where mer.merId=exp.merId and mer.merId=inf.merId 
+		 and mer.bankId = b.bankId
+		 and (b.bankType=3 or b.bankType=6 or b.bankType=61 or b.bankType=62)
+		 #if( $operator && $operator!='' ) 
+		   and o.mer_id=exp.merId and o.state=2 and o.operator=:operator 
+		 #end
+		 #if( $merId && $merId!='' ) 
+		   and  mer.merId=:merId 
+		 #end 
+		 #if( $merName && $merName!='' ) 
+		   and  inf.merName like '%$merName%'   
+		 #end 
+		 #if( $bankId && $bankId!='' ) 
+		   and  mer.bankId=:bankId   
+		 #end 
+		 #if( $state && $state!='' ) 
+		   and  mer.state=:state 
+		 #end
+		 order by mer.modTime desc
+	  ]]>
+	</sql>
+	<sql id="henanMerBanks"> 
+	<![CDATA[
+		 select mer.merId,mer.bankId,inf.merName,mer.bankmerid,mer.state,mer.bankposid 
+		 from umpay.t_mer_bank mer, umpay.t_hfmer_exp exp, umpay.t_mer_inf inf 
+		 where mer.merId=exp.merId and mer.merId=inf.merId 
+		 and mer.bankId='XE371000'  
+		 #if( $merId && $merId!='' ) 
+		   and  mer.merId=:merId 
+		 #end 
+		 order by mer.merId
+	  ]]>
+	</sql>
+</mapper> 

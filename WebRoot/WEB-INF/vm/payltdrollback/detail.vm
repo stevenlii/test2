@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/payltdrollback.js"></script>
+<script>
+  jQuery(document).ready(function() {
+	  
+	  var optStr="${opts}";
+	  var opts=optStr.split(',');
+	  jQuery('[code]').each(function () {
+		  var code=$(this).attr("code");
+		  for(var i=0;i<opts.length;i++){
+			  if(code==opts[i]){
+				  $(this).css('display','inline');						
+			  }
+		  };
+	  });
+    
+          jQuery('#dataform').submit(function() {
+        	  var monthPayed=jQuery('#monthPayed').text();
+        	  if(monthPayed == ""){
+        		  alert("当月累计额不存在，无需回滚");
+        		  return false;
+        	  }
+        	  if(!jQuery("#dataform").valid()) { 
+        		  return false;
+        	  }
+        	  var amt=jQuery('#amt').val();
+        	  if(eval(amt)>eval(monthPayed)){
+        		  alert("回滚金额不能大于当月累计额");
+        		  return false;
+        	  }
+        	  jQuery(this).omAjaxSubmit({
+        		  dataType: 'text',
+        		  success:function(res){
+        		  	  showSimpleTip(res);
+   				  }
+             });
+             return false; 
+         });
+          
+    });       
+
+</script>
+</head>
+<body>
+<form id ="dataform" method="post" name="dataform">
+<table width="100%" >
+	<tr><td>
+	  	<table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+		    <tr>
+		      <th width="30%"><span>*</span>手机号：</th>
+		      <td class="td">$!{payltd.mobileId}</td>
+		    </tr>
+		    <tr>
+		      <th><span>*</span>省代码：</th>
+		      <td class="td1">$!{payltd.provCode}</td>
+		    </tr>
+		   <tr>
+		      <th><span>*</span>银行：</th>
+		      <td class="td">$!{bankName}($!{payltd.bankId})</td>
+		    </tr>
+		   <tr>
+		      <th><span>*</span>本次回滚金额：</th>
+		      <td class="td1">$!{payltd.amt} 元</td>
+	      </tr>
+	      <tr>
+		      <th><span>*</span>商户号：</th>
+		      <td class="td">$!{payltd.merId}</td>
+	      </tr>
+	      <tr>
+		      <th><span>*</span>商户名称：</th>
+		      <td class="td1">$!{merName}</td>
+	      </tr>
+	      <tr>
+		      <th><span>*</span>商品号：</th>
+		      <td class="td">$!{payltd.goodsId}</td>
+	      </tr>
+	      <tr>
+		      <th><span>*</span>商品名称：</th>
+		      <td class="td1">$!{goodsName}</td>
+	      </tr>
+	      <tr>
+			<td height="50" colspan="2"><textarea id="resultDesc" name="resultDesc" rows="3" style="width:98%" #if($!{audit.state}==0)#else disabled="disabled" #end >$!{audit.resultDesc}</textarea></td>
+		  </tr>
+	  </table>
+  </td></tr>
+  <tr><td align="center">
+  	#if($!{audit.state}==0)
+	  <input type="button" value="通过" code="011" style="display:none" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goPass1($audit.id)"/>
+	  <input type="button" value="不通过" code="012" style="display:none" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goNotPass($audit.id)"/>
+	#end
+	  <input type="button" value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog()" />
+   </td></tr>
+<table>
+</form>
+</body>
+</html>

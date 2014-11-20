@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script> 
+   function trim(v){
+	return $.trim(v);
+     }
+     //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }
+    </script>
+</head>
+<body>   
+      <table class="infowrite" cellspacing="0" cellpadding="0" width="300px"  align="center" >
+       <tr >
+         <th width="40%">商户号：</th>
+         <td  class="td">$!{goodsbank.merId}</td>
+          </tr>
+       <tr >
+         <th>商品号：</th>
+         <td class="td1">$!{goodsbank.goodsId}</td>
+          </tr>
+       <tr >
+         <th>支付银行：</th>
+         <td class="td">$!{goodsbank.bankId}</td>
+         </tr>
+       <tr >
+         <th>商品银行金额：</th>
+         <td class="td1"> $!{goodsbank.amount}分</td>
+       </tr>
+       <tr>
+         <th>二次确认校验码：</th>
+         <td class="td" >$!{goodsbank.verifyTag.trim()} </td>
+         </tr>
+      <tr>
+         <th>商品最长计费天数：</th>
+         <td class="td1">$!{goodsbank.checkDay.trim()}</td>
+       </tr>
+        <tr>
+         <th>商品开通状态：</th>
+         <td class="td">  #if ($!{goodsbank.kState}==11)  只开通新增 #elseif ($!{goodsbank.kState}==12) 只保留续费 
+          #elseif ($!{goodsbank.kState}==13) 新增与续费全部开通  #else 新增与续费全部注销 #end                         
+       </tr>
+       <tr>  
+         <th>下发商品时间：</th>
+         <td class="td1">#if ($!{goodsbank.isRealTime}==0)  即时下发 #elseif ($!{goodsbank.isRealTime}==1) 智能网异步发货 
+          #elseif ($!{goodsbank.isRealTime}==2) BOSS异步发货  #else 全部异步发货 #end </td>
+       </tr>
+         <th>平台在机构商户号：</th>
+         <td class="td">$!{goodsbank.bankMerId}</td>
+         </tr>
+        <tr>
+         <th>平台在机构终端号：</th>
+         <td class="td1">$!{goodsbank.bankPosId}</td>
+        </tr>
+     </table>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/merbusiconf.js"></script>
+<script type="text/javascript">
+var setting2 = {
+	data: {simpleData: {enable: true}},
+	callback: {onClick: onClick2}
+};
+  var url="$request.contextPath/merbusiconf/query.do?queryKey=merbusiconf.allBusiConf";
+    jQuery(document).ready(function() {
+    	jQuery("#search_div").width(jQuery(window).width()-20);
+
+    	var busiType1="${busiType}";
+    	var busiType=eval(busiType1);
+    	$.fn.zTree.init($("#busiTypeTree"), setting2, busiType);
+    	
+		    var optStr="${opts}";
+			var opts=optStr.split(',');
+		    jQuery('[code]').each(function () {
+		        var code=$(this).attr("code");
+		        for(var i=0;i<opts.length;i++){
+				   if(code==opts[i]){
+					   $(this).css('display','inline');
+						}
+		    		};
+				});
+	
+      jQuery('#grid').omGrid({
+            dataSource : url,
+            width:'100%',
+            height : 455,
+            limit : 15,
+            singleSelect : false,
+            rowClasses : function(rowIndex,rowData){
+				if(rowData.MODLOCK==1){
+					return "lock";
+				}else{
+					return "checkbox";
+				}
+			},
+            colModel : [ {header : '更新时间', name : 'MODTIME',width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+            				return "<a title='"+value+"'>"+value+"</a>";
+            			}}, 
+                         {header : '商户名称', name : 'MERNAME', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                         	    return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                          {header : '商户号', name : 'MERID',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                        	  return "<a title='"+value+"'>"+value+"</a>";
+                          } },
+                         {header : '业务属性', name : 'BUSITYPE',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                           	return "<a title='"+value+"'>"+value+"</a>";
+                         } },
+                         {header : '支付类型', name : 'BIZTYPENAME',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                       	    return "<a title='"+value+'('+rowData.BIZTYPE+")'>"+value+"("+rowData.BIZTYPE+")"+"</a>";
+                          } },
+                         {header : '状态', name : 'STATE',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+                         	var state = rowData.STATE;
+                         	var name = "";
+                         	if(state==2){
+                         		name = "启用";
+                         	}else{ 
+                         		name = "禁用";
+                            }
+                          	return "<a title='"+name+"'>"+name+"</a>";
+                         }},
+                         {header : '操作人', name : 'MODUSER',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+                      	    return "<a title='"+value+"'>"+value+"</a>";
+                         } },
+                         {header : '操作', name:'oper',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	var merId=rowData.MERID;
+                             	var bizType=rowData.BIZTYPE;
+                             	var modLock=rowData.MODLOCK;
+                             	var result="";
+                             	if(modLock==0){// 正常
+                             		if(state==2){//启用状态
+                             			if(optStr.indexOf("003")!=-1){//有禁用权限，返回修改、禁用、详情按钮
+                             				result+="<input  name='禁用' title='禁用' type='image'  src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable(&quot;"+merId+"&quot;, &quot;"+bizType+"&quot;)'/> ";
+                             			}
+                             		}else{//禁用状态，不能修改
+                             			if(optStr.indexOf("004")!=-1){//有启用权限，返回修改、启用、详情按钮
+                             				result+="<input  name='启用' title='启用' type='image'  src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable(&quot;"+merId+"&quot;, &quot;"+bizType+"&quot;)'/> ";
+                             			}
+                             		}
+                             	}else{//锁定，无法启用或禁用
+                             		if(state==2){//启用状态
+                             			if(optStr.indexOf("003")!=-1){//有禁用权限，返回修改（不可用变灰）、禁用（不可用变灰）、详情按钮
+                             				result+="<input  name='禁用' title='禁用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Disable1.png'/> ";
+                             			}
+                             		}else{//禁用状态
+                             			if(optStr.indexOf("004")!=-1){//有启用权限，返回修改（不可用变灰）、启用（不可用变灰）、详情按钮
+                             				result+="<input  name='启用' title='启用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Enable1.png'/> ";
+                             			}
+                             		}
+                             	}
+                             	return result;	
+                         }}
+                        ],
+                        autoFit:true
+        });
+        
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+         });
+         
+       //初始化修改人列表
+      jQuery('#modUser').omCombo({
+          dataSource : '$request.contextPath/option/operatorlist3.do',
+          width:'75px',
+          listMaxHeight:150,
+          emptyText:'全部 ',
+          valueField : 'id',
+          inputField : 'name',
+          optionField : function(data, index) {return data.name;},
+          onSuccess:function(data, textStatus, event){
+ 	  			var tmp = $.parseJSON('{"id":"","name":"全部","initials":"qb"}');
+ 	  			data.unshift(tmp);
+    		},
+    	  filterStrategy : function(value, data) {
+    			var initials=data.initials+"";
+    			var list=initials.split(",");
+    			for(var i=0;i<list.length;i++){
+    				if(list[i].indexOf(value) == 0)
+    					return true;
+    			}
+                return false;
+          },
+          filterDelay : 100,
+    	  forceSelection : true
+      });
+	//状态       
+  	  $('#state').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+          width:'75px',
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+  	  
+      //商户支付类型列表 
+      $('#bizType').omCombo({
+            dataSource : '$request.contextPath/option/merBizType.do',
+            optionField:function(data,index){
+                if(data.value!=''){
+              		return data.text+'('+data.value+')';
+                }
+                return data.text;
+      		},
+            width:'120px',
+            listMaxHeight:150,
+      		listAutoWidth : true,
+            emptyText:'全部 ' ,
+            onSuccess:function(data, textStatus, event){
+   	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+   	  			data.unshift(tmp);
+      		},
+      		forceSelection : true
+       });
+    });
+    
+   
+</script>
+
+</head>
+<body>
+
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+      <table border="0" width="100%">
+        <tr>
+        <td align="left">
+             </td>
+		<td align="right">
+		     <input name="添加支付类型" type="image" title='添加支付类型' style="display:none" code="005" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add();"/>
+		     <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expMerBusiConf();"/></td>
+         </tr>
+        </table>
+     </div>
+  
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="80%" border="0">
+       <tr>
+        <td  align="left" >
+          <!--查询块区 start--> 
+           <form id="form" method="post"> 
+            <table width="90%" border="0">
+              <tr>
+	              <th width="10%">商户名称：</th>
+	              <td width="10%"><input id="merName" name="merName" type="text" class="input1"/></td>
+		         <th width="10%">支付类型：</th>
+		         <td width="10%"><input id="bizType" name="bizType" class="select1"/></td>
+		         <th width="10%">状态：</th>
+		         <td width="10%"><input id="state" name="state" class="select1"/></td>
+            </tr>
+            <tr>
+             <th>商户号：</th>
+             <td><input id="merId" name="merId" type="text" class="input1"/></td>
+	         <th>业务属性：</th>
+	         <td>
+	         	<span class="om-combo om-widget om-state-default" style="width:120px;">
+	         		<input type="text" id="merBusiType" readonly value="全部" onclick="showMenu2(); return false;" onkeydown="refuseBackspace()" class="select2" style="width:99px;"><span onclick="showMenu2(); return false;" class="om-combo-trigger ioi_trigger"></span>
+	         	</span>
+	         	<input type="hidden" id="busiType" name="busiType" value="" type="text" />
+	         </td>
+	         <th>操作人：</th>
+	         <td><input id="modUser" name="modUser" class="select1"/></td>
+            </tr>
+        </table>
+        </form> 
+       </td>
+         <td align="left"><input id="query" title="查询" name="submit" type="image" style="display:none" code="001" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+   </div>  
+   
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+<div id="menuContent2" class="list_zTree">
+	<ul id="busiTypeTree" class="ztree" style="margin-top:0; width:160px; height:150px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

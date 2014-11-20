@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UPService">
+	<typeAlias alias="UPService" type="com.umpay.hfmng.model.UPService" />
+	<sql id="select_what">
+	 select * from UMPAY.T_UPSERVICE_INF where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="goodsId" prepend=" and ">
+			goodsId = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty	property="gateId" prepend=" and ">
+			gateId = #gateId#
+		</isNotEmpty>
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="goodsId" prepend=" and ">
+			goodsId = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty	property="gateId" prepend=" and ">
+			gateId = #gateId#
+		</isNotEmpty>
+		<isNotEmpty	property="state" prepend=" and ">
+			state = #state#
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="UPService" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="UPService" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from UMPAY.T_UPSERVICE_INF
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Insert">
+		insert into UMPAY.T_UPSERVICE_INF(MERID,GOODSID,GATEID,STATE
+				<isNotEmpty	property="serviceId" prepend=" , ">serviceId</isNotEmpty>
+				<isNotEmpty	property="serviceName" prepend=" , ">serviceName</isNotEmpty>
+				<isNotEmpty	property="serviceId1" prepend=" , ">serviceId1</isNotEmpty>
+				<isNotEmpty	property="serviceName1" prepend=" , ">serviceName1</isNotEmpty>
+				<isNotEmpty	property="serviceId2" prepend=" , ">serviceId2</isNotEmpty>
+				<isNotEmpty	property="serviceName2" prepend=" , ">serviceName2</isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , ">amount</isNotEmpty>
+				<isNotEmpty	property="feeType" prepend=" , ">fee_Type</isNotEmpty>
+				<isNotEmpty	property="busiDesc" prepend=" , ">busi_Desc</isNotEmpty>
+				<isNotEmpty	property="merPriv" prepend=" , ">merPriv</isNotEmpty>
+				<isNotEmpty	property="expand" prepend=" , ">expand</isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+			) values(#merId#,#goodsId#,#gateId#,2
+				<isNotEmpty	property="serviceId" prepend=" , ">#serviceId#</isNotEmpty>
+				<isNotEmpty	property="serviceName" prepend=" , ">#serviceName#</isNotEmpty>
+				<isNotEmpty	property="serviceId1" prepend=" , ">#serviceId1#</isNotEmpty>
+				<isNotEmpty	property="serviceName1" prepend=" , ">#serviceName1#</isNotEmpty>
+				<isNotEmpty	property="serviceId2" prepend=" , ">#serviceId2#</isNotEmpty>
+				<isNotEmpty	property="serviceName2" prepend=" , ">#serviceName2#</isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , ">#amount#</isNotEmpty>
+				<isNotEmpty	property="feeType" prepend=" , ">#feeType#</isNotEmpty>
+				<isNotEmpty	property="busiDesc" prepend=" , ">#busiDesc#</isNotEmpty>
+				<isNotEmpty	property="merPriv" prepend=" , ">#merPriv#</isNotEmpty>
+				<isNotEmpty	property="expand" prepend=" , ">#expand#</isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_UPSERVICE_INF set modTime=CURRENT TIMESTAMP,serviceId=#serviceId#,
+			serviceId1=#serviceId1#,serviceId2=#serviceId2#,serviceName=#serviceName#,
+			serviceName1=#serviceName1#,serviceName2=#serviceName2# 
+			<isNotEmpty	property="amount" prepend=" , "> amount=#amount# </isNotEmpty>
+			<isNotEmpty	property="feeType" prepend=" , "> fee_Type=#feeType# </isNotEmpty>
+			<isNotEmpty	property="busiDesc" prepend=" , "> busi_Desc=#busiDesc# </isNotEmpty>
+			<isNotEmpty	property="merPriv" prepend=" , "> merPriv=#merPriv# </isNotEmpty>
+			<isNotEmpty	property="expand" prepend=" , "> expand=#expand# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where merId=#merId# and goodsId=#goodsId# and gateId=#gateId#
+	</statement>
+	
+	<statement id="updateState" resultClass="integer">
+		update UMPAY.T_UPSERVICE_INF set modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where merId=#merId# and goodsId=#goodsId# and gateId=#gateId#
+	</statement>
+	
+</sqlMap>

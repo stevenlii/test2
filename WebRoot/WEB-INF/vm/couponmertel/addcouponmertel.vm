@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/couponmertel.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+		
+  	 	jQuery(document).ready(function() {
+		
+  	 		//初始化商户列表
+  	        $('#merId').omCombo({
+  	            dataSource: '$request.contextPath/option/couponmerinflist.do',
+  	            width: '150px',
+  	            emptyText: '请选择..',
+  				listAutoWidth: true,
+  	            forceSelection: true
+  	        });
+  	 		
+  	    	//初始化兑换码兑换方式列表
+            $('#exchangeType').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponCodeExchangeTypes_MERTEL',
+                width: '150px',
+                emptyText: '请选择..',
+                forceSelection: true,
+                onSuccess:function(data, textStatus, event){
+		      	    data.sort(function(a, b) { return a.value > b.value ? 1 : -1;}); // 按value升序排序
+	   			}
+            });
+  	    	
+          	//初始化商户兑换电话状态列表
+            $('#state').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponMerTelStates',
+                width: '150px',
+                emptyText: '请选择..',
+                forceSelection: true
+            });
+			
+            $.validator.addMethod("Check1",
+            function() {
+    			var linkTel = $('#linkTel').val();
+    			if( linkTel.indexOf('0') != 0 && linkTel.indexOf('1') != 0){
+    				return false;
+    			}
+                return true;
+            }, '');
+          	
+			jQuery("#dataform").validate({
+                rules: {
+                    "merId": {
+						required: true
+                    },
+                    "linkTel": {
+                        required: true,
+                        number: true,
+						maxlength: 13,
+						Check1: true
+                    },
+                    "remark": {
+						maxlength: 128
+                    },
+                    "exchangeType": {
+						required: true
+                    },
+                    "state": {
+						required: true
+                    }
+                },
+                messages: {
+                    "merId": {
+                        required: "请选择商户"
+                    },
+                    "linkTel": {
+                        required: "请输入座机/手机",
+                        number: "请输入全数字",
+						maxlength: "超出最大长度",
+						Check1: "座机/手机输入有误"
+                    },
+                    "remark": {
+						maxlength: "超出最大长度"
+                    },
+                    "exchangeType": {
+                        required: "请选择兑换方式"
+                    },
+                    "state": {
+                        required: "请选择启用状态"
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_add").attr("disabled", "disabled");
+            jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					if(res == '1'){
+    					window.parent.showSimpleTip1(res);
+             			closeDialog();
+    					window.parent.shuaxin();
+             		}else if(res == '0'){
+             			window.parent.showSimpleTip1(res);
+             		}else{
+             			window.parent.$.omMessageBox.alert({
+        		    		type:'error',
+        		            title : '操作提示',
+        		            content : res
+        		        });
+             		}
+					// 设置按钮可用
+					$("#btn_add").removeAttr("disabled");
+                }
+            });
+            return false;
+        });});
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/couponmertel/save.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="15%"><span>*</span>商    户：</th>
+         <td width="58%" class="td"><input id="merId" name="merId" /></td>
+         <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span>
+         </td>
+       </tr>
+       <tr>
+         <th ><span>*</span>座机/手机：</th>
+         <td  class="td1"><input id="linkTel" name="linkTel" type="text" class="input2" maxlength="13" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th>备    注：</th>
+         <td class="td" ><textarea style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:80%" id="remark" name="remark" rows="5"></textarea></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>兑换方式：</th>
+         <td  class="td1"><input id="exchangeType" name="exchangeType" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr>
+         <th ><span>*</span>是否启用：</th>
+         <td  class="td"><input id="state" name="state" /></td>
+         <td class="td" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+
+     </table>
+
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="添加" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+	   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html>

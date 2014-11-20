@@ -1,0 +1,204 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/couponrule.js"></script>
+<script>
+   //关闭窗口方法
+   function closeDialog() {
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+	
+   $(document).ready(function() {
+	   if( $!{auditCouponRule.generateMethod} == 1 ){
+	        // 第三方导入
+	        $("tr.modeDiv").hide();
+			$("tr.subModeDiv").hide();
+			$("tr.subModeDiv1").hide();
+		}else {
+			// 本平台实时生成
+			$("tr.modeDiv").show();
+			if( $!{auditCouponRule.effType} == 2 ){
+                // 售出后有效天数
+        	    $("tr.subModeDiv").hide();
+        	    $("tr.subModeDiv1").show();
+            }else{
+                $("tr.subModeDiv1").hide();
+        	    $("tr.subModeDiv").show();
+            }
+		}
+   });
+	
+</script>
+</head>
+<body>
+<div>
+<!-- 审核详情页面 -->
+<form id ="dataform-add" method="post" name="dataform-add">
+	<table class="infowrite" cellspacing="0" cellpadding="0">
+	   <tr >
+         <th width="30%">兑换券（编号）：</th>
+         <td  class="td">$!{auditCouponRule.couponName}（$!{auditCouponRule.couponId}）</td>
+       </tr>
+       <tr >
+         <th>商户（编号）：</th>
+         <td class="td1">$!{auditCouponRule.merName}（$!{auditCouponRule.merId}）</td>
+       </tr>
+	   <tr >
+         <th>商品（编号）：</th>
+         <td  class="td">$!{auditCouponRule.goodsName}（$!{auditCouponRule.goodsId}）</td>
+       </tr>
+	   <tr>
+         <th>是否为代金劵：</th>
+         <td class="td1">
+			 #if($auditCouponRule.consumetype== 2)
+    			是
+             #else
+    			否
+             #end
+         </td>
+       </tr>
+	   #if($auditCouponRule.consumetype== 2)
+	   <tr>
+         <th>一笔订单中能否使用多个该类型的劵码：</th>
+         <td class="td">
+			#if($auditCouponRule.ismulti== 1)
+    			是
+             #else
+    			否
+             #end
+         </td>
+       </tr>
+	   <tr>
+         <th>是否能转赠他人：</th>
+         <td class="td1">
+			#if($auditCouponRule.istransfer== 1)
+    			是
+             #else
+    			否
+             #end
+         </td>
+       </tr>
+	   <tr>
+         <th>可兑换商户：</th>
+         <td class="td">
+			#foreach($rmg in $list)
+                $rmg.mername
+				#if($rmg.mername == '全部商户')
+        			#break
+                 #end
+				<br/>
+			#end 
+         </td>
+       </tr>
+	   <tr>
+         <th>可兑换商品：</th>
+         <td class="td1">
+			#foreach($rmg in $list)
+                $rmg.goodsname
+				#if($rmg.goodsname == '可兑换商户的全部商品')
+        			#break
+                 #end
+				<br/>
+			#end 
+         </td>
+       </tr>
+	   #end
+       <tr >
+         <th>兑换码形式：</th>
+         <td class="td1">$!{auditCouponRule.couponCodeTypeName}</td>
+       </tr>
+	   <tr >
+         <th>兑换码生成方式：</th>
+         <td  class="td">$!{auditCouponRule.generateMethodName}</td>
+       </tr>
+       <tr class="modeDiv">
+         <th>兑换券有效期类型：</th>
+         <td class="td1">$!{auditCouponRule.effTypeName}</td>
+       </tr>
+	   <tr class="subModeDiv1">
+         <th >售出后：</th>
+         <td class="td">$!{auditCouponRule.effDays}&nbsp;天有效</td>
+       </tr>
+       <tr class="subModeDiv">
+         <th>兑换券有效期：</th>
+         <td class="td">$!{auditCouponRule.useStartDate} 至 $!{auditCouponRule.useEndDate}</td>
+       </tr>
+	   <tr class="modeDiv">
+         <th>兑换券销售期：</th>
+         <td class="td1">$!{auditCouponRule.sellStartDate} 至 $!{auditCouponRule.sellEndDate}</td>
+       </tr>
+	   <tr class="modeDiv">
+         <th>兑换码库存数量：</th>
+         <td class="td">$!{auditCouponRule.goodsSum}（注：-1为不限库存数量）</td>
+       </tr>
+	   <tr >
+         <th>库存告警阀值：</th>
+         <td class="td1">$!{auditCouponRule.switchAmt}&nbsp;（注：0为不告警）</td>
+       </tr>
+	   <tr >
+         <th>库存告警邮件地址：</th>
+         <td class="td">$!{auditCouponRule.alarmEmail}</td>
+       </tr>
+	   <tr >
+         <th>库存告警短信手机号：</th>
+         <td class="td1">$!{auditCouponRule.alarmMobile}</td>
+       </tr>
+	   <tr >
+         <th>码过期提醒天数：</th>
+         <td class="td">$!{auditCouponRule.effWarnDays} 天（注：0为不提醒）</td>
+       </tr>
+	   <tr>
+         <th>是否需批量导出：</th>
+         <td class="td1" >
+			#if($auditCouponRule.ruletype == '0')
+				否
+			#else
+				是
+             #end
+		 </td>
+       </tr>
+	   #if(${couponRule.originalprice}!='0')
+	   <tr>
+         <th>面值：</th>
+         <td class="td">
+			#set ( $value = $auditCouponRule.originalprice / 100.00) $value 元</td>
+       </tr>
+	   #end
+       <tr>
+         <th>启用状态：</th>
+         <td class="td1" >$!{auditCouponRule.stateName}</td>
+       </tr>
+	   <tr>
+         <th>待审核类型：</th>
+         <td class="td"><span>新增</span></td>
+       </tr>
+	</table>
+	<div class="pop_btn_sh">
+       <input type="button" value="通过" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goPass($auditId)" id="btn_pass" />
+       <input type="button" value="拒绝" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="goNotPass($auditId)" id="btn_nopass" />
+       <input type="button" value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog(0)" />
+    </div>
+    <table class="infowrite" cellspacing="0" cellpadding="0">
+		<tr>
+         <th width="30%">审核意见：</th>
+         <td class="td"><textarea id="resultDesc" name="resultDesc" rows="3" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%"></textarea></td>
+       </tr>
+	</table>
+	
+</form>
+</div>
+</body>
+</html>

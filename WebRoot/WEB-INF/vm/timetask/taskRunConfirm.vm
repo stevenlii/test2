@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script type="text/javascript" src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script>
+	//关闭窗口方法
+	function closeDialog() {
+		window.parent.fillBackAndCloseDialog("#dialog");
+	}
+
+	jQuery(document).ready(function() {
+		$('#taskdataform').submit(function() {
+			$(this).omAjaxSubmit({
+				success : function(res) {
+					window.parent.showSimpleTip(res);
+					if (res == '2') {
+						closeDialog();
+					}
+				}
+			});
+			return false;//返回false,阻止浏览器默认行为
+		});
+	});
+</script>
+</head>
+<body>
+	<form id="taskdataform" method="post" action="${request.contextPath}/timetask/manualRunTask.do">
+		<input value="$!{taskInf.taskId}" type="hidden" id="taskId" name="taskId" />
+		<div>
+			<table class="infowrite" cellspacing="0" cellpadding="0">
+				<tr>
+					<th width="30%">任务编号：</th>
+					<th style="text-align:left;">$!{taskInf.taskId}</th>
+				</tr>
+				<tr>
+					<th>所属平台：</th>
+					<td class="td">$!{taskInf.platName}</td>
+				</tr>
+				<tr>
+					<th>任务说明：</th>
+					<td class="td1">$!{taskInf.taskDesc}</td>
+				</tr>
+				<tr>
+				<tr>
+					<th>触发地址：</th>
+					<td class="td">$!{taskInf.postUrl}</td>
+				</tr>
+				<tr>
+					<th>错误重试：</th>
+					<td class="td1">#if("2"=="$!{taskInf.isReTry}")是#end#if("4"=="$!{taskInf.isReTry}")否#end</td>
+				</tr>
+				#if("2"=="$!{taskInf.isReTry}")
+				<tr>
+					<th>重试次数：</th>
+					<td class="td">$!{taskInf.reTryTimes}</td>
+				</tr>
+				<tr>
+					<th>重试间隔时间：</th>
+					<td class="td1">$!{taskInf.reTryInterval}</td>
+				</tr>
+				<tr>
+					<th>反馈超时阀值：</th>
+					<td class="td">$!{taskInf.retTimeout}</td>
+				</tr>
+				#end
+			</table>
+		</div>
+	<div class="pop_btn">
+		<input name="btn_manualRunTask" type="submit" class="popbtn" value="即刻执行" 
+			onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_manualRunTask" />
+		 <input name="btn_close" type="button" class="popbtn" value="取消" onclick="closeDialog();"
+			onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+	</div>
+	</form>
+</body>
+</html>

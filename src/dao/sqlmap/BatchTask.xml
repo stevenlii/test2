@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BatchTask">
+	<typeAlias alias="BatchTask" type="com.umpay.hfmng.model.BatchTask" />
+	<sql id="select_what">
+	 select taskId,taskType,creator,synState,synResult,resultDesc,inTime,modTime,modUser
+	 from umpay.T_SYNTASK where 1=1
+	</sql>
+	
+	<sql id="key_find">
+		<isNotEmpty	property="taskId" prepend=" and ">taskId = #taskId#</isNotEmpty>	
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="taskId" prepend=" and ">taskId = #taskId#</isNotEmpty>
+		<isNotEmpty	property="taskType" prepend=" and ">taskType = #taskType#</isNotEmpty>
+		<isNotEmpty	property="creator" prepend=" and ">creator = #creator#</isNotEmpty>
+		<isNotEmpty	property="synState" prepend=" and ">synState = #synState#</isNotEmpty>
+		<isNotEmpty	property="synResult" prepend=" and ">synResult = #synResult#</isNotEmpty>
+		<isNotEmpty	property="resultDesc" prepend=" and ">resultDesc = #resultDesc#</isNotEmpty>
+		<isNotEmpty	property="modUser" prepend=" and ">modUser = #modUser#</isNotEmpty>
+	</sql>
+	
+	<statement id="Get" resultClass="BatchTask" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="BatchTask" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.T_SYNTASK
+		<include refid="where_find" />
+	</statement>
+   
+   	<statement id="Insert" resultClass="BatchTask">
+		insert into umpay.T_SYNTASK(taskId,inTime
+		<isNotEmpty property="taskType" prepend=" , "> taskType</isNotEmpty>
+		<isNotEmpty property="creator" prepend=" , "> creator</isNotEmpty>
+		<isNotEmpty property="synState" prepend=" , "> synState</isNotEmpty>
+		<isNotEmpty property="synResult" prepend=" , "> synResult</isNotEmpty>
+		<isNotEmpty property="resultDesc" prepend=" , "> resultDesc</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , "> modTime</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> modUser</isNotEmpty>
+		) values(#taskId#,CURRENT TIMESTAMP
+		<isNotEmpty property="taskType" prepend=" , ">#taskType#</isNotEmpty>
+		<isNotEmpty property="creator" prepend=" , ">#creator#</isNotEmpty>
+		<isNotEmpty property="synState" prepend=" , ">#synState#</isNotEmpty>
+		<isNotEmpty property="synResult" prepend=" , ">#synResult#</isNotEmpty>
+		<isNotEmpty property="resultDesc" prepend=" , ">#resultDesc#</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">#modTime#</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , ">#modUser#</isNotEmpty>
+		)
+	</statement>
+	
+	<statement id="updateBatchTask" resultClass="integer">
+		update umpay.T_SYNTASK set modTime=CURRENT TIMESTAMP
+			<isNotEmpty property="synState" prepend=" , ">synState=#synState#</isNotEmpty>
+			<isNotEmpty property="synResult" prepend=" , ">synResult=#synResult#</isNotEmpty>
+			<isNotEmpty property="resultDesc" prepend=" , ">resultDesc=#resultDesc#</isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" , ">modUser=#modUser#</isNotEmpty>
+		where taskId=#taskId#
+	</statement>
+	
+</sqlMap>

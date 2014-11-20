@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/mergrade.js"></script>
+<script>
+jQuery(document).ready(function() {
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+});
+</script>
+</head>
+<body>
+<form id ="dataform" method="post" name="dataform" action="${request.contextPath}/mergrade/update.do">
+	<table align="center" style="width:100%">
+		<tr><td>
+			<table class="infowrite" cellspacing="0" cellpadding="0" style="width:100%; margin-bottom:10px" align="center" >
+				<caption><h2 style="height:25px">评分修改详情</h2></caption>
+				<tr>
+					<th width="20%">商户名称：</th><td class="td">$!{oldGrade.merName}</td>
+					<th width="15%">商户号：</th><td width="10%" class="td">$!{oldGrade.merId}</td>
+					<th width="20%">运营状态：</th><td width="10%" class="td">$!{oldGrade.operState}</td>
+				</tr>
+			</table>
+		</td></tr>
+		<tr><td>
+			<table class="infowrite" cellspacing="0" cellpadding="0" style="width:100%" align="center" >
+				<caption><h3 style="height:20px">基本考核项</h3></caption>
+				<tr>
+					<th width="26%">交易额评分：</th>
+					<td class="td" width="14%">#if($!{oldGrade.turnoverIndex}==$!defGrade) - #else $!{oldGrade.turnoverIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.turnoverIndex}==$!{newGrade.turnoverIndex})  
+						#else
+							#if($!{newGrade.turnoverIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.turnoverIndex}</span>
+							#end
+						#end
+					</td>
+					<th width="20%">交易额：</th><td class="td" width="25%"><span>$!{turnover}</span></td>
+				</tr>
+				<tr>
+					<th>增产率评分：</th>
+					<td class="td">#if($!{oldGrade.riseRateIndex}==$!defGrade) - #else $!{oldGrade.riseRateIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.riseRateIndex}==$!{newGrade.riseRateIndex})  
+						#else
+							#if($!{newGrade.riseRateIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.riseRateIndex}</span>
+							#end
+						#end
+					</td>
+					<th>增产率：</th><td class="td">#if($!{oldGrade.riseRate}==-99) #else <span>$!{oldGrade.riseRate}%</span>#end</td>
+				</tr>
+				<tr>
+					<th>虚假交易评分：</th>
+					<td class="td">#if($!{oldGrade.falseTradeIndex}==$!defGrade) - #else $!{oldGrade.falseTradeIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.falseTradeIndex}==$!{newGrade.falseTradeIndex})  
+						#else
+							#if($!{newGrade.falseTradeIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.falseTradeIndex}</span>
+							#end
+						#end
+					</td>
+					<th>虚假交易：</th><td class="td">#if($!{oldGrade.reduceRate}==-99) #else <span>$!{oldGrade.reduceRate}%</span> #end</td>
+				</tr>
+				<tr>
+					<th>客诉评分：</th>
+					<td class="td">#if($!{oldGrade.complaintIndex}==$!defGrade) - #else $!{oldGrade.complaintIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.complaintIndex}==$!{newGrade.complaintIndex})  
+						#else
+							#if($!{newGrade.complaintIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.complaintIndex}</span>
+							#end
+						#end
+					</td>
+					<th>客诉笔数：</th><td class="td">#if($!{oldGrade.complaintCount}==-99) #else <span>$!{oldGrade.complaintCount}（笔）</span> #end</td>
+				</tr>
+				<tr>
+					<th>系统稳定性评分：</th>
+					<td class="td">#if($!{oldGrade.sysStabIndex}==$!defGrade) - #else $!{oldGrade.sysStabIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.sysStabIndex}==$!{newGrade.sysStabIndex})  
+						#else
+							#if($!{newGrade.sysStabIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.sysStabIndex}</span>
+							#end
+						#end
+					</td>
+					<th>交易笔数：</th><td class="td">#if($!{oldGrade.tradingCount}==-99) #else <span>$!{oldGrade.tradingCount}（笔）</span> #end</td>
+				</tr>
+				<tr>
+					<th>配合力度评分：</th>
+					<td class="td">#if($!{oldGrade.cooperateIndex}==$!defGrade) - #else $!{oldGrade.cooperateIndex} #end</td>
+					<td class="td" colspan="3">
+						#if($!{oldGrade.cooperateIndex}==$!{newGrade.cooperateIndex})  
+						#else
+							#if($!{newGrade.cooperateIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.cooperateIndex}</span>
+							#end
+						#end
+					</td>
+				</tr>
+			</table>
+		</td></tr>
+		<tr><td>
+		<br>
+			<table class="infowrite" cellspacing="0" cellpadding="0" style="width:100%" align="center" >
+				<caption><h3 style="height:20px">加减分项</h3></caption>
+				<tr>
+					<th width="26%">违约情况评分：</th>
+					<td class="td" width="20%">#if($!{oldGrade.breachIndex}==$!defGrade) - #else $!{oldGrade.breachIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.breachIndex}==$!{newGrade.breachIndex})  
+						#else
+							#if($!{newGrade.breachIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.breachIndex}</span>
+							#end
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>重大投诉评分：</th>
+					<td class="td">#if($!{oldGrade.upgradeIndex}==$!defGrade) - #else $!{oldGrade.upgradeIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.upgradeIndex}==$!{newGrade.upgradeIndex})  
+						#else
+							#if($!{newGrade.upgradeIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.upgradeIndex}</span>
+							#end
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>营销活动评分：</th>
+					<td class="td">#if($!{oldGrade.marketingIndex}==$!defGrade) - #else $!{oldGrade.marketingIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.marketingIndex}==$!{newGrade.marketingIndex})  
+						#else
+							#if($!{newGrade.marketingIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.marketingIndex}</span>
+							#end
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>资源支持评分：</th>
+					<td class="td">#if($!{oldGrade.supportIndex}==$!defGrade) - #else $!{oldGrade.supportIndex} #end</td>
+					<td class="td">
+						#if($!{oldGrade.supportIndex}==$!{newGrade.supportIndex})  
+						#else
+							#if($!{newGrade.supportIndex}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.supportIndex}</span>
+							#end
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>总 分：</th>
+					<td class="td"><span>#if($!{oldGrade.total}==$!defGrade) - #else $!{oldGrade.total} #end（分）</span></td>
+					<td class="td">
+						#if($!{oldGrade.total}==$!{newGrade.total})  
+						#else
+							#if($!{newGrade.total}==$!defGrade) <span>-</span>
+							#else <span>$!{newGrade.total}（分）</span>
+							#end
+						#end
+					</td>
+				</tr>
+				<tr>
+		         <td colspan="3" align="left" valign="bottom">
+		         <textarea id="resultDesc" name="resultDesc" rows="2" style="width:98%;" #if($!{audit.state}==0)#else disabled="disabled" #end>$!{audit.resultDesc}</textarea>
+		         </td>
+		        </tr>
+			</table>
+		</td></tr>
+		<tr><td align="center">
+			#if($!{audit.state}==0)
+			   <input type="button" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goPass1($audit.id)"/>
+			   <input type="button" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="不通过" onclick="goNotPass($audit.id)"/>
+			#end
+			   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()"/>
+		</td></tr>
+	</table>
+</form>
+</body>
+</html>

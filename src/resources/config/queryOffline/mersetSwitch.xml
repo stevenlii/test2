@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="mersetswitch">
+	<sql id="all">
+	<![CDATA[
+		 SELECT t.seq_id as seqid, t.mer_id as merid, t1.mername, t.config_time as configtime, t.is_open as isopen, t.is_valid as isuse, t.mod_time as modtime, t.in_time as intime
+		 FROM UMPAY.T_COUPON_MERSET_SWITCH t
+		 JOIN UMPAY.T_MER_INF t1 ON t.MER_ID = t1.MERID
+		 WHERE 1 = 1
+		 and t.is_valid = 2
+		 ORDER BY t.mod_time DESC
+	  ]]>
+	</sql>
+</mapper> 

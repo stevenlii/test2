@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/couponbatch.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+		// 按钮权限控制
+        var optStr = "${opts}";
+        var opts = optStr.split(',');
+        jQuery('[code]').each(function() {
+            var code = $(this).attr("code");
+            for (var i = 0; i < opts.length; i++) {
+                if (code == opts[i]) {
+                    $(this).css('display', 'inline');
+                }
+            };
+        });
+	
+		//初始化批次状态列表
+        $('#state').omCombo({
+            dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponBatchStates',
+            width: '120px',
+            emptyText: '请选择..',
+			forceSelection: true
+        });
+	
+		var vRuleId = $('#ruleId').val();
+        jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/couponbatch/query.do?queryKey=couponbatch.all&ruleId=" + vRuleId,
+			method: 'POST',
+			showIndex: false,
+            width: '100%',
+            height: 230,
+            limit: 0,
+            colModel: [{
+                header: '批次名称',
+				name: 'BATCHID',
+                width: 50,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+    				return "第" + (rowIndex + 1) + "批次";
+                }
+            },
+            {
+                header: '兑换券有效期',
+                name: 'useDate',
+                width: 130,
+                align: 'left',
+    			renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.USESTARTDATE + " 至 " + rowData.USEENDDATE + "'>" + rowData.USESTARTDATE + " 至 " + rowData.USEENDDATE + "</a>";
+                }
+            },
+            {
+                header: '兑换券售卖期',
+                name: 'sellDate',
+                width: 130,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.SELLSTARTDATE + " 至 " + rowData.SELLENDDATE + "'>" + rowData.SELLSTARTDATE + " 至 " + rowData.SELLENDDATE + "</a>";
+                }
+            },
+            {
+                header: '库存数量',
+                name: 'GOODSSUM',
+                width: 50,
+                align: 'left'
+            },
+            {
+                header: '已售数量',
+                name: 'SALEDSUM',
+                width: 50,
+                align: 'left'
+            },
+            {
+                header: '导入日期',
+                name: 'INTIME',
+                width: 100,
+                align: 'left'
+            },
+            {
+                header: '启用状态',
+                name: 'STATE',
+                width: 50,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+    				return rowData.STATENAME;
+                }
+            },
+            {
+                header: '操作',
+                name: 'oprs',
+                width: 85,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					// 当批次状态为【未启用】、【启用】时才能进行 停止 操作
+					if( rowData.STATE == '0' || rowData.STATE == '2' ){
+						var result = "<img title='停止' src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='stopBatch(\"" + rowData.BATCHID + "\")' />";
+					}else{
+						var result = "<img title='停止' src='${request.contextPath}/profile/default/images/tool_Disable1.png' />";
+					}
+					// 当批次状态为【未启用】、【停止】时才能进行 启用 操作
+					if( rowData.STATE == '0' || rowData.STATE == '4' ){
+						if( optStr.indexOf("001") != -1 ){
+							// 有启用权限
+							result += "&nbsp;&nbsp;<img title='启用' src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='startBatch(\"" + rowData.BATCHID + "\")' />";
+						}
+						result += "&nbsp;&nbsp;<img title='修改' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='showModifyDialog(\"" + rowData.BATCHID + "\", " + (rowIndex + 1) + ")' />";
+						result += "&nbsp;&nbsp;<img title='追加导入' src='${request.contextPath}/profile/default/images/tool_batchimport.png' onclick='showAppendDialog(\"" + rowData.BATCHID + "\")' />";
+					}else{
+						if( optStr.indexOf("001") != -1 ){
+							// 有启用权限
+							result += "&nbsp;&nbsp;<img title='启用' src='${request.contextPath}/profile/default/images/tool_Enable1.png' />";
+						}
+						result += "&nbsp;&nbsp;<img title='修改' src='${request.contextPath}/profile/default/images/tool_modify1.png' />";
+						result += "&nbsp;&nbsp;<img title='追加导入' src='${request.contextPath}/profile/default/images/tool_batchimport1.png' />";
+					}
+                    return result;
+                }
+            }]
+        });
+		
+		jQuery( "#subdialog").omDialog({
+            autoOpen: false
+        });
+	});
+
+	//关闭窗口方法
+    function closeDialog() {
+        window.parent.fillBackAndCloseDialog("#dialog");
+    }
+</script>
+</head>
+<body>
+	<div >
+		<table cellpadding="0" cellspacing="0" class="infowrite" style="float:none;width:100%" >
+                <tr>
+                    <th width="15%">
+							规则编号：
+                    </th>
+                    <td width="30%" class="td">
+                        $!{couponRule.ruleId}
+						<input id="ruleId" name="ruleId" type="hidden" value="$!{couponRule.ruleId}"/>
+                    </td>
+                </tr>
+				<tr>
+					<th width="15%">
+							兑&nbsp;换&nbsp;券：
+                    </th>
+                    <td width="40%" class="td1">
+                        $!{couponName}（$!{couponRule.couponId}）
+						<input id="couponId" name="couponId" type="hidden" value="$!{couponRule.couponId}"/>
+                    </td>
+				</tr>
+                <tr>
+                    <th>
+							商&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户：
+                    </th>
+                    <td class="td">
+                        $!{merName}（$!{couponRule.merId}）
+						<input id="merId" name="merId" type="hidden" value="$!{couponRule.merId}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+							商&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;品：
+                    </th>
+                    <td class="td1">
+                        $!{goodsName}（$!{couponRule.goodsId}）
+						<input id="goodsId" name="goodsId" type="hidden" value="$!{couponRule.goodsId}"/>
+                    </td>
+                </tr>
+            </table>
+	</div>
+	
+	<div class="pop_btn_sh" style="float:none;width:90%">
+		批次状态：
+		<input id="state" name="state" />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="查询" onclick="query()" />
+		<input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="批量导入" onclick="add()" />
+		<input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog(0)"/>
+	</div>
+	
+	<!--列表查询区-->
+    <div align="center">
+        <table align="left" id="grid">
+        </table>
+    </div>
+	
+	<div id="subdialog">
+	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+</body>
+</html>

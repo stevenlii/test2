@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponCode">
+	<typeAlias alias="CouponCode" type="com.umpay.hfmng.model.CouponCode" />
+
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="batchId" prepend=" and ">
+				batchId = #batchId#
+			</isNotEmpty>
+			<isNotEmpty property="orderId" prepend=" and ">
+				orderId = #orderId#
+			</isNotEmpty>
+			<isNotEmpty property="paidMobileId" prepend=" and ">
+				paidMobileId =
+				#paidMobileId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<statement id="insert" resultClass="CouponCode">
+		insert into umpay.t_coupon_code(couponCode, merId
+		<isNotEmpty property="goodsId" prepend=" , "> goodsId
+		</isNotEmpty>
+		<isNotEmpty property="couponId" prepend=" , "> couponId
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , "> modTime
+		</isNotEmpty>
+		<isNotEmpty property="operator" prepend=" , "> operator
+		</isNotEmpty>
+		<isNotEmpty property="exchangeTime" prepend=" , "> exchangeTime
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , "> state
+		</isNotEmpty>
+		<isNotEmpty property="saledTime" prepend=" , "> saledTime
+		</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , "> useStartDate
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , "> useEndDate
+		</isNotEmpty>
+		<isNotEmpty property="couponCodeType" prepend=" , ">
+			couponCodeType
+		</isNotEmpty>
+		<isNotEmpty property="remindTime" prepend=" , "> remindTime
+		</isNotEmpty>
+		<isNotEmpty property="ruleId" prepend=" , "> ruleId
+		</isNotEmpty>
+		<isNotEmpty property="batchId" prepend=" , "> batchId
+		</isNotEmpty>
+		<isNotEmpty property="orderId" prepend=" , "> orderId
+		</isNotEmpty>
+		<isNotEmpty property="channelId" prepend=" , "> channelId
+		</isNotEmpty>
+		<isNotEmpty property="price" prepend=" , "> price
+		</isNotEmpty>
+		<isNotEmpty property="paidMobileId" prepend=" , "> paidMobileId
+		</isNotEmpty>
+		<isNotEmpty property="alarmCount" prepend=" , "> alarmCount
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , "> inTime
+		</isNotEmpty>
+		<isNotEmpty property="originalprice" prepend=" , "> originalprice
+		</isNotEmpty>
+		) values(#couponCode#, #merId#
+		<isNotEmpty property="goodsId" prepend=" , "> #goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="couponId" prepend=" , "> #couponId#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , "> #modTime#
+		</isNotEmpty>
+		<isNotEmpty property="operator" prepend=" , "> #operator#
+		</isNotEmpty>
+		<isNotEmpty property="exchangeTime" prepend=" , "> #exchangeTime#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , "> #state#
+		</isNotEmpty>
+		<isNotEmpty property="saledTime" prepend=" , "> #saledTime#
+		</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , "> #useStartDate#
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , "> #useEndDate#
+		</isNotEmpty>
+		<isNotEmpty property="couponCodeType" prepend=" , ">
+			#couponCodeType#
+		</isNotEmpty>
+		<isNotEmpty property="remindTime" prepend=" , "> #remindTime#
+		</isNotEmpty>
+		<isNotEmpty property="ruleId" prepend=" , "> #ruleId#
+		</isNotEmpty>
+		<isNotEmpty property="batchId" prepend=" , "> #batchId#
+		</isNotEmpty>
+		<isNotEmpty property="orderId" prepend=" , "> #orderId#
+		</isNotEmpty>
+		<isNotEmpty property="channelId" prepend=" , "> #channelId#
+		</isNotEmpty>
+		<isNotEmpty property="price" prepend=" , "> #price#
+		</isNotEmpty>
+		<isNotEmpty property="paidMobileId" prepend=" , "> #paidMobileId#
+		</isNotEmpty>
+		<isNotEmpty property="alarmCount" prepend=" , ">
+			#alarmCount#
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , "> #inTime#
+		</isNotEmpty>
+		<isNotEmpty property="originalprice" prepend=" , "> #originalprice#
+		</isNotEmpty>
+		)
+	</statement>
+
+	<statement id="get" resultClass="CouponCode">
+		select couponCode,
+			   orderId,
+		       merId,
+		       channelId,
+		       goodsId,
+		       couponId,
+		       generateMethod,
+		       to_char(exchangeTime, 'yyyy-mm-dd hh24:mi:ss') as exchangeTime,
+		       state,
+		       couponCodeType,
+		       a.ruleId,
+		       batchid,
+		       price,
+		       paidMobileId,
+		       to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime,
+		       to_char(saledTime, 'yyyy-mm-dd hh24:mi:ss') as saledTime,
+		       useStartDate,
+		       useEndDate,
+		       exchangeType
+		  from umpay.T_COUPON_CODE a
+		  left join (select ruleId, generateMethod from umpay.T_COUPON_RULE) b
+		    on a.ruleId = b.ruleId
+		 where a.merId = #merId# and a.couponCode = #couponCode#
+	</statement>
+
+	<statement id="update" resultClass="integer">
+		update umpay.T_COUPON_CODE set merId=#merId#, couponCode=#couponCode#
+		<isNotEmpty property="goodsId" prepend=" , ">
+			goodsId=#goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="couponId" prepend=" , ">
+			couponId=#couponId#
+			</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime=#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="operator" prepend=" , ">
+			operator=#operator#
+		</isNotEmpty>
+		<isNotEmpty property="exchangeTime" prepend=" , ">
+			exchangeTime=#exchangeTime#
+		</isNotEmpty>
+		<isNotEqual property="state" prepend=" , " compareValue="-99">
+			state=#state#
+		</isNotEqual>
+		<isNotEmpty property="saledTime" prepend=" , ">
+			saledTime=#saledTime#
+		</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , ">
+			useStartDate=#useStartDate#
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , ">
+			useEndDate=#useEndDate#
+		</isNotEmpty>
+		<isNotEmpty property="couponCodeType" prepend=" , ">
+			couponCodeType=#couponCodeType#
+		</isNotEmpty>
+		<isNotEmpty property="remindTime" prepend=" , ">
+			remindTime=#remindTime#
+		</isNotEmpty>
+		<isNotEmpty property="ruleId" prepend=" , ">
+			ruleId=#ruleId#
+		</isNotEmpty>
+		<isNotEmpty property="batchId" prepend=" , ">
+			batchTd=#batchTd#
+		</isNotEmpty>
+		<isNotEmpty property="orderId" prepend=" , ">
+			orderId=#orderId#
+		</isNotEmpty>
+		<isNotEmpty property="channelId" prepend=" , ">
+			channelId=#channelId#
+		</isNotEmpty>
+		<isNotEqual property="price" prepend=" , " compareValue="-1">
+			price=#price#
+		</isNotEqual>
+		<isNotEmpty property="paidMobileId" prepend=" , ">
+			paidMobileId=#paidMobileId#
+		</isNotEmpty>
+		<isNotEqual property="alarmCount" prepend=" , " compareValue="-99">
+			alarmCount=#alarmCount#
+		</isNotEqual>
+		<isNotEmpty property="inTime" prepend=" , ">
+			inTime=#inTime#
+		</isNotEmpty>
+		where merId=#merId# and couponCode=#couponCode#
+	</statement>
+
+	<statement id="updateselfdefine" resultClass="integer">
+		update umpay.T_COUPON_CODE
+		set couponId=couponId
+		<isNotEmpty property="state" prepend=" , ">
+			state=#state#
+		</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , ">
+			useStartDate=#useStartDate#
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , ">
+			useEndDate=#useEndDate#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime=CURRENT
+			TIMESTAMP
+		</isNotEmpty>
+		where 1 = 1
+		<isNotEmpty property="where_batchId" prepend=" and ">
+			batchId=#where_batchId#
+		</isNotEmpty>
+		<isNotEmpty property="where_state" prepend=" and ">
+			state=#where_state#
+		</isNotEmpty>
+		<isNotEmpty property="where_orderId" prepend=" and ">
+			orderId=#where_orderId#
+		</isNotEmpty>
+		<isNotEmpty property="where_paidMobileId" prepend=" and ">
+			paidMobileId=#where_paidMobileId#
+		</isNotEmpty>
+	</statement>
+</sqlMap>

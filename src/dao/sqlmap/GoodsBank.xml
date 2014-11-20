@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="GoodsBank">
+	<typeAlias alias="GoodsBank" type="com.umpay.hfmng.model.GoodsBank" />
+	<sql id="select_what">
+		select merid,goodsid,bankid,amttype,kstate,buyprice,
+		saleprice,amount,timeltd,verifytag,checkday,isrealtime,bankmerid,bankposid,modlock
+		from umpay.t_goods_bank 
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="merId" prepend=" and ">
+				merId = #merId#
+			</isNotEmpty>
+			<isNotEmpty property="bankId" prepend=" and ">
+				bankId = #bankId#
+			</isNotEmpty>
+			<isNotEmpty property="goodsId" prepend=" and ">
+				goodsId = #goodsId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<sql id="key_find">
+		<dynamic prepend=" where  ">
+			<isNotEmpty property="merId" prepend=" and ">
+				merId = #merId#
+			</isNotEmpty>
+			<isNotEmpty property="goodsId" prepend=" and ">
+				goodsId = #goodsId#
+			</isNotEmpty>
+			<isNotEmpty property="bankId" prepend=" and ">
+				bankId like '$bankId$%'
+			</isNotEmpty>
+			<isNotEmpty property="modLock" prepend=" and ">
+				modLock = #modLock#
+			</isNotEmpty>
+			<isNotEmpty property="excludeMW" prepend=" and ">
+				bankId not like '$excludeMW$%'
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<statement id="Get" resultClass="GoodsBank">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	<statement id="Find" resultClass="GoodsBank">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+
+	<statement id="FindHN" resultClass="GoodsBank">
+		select merid,goodsid,bankid,kstate,amttype from umpay.t_goods_bank where bankid = 'XE371000' order by merid,goodsid 
+	</statement>
+
+	<statement id="GetXeOrMw" resultClass="GoodsBank">
+		select * from umpay.t_goods_bank where 1=1
+		<isNotEmpty property="merId" prepend=" and ">
+			merId=#merId#
+			</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend=" and ">
+			goodsId=#goodsId#
+			</isNotEmpty>
+		<isNotEmpty property="bankId" prepend=" and ">
+			bankId like #bankId#||'%'
+			</isNotEmpty>
+		<isNotEmpty property="modLock" prepend=" and ">
+			modLock = #modLock#
+			</isNotEmpty>
+	</statement>
+	<statement id="GetUPbank" resultClass="GoodsBank">
+		select * from umpay.t_goods_bank where 1=1
+		<isNotEmpty property="merId" prepend=" and ">
+			merId=#merId#
+			</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend=" and ">
+			goodsId=#goodsId#
+			</isNotEmpty>
+		<isNotEmpty property="bankId" prepend=" and ">
+			bankId like #bankId#||'%'
+			</isNotEmpty>
+		<isNotEmpty property="modLock" prepend=" and ">
+			modLock = #modLock#
+			</isNotEmpty>
+	</statement>
+
+
+	<statement id="updateGoodsBankLock" resultClass="integer">
+		update umpay.t_goods_bank set modLock=#modLock#
+		where merId=#merId# and goodsId=#goodsId# and bankId=#bankId#
+	</statement>
+
+	<statement id="checkFromTgoods" resultClass="GoodsInfo">
+		select goodsId from umpay.t_goods_inf where 1=1
+		<isNotEmpty property="goodsId" prepend=" and ">
+			goodsId=#goodsId#
+			</isNotEmpty>
+		<isNotEmpty property="merId" prepend=" and ">
+			merId=#merId#
+			</isNotEmpty>
+	</statement>
+	<!--  根据商户号查商品号-->
+	<statement id="GetGoodsByMerId" resultClass="GoodsInfo">
+		select tgi.goodsId from umpay.t_goods_inf tgi ,umpay.t_hfgoods_exp tge
+		where tgi.merId=tge.merId and tgi.goodsId=tge.goodsId
+
+		<isNotEmpty property="merId" prepend=" and ">
+			tgi.merId=#merId#
+			</isNotEmpty>
+	</statement>
+
+	<statement id="insertGoodsBank" resultClass="GoodsBank">
+		insert into umpay.t_goods_bank (merId,goodsId, bankId, modLock
+		<isNotEmpty property="kState" prepend=" , "> kState </isNotEmpty>
+		<isNotEmpty property="amount" prepend=" , "> amount </isNotEmpty>
+		<isNotEmpty property="verifyTag" prepend=" , "> verifyTag
+		</isNotEmpty>
+		<isNotEmpty property="checkDay" prepend=" , "> checkDay
+		</isNotEmpty>
+		<isNotEmpty property="isRealTime" prepend=" , "> isRealTime
+		</isNotEmpty>
+		<isNotEmpty property="amtType" prepend=" , "> amtType
+		</isNotEmpty>
+		<isNotEmpty property="buyPrice" prepend=" , "> buyPrice
+		</isNotEmpty>
+		<isNotEmpty property="salePrice" prepend=" , "> salePrice
+		</isNotEmpty>
+		<isNotEmpty property="timeLtd" prepend=" , "> timeLtd
+		</isNotEmpty>
+		<isNotEmpty property="bankMerId" prepend=" , "> bankMerId
+		</isNotEmpty>
+		<isNotEmpty property="bankPosId" prepend=" , "> bankPosId
+		</isNotEmpty>
+		) values(#merId#,#goodsId#, #bankId#, 0
+		<isNotEmpty property="kState" prepend=" , "> #kState#
+		</isNotEmpty>
+		<isNotEmpty property="amount" prepend=" , "> #amount#
+		</isNotEmpty>
+		<isNotEmpty property="verifyTag" prepend=" , "> #verifyTag#
+		</isNotEmpty>
+		<isNotEmpty property="checkDay" prepend=" , "> #checkDay#
+		</isNotEmpty>
+		<isNotEmpty property="isRealTime" prepend=" , "> #isRealTime#
+		</isNotEmpty>
+		<isNotEmpty property="amtType" prepend=" , "> #amtType#
+		</isNotEmpty>
+		<isNotEmpty property="buyPrice" prepend=" , "> #buyPrice#
+		</isNotEmpty>
+		<isNotEmpty property="salePrice" prepend=" , "> #salePrice#
+		</isNotEmpty>
+		<isNotEmpty property="timeLtd" prepend=" , "> #timeLtd#
+		</isNotEmpty>
+		<isNotEmpty property="bankMerId" prepend=" , "> #bankMerId#
+		</isNotEmpty>
+		<isNotEmpty property="bankPosId" prepend=" , "> #bankPosId#
+		</isNotEmpty>
+		)
+	</statement>
+	<statement id="updateGoodsBank" resultClass="GoodsBank">
+		update umpay.t_goods_bank set modLock=0,modTime=CURRENT TIMESTAMP
+		<isNotEmpty property="kState" prepend=" , "> kState=#kState#
+		</isNotEmpty>
+		<isNotEmpty property="amount" prepend=" , "> amount=#amount#
+		</isNotEmpty>
+		<isNotEmpty property="verifyTag" prepend=" , ">
+			verifyTag=#verifyTag# </isNotEmpty>
+		<isNotEmpty property="checkDay" prepend=" , ">
+			checkDay=#checkDay# </isNotEmpty>
+		<isNotEmpty property="isRealTime" prepend=" , ">
+			isRealTime=#isRealTime# </isNotEmpty>
+		<isNotEmpty property="amtType" prepend=" , "> amtType=#amtType#
+		</isNotEmpty>
+		<isNotEmpty property="buyPrice" prepend=" , ">
+			buyPrice=#buyPrice# </isNotEmpty>
+		<isNotEmpty property="salePrice" prepend=" , ">
+			salePrice=#salePrice# </isNotEmpty>
+		<isNotEmpty property="timeLtd" prepend=" , "> timeLtd=#timeLtd#
+		</isNotEmpty>
+		<isNotEmpty property="bankMerId" prepend=" , ">
+			bankMerId=#bankMerId# </isNotEmpty>
+		<isNotEmpty property="bankPosId" prepend=" , ">
+			bankPosId=#bankPosId# </isNotEmpty>
+		where merId=#merId# and goodsId=#goodsId# and bankId=#bankId#
+	</statement>
+	
+	<!-- 根据商户、商品ID查询已开通的商品银行记录数 -->
+	<statement id="queryOpenCount" resultClass="HashMap">
+		select count(1) as num
+		  from umpay.T_GOODS_BANK
+		 where merId = #merId#
+		   and goodsId = #goodsId#
+		   and SUBSTR(char(kstate), 1, 1) = '1'
+	</statement>
+
+</sqlMap>

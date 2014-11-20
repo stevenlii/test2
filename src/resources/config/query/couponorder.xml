@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="couponorder">
+    <sql id="query">
+		<![CDATA[
+			select t.ORDERID, t.PAIDMOBILEID, t.PAIDAMT / 100 as PAIDAMT, t.MERID, m.MERNAME, t.GOODSID, g.GOODSNAME, c.COUPONNAME, 
+				t.ACCESSTYPE as ACCESSTYPE, #if($paystate && $paystate != '0') case when temp.TRANSTATE is null then 0 else temp.TRANSTATE end #end #if($paystate && $paystate == '0') '0' #end  as TRANSTATE, t.STATE as STATE, #if($paystate && $paystate != '0') TO_CHAR (temp.TRANSACTIME,'YYYY-MM-DD HH24:MI:SS') #end  #if($paystate && $paystate == '0') '--' #end as TRANSACTIME, TO_CHAR (t.INTIME,'YYYY-MM-DD HH24:MI:SS') as INTIME  
+			 	from UMPAY.T_COUPON_ORDER t join UMPAY.t_mer_inf m on t.MERID = m.MERID join UMPAY.t_goods_inf g on t.GOODSID = g.GOODSID
+                join UMPAY.t_coupon_rule r on t.RULEID = r.RULEID join UMPAY.t_coupon_inf c on r.COUPONID = c.COUPONID 
+			  	#if($paystate && $paystate != '0') 
+				  	left join (
+				     	select t.orderid, t.TRANSTATE as transtate, t.TRANSACTIME
+				    		from 
+					    		(
+					        		select ORDERID, max(TRANSACTIME) as TRANSACTIME from UMPAY.t_coupon_trans group by  ORDERID 
+					    		) c, UMPAY.t_coupon_trans t
+					    		where c.orderid = t.orderid and c.TRANSACTIME = t.transactime
+				  	)temp on t.ORDERID = temp.ORDERID 
+			  	#end
+			where t.MERID = g.MERID
+			#if($orderid && $orderid!='') 
+				and t.orderid =:orderid
+			#end
+			#if($phone && $phone!='') 
+				and t.PAIDMOBILEID =:phone
+			#end
+			#if($state && $state!='') 
+				and t.STATE =:state
+			#end
+			#if($paystate && $paystate!= '' && $paystate!='0') 
+				and integer(temp.TRANSTATE) =:paystate
+			#end
+			#if($paystate && $paystate=='0') 
+				and t.STATE in(0, 1, 6)
+			#end
+			#if($type && $type!='') 
+				and c.COUPONID =:type
+			#end
+			#if($mertype && $mertype!='') 
+				and t.merid =:mertype
+			#end
+			#if($goodstype && $goodstype!='') 
+				and t.GOODSID =:goodstype
+			#end
+			order by t.INTIME desc
+		]]>
+	</sql>
+	
+	<sql id="querylog">
+	<![CDATA[
+		select orderId, phone, couponCode, operdata, moduser, a.intime
+		  from (select ixdata1 as orderId,
+		               ixdata2 as phone,
+		               ixdata3 as couponCode,
+		               operdata,
+		               moduser,
+		               to_char(intime, 'yyyy-MM-dd hh24:mi:ss') intime
+		          from umpay.T_COUPON_OPLOG
+		         where businessobject = 'umpay.T_COUPON_ORDER' or businessobject = 'umpay.T_COUPON_GCORDER') a
+		 where 1 = 1
+	       #if( $orderId && $orderId!='' ) 
+	           and orderId = :orderId
+	       #end
+	       #if( $phone && $phone!='' ) 
+	           and phone = :phone
+	       #end
+	       #if( $couponCode && $couponCode!='' ) 
+	           and couponCode = :couponCode
+	       #end
+	       #if( $moduser && $moduser!='' ) 
+	           and moduser = :moduser
+	       #end
+	       #if( $optdate && $optdate!='' ) 
+	           and POSSTR(intime, :optdate)>0
+	       #end
+     	 order by intime desc
+	]]>
+	</sql>
+	
+	<!-- 根据订单编号查询兑换码信息 -->
+	<sql id="couponcodes">
+	<![CDATA[
+		select cc.couponcode,
+		       ci.COUPONID,
+		       ci.COUPONNAME,
+		       usestartdate || ' 至 ' || useenddate as useRange,
+		       char(cc.couponcodetype) as couponStyle,
+		       char(cc.state) as couponState,
+		       cc.state as state,
+		       cc.merid as merId,
+		       cc.consumetype
+		  from UMPAY.t_coupon_code cc, UMPAY.t_coupon_inf ci
+		 where cc.couponid = ci.COUPONID
+		   and cc.ORDERID = :orderId
+	]]>
+	</sql>
+	
+	<!-- 取码订单查询 -->
+	<sql id="gcquery">
+	<![CDATA[
+		select orderId,
+		       orderDate,
+		       merOrderId,
+		       merOrderDate,
+		       channelId,
+		       couponId,
+		       ruleId,
+		       state,
+		       merId,
+		       goodsId,
+		       goodsSum,
+		       amount,
+		       merCheck,
+		       mobileId,
+		       to_char(modTime, 'yyyy-mm-dd hh24:mi:ss') as modTime,
+		       to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime
+		  from umpay.T_COUPON_GCORDER
+		 where 1 = 1
+		 #if( $orderId && $orderId!='' ) 
+		     and orderId = :orderId 
+		 #end
+		 #if( $mobileId && $mobileId!='' )
+		     and mobileId = :mobileId 
+		 #end
+		 #if( $state && $state!='' ) 
+		     and state = :state 
+		 #end
+		 #if( $channelId && $channelId!='' ) 
+		     and channelId = :channelId 
+		 #end
+		 #if( $merId && $merId!='' ) 
+		     and merId = :merId 
+		 #end
+		 #if( $goodsId && $goodsId!='' ) 
+		     and goodsId = :goodsId 
+		 #end
+		 order by inTime desc
+	]]>
+	</sql>
+</mapper> 

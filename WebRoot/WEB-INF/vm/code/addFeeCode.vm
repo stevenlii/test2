@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/busi/codeMng.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+
+  <script>
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  		   
+        //获取商品分类列表
+  	     $('#category').omCombo({
+                dataSource : '$request.contextPath/option/feecategory2.do',
+                width:'100px',
+                listMaxHeight:80,
+                emptyText:'请选择..' ,
+                forceSelection : true
+            });
+  	      
+  	     $('#feeType').omCombo({
+           dataSource : [{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+           width:'100px',
+           emptyText:'请选择..' ,
+           forceSelection : true
+       });
+  	     
+  	     
+  	     //自定义校验规则
+  	   $.validator.addMethod("leng", function(value) {
+  		 var reg = new RegExp("^-[a-zA-Z]{4}|[a-zA-Z]{4}$");
+  		 if(reg.test(value)){
+  			 if(value.length==5){
+  				 if(value.split('')[0]=='-'){
+  					 return true;
+  				 }
+  			 }else{
+  				 return true;
+  			 }
+  		 }
+  		 return false;
+  	   }, "代码为4位字母或:'-'+4位字母");
+  	   $.validator.addMethod("exist", function(value) {
+	        return checkServiceId(value);
+	    }, "当前计费代码已存在！");
+  	 
+  	 	 jQuery("#dataform").validate({
+  	 		 	onkeyup: false,
+                rules : {
+                    "serviceId" : {
+                    	required : true,
+                    	 minlength : 4,
+                    	 maxlength : 5,
+                    	 leng:true,
+                    	 exist:true
+                    },
+                    "detail": {
+                        required : true
+                    },
+                    "feeType": {
+                    	required : true
+                    },
+                    "category": {
+                        required : true
+                    },
+                    "amount": {
+                        required : true,
+                        digits : true
+                    }
+                },
+                messages : {
+                    "serviceId" : {
+                        required : "请输入代码号",
+                        minlength : "代码号不能小于4位",
+                        maxlength : "代码号不能大于5位"
+                    },
+                    "detail": {
+                        required : "请输入代码名称"
+                    },
+                    "feeType" : {
+                    	required : "请选择类型"
+                    },
+                    "category": {
+                        required : "请选择分类"  
+                    },
+                     "amount": {
+                        required : "请输入金额" , 
+                        digits  : "金额只能为正整数"
+                    }
+                },
+                
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+                });
+            
+            
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){ 
+                 return false;
+  	 	 	 }
+              jQuery(this).omAjaxSubmit({success:function(res){
+             		if(res == '1'){
+             			closeDialog(); 
+             			window.parent.shuaxin();
+             		}else if(res == '0'){
+             			window.parent.showSimpleTip(res);
+             		}else{
+             			window.parent.$.omMessageBox.alert({
+        		    		type:'error',
+        		            title : '操作提示',
+        		            content : res
+        		        });
+             		}
+         		}
+            });
+              return false; 
+  	 	});
+  	 
+     });
+       
+  </script>  
+  </head>
+  <body>
+<div id="container">
+  <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/code/save.do">
+  <table width="100%" >
+  <tr><td>
+    <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+      <tr>
+        <th width="20%"><span>*</span>代&nbsp;码：</th>
+        <td class="td"><input name="serviceId" type="text" maxlength="5" class="input1" /></td>
+        <td width="40%" class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+      </tr>
+      <tr>
+        <th width="20%"><span>*</span>代码名称：</th>
+        <td class="td1"><input name="detail" type="text" size="26" maxlength="13" class="input2"></td>
+        <td  width="40%"  class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+      </tr>
+      <tr>
+      <th  width="20%"><span>*</span>类&nbsp;型：</th>
+      <td class="td"><input id="feeType" name="feeType" class="select1" /></td> 
+      <td  width="40%" class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+      </tr>
+      <tr>
+      <th><span>*</span>分&nbsp;类：</th>
+      <td class="td1"><input id="category" name="category" class="select1"/></td>
+      <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+      </tr>     
+    <tr>
+        <th><span>*</span>金&nbsp;额：</th>
+        <td class="td"><input name="amount" type="text" size="13" maxlength="13" class="input1">分</td>
+        <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+    </tr>
+    </table>
+    </td></tr><tr><td>
+    <table width="100%" cellpadding="0" cellspacing="0">
+         <tr>
+            <td height="15"></td></tr>
+         <tr>
+            <td align="center"><input id="add_button1" name="submit" type="submit" value="添加" class="popbtn"onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+            <input id="add_button2" name="add_button2" type="reset"  value="取消" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+          </tr>
+     </table>
+     </td></tr>
+     <table>
+  </form>
+                  
+</div>
+</body>
+</html>

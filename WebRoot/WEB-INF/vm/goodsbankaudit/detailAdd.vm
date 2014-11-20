@@ -1,0 +1,151 @@
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/goodsbankaudit.js"></script>
+<script>
+jQuery(document).ready(function() {
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+});
+//商品银行配置审核通过方法
+function goPassAdd(id){
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	var flag = confirm("确认审核通过此信息？");
+	if (flag){
+		$.ajax({
+			url : '$request.contextPath/goodsbankaudit/goodsbankauditpass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'id' : id,
+					'resultDesc' : resultDesc
+			},
+			success : function(data){
+					closeDialog();
+					window.parent.shuaxin();
+					window.parent.showSimpleTip(data);
+			}
+		});
+	}
+}
+
+function goNotPassAdd(id){
+    var flag = true;
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(resultDesc == ""){
+		alert("请先输入审核意见！");
+		flag = false;
+	}
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	if(flag){
+		$.ajax({
+			url : '$request.contextPath/goodsbankaudit/goodsbankauditnotpass.do',   
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'id' : id,
+					'resultDesc' : resultDesc
+			},
+			success : function(data){
+				closeDialog();
+				window.parent.shuaxin();
+				showSimpleTip(data);
+			}
+		});
+	}
+}
+
+
+</script>
+<!--新增或启用/禁用商品银行配置审核详情页面-->
+<form id="dataform-add" method="post" name="dataform-add">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0"  width="100%" >
+		<tr>
+		    <th width="40%">所属商户号：</th>
+			<td class="td">$!{audit.merId}</td>
+		</tr>
+		<tr>
+		    <th >商&nbsp;品&nbsp;号：</th>
+			<td class="td1">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+		    <th >商品银行名称：</th>
+			<td class="td">$!{audit.bankName}($!{audit.bankId})</td>
+		</tr>
+		<tr>
+		    <th >商品金额：</th>
+			<td class="td1">$!{audit.amount}分</td>
+		</tr>
+		<tr>
+		    <th>2次确认校验码：</th>
+			<td class="td">$!{audit.verifyTag}</td>
+		</tr>
+		<tr>
+		    <th >商品最长计费天数：</th>
+			<td class="td1">$!{audit.checkDay}天</td>
+		</tr>
+		<tr>
+		    <th >包月商品开通状态：</th>
+			<td class="td">
+			  #if ($!{audit.kState}==11) 
+                                                只开通新增 
+              #elseif ($!{audit.kState}==12) 
+                                                只开通续费 
+              #elseif ($!{audit.kState}==13) 
+                                                新增与续费全部开通  
+              #else 新增与续费全部注销 
+              #end 
+            </td>
+		</tr>
+		
+		<tr>
+		    <th >下发商品时间：</th>
+			 <td class="td1">#if ($!{audit.isRealTime}==0)  即时下发 #elseif ($!{audit.isRealTime}==1) 智能网异步发货 
+             #elseif ($!{audit.isRealTime}==2) BOSS异步发货  #else 全部异步发货 #end </td>
+		</tr>
+	    <tr>
+		    <th >平台在机构商户号：</th>
+			<td class="td">${audit.bankMerId}</td>      
+		</tr>
+		  <tr>
+		    <th >平台在机构终端号：</th>
+			<td class="td1">${audit.bankPosId}</td>      
+		</tr>
+		<tr>
+		    <th >审核意见：</th>
+			<td height="63" colspan="2" align="left" valign="bottom"><textarea id="resultDesc" name="resultDesc" rows="3" style="{width:100%;}"></textarea></td>
+		</tr>
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goPassAdd(&quot;${id}&quot;)"/>
+	   <input type="button" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="不通过" onclick="goNotPassAdd(&quot;${id}&quot;)"/>
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="返回" onclick="closeDialog(0)" />
+	 </div>
+</form>

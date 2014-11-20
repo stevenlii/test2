@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="FeeCodeCount">
+	<typeAlias alias="FeeCodeCount" type="com.umpay.hfmng.model.FeeCodeCount" />
+	
+
+	<!-- 查询计费代码的使用次数  zhaojunbao	-->
+	<statement id="getCount" resultClass="FeeCodeCount">
+	select count(g.serviceid) as usecount,t.serviceid,g.serviceid
+		 from umpay.t_service_inf t left join umpay.T_GOODS_SERVICEID g on 
+         t.serviceid=g.serviceid left join umpay.t_goods_inf tgi on g.merid=tgi.merid and g.goodsid=tgi.goodsid and   tgi.state=2
+          where ( g.serviceid is  NULL  OR g.state=2  )  group by t.serviceid,g.serviceid 
+	</statement>
+	<!-- 查询跟商品类型，分类，金额完全匹配的计费代码   zhaojunbao	-->
+	<statement id="getMatch" resultClass="FeeCodeCount">
+     	 select tgs.* from  umpay.t_goods_serviceid tgs  join umpay.t_service_inf tsi on (tgs.serviceid=tsi.serviceid and tgs.state = 2 )
+		 join umpay.t_goods_inf tgi on (tgi.goodsid=tgs.goodsid and tgi.merid=tgs.merid )  
+		 join umpay.t_hfgoods_exp   tge on (tgi.goodsid=tge.goodsid and tgi.merid=tge.merid)
+		 where
+		 tge.category =  tsi.category  
+		 and tsi.amount=tge.amount 
+		 and tgi.servtype = tsi.feetype
+	</statement>
+	
+	
+	<statement id="update" resultClass="integer">
+	update umpay.T_SERVICE_STAT set modTime=CURRENT TIMESTAMP
+	   <isNotEmpty	property="matchType" prepend=" , "> matchType=#matchType# </isNotEmpty>
+	   <isNotEmpty	property="useCount" prepend=" , "> useCount=#useCount#</isNotEmpty>
+	    where serviceId=#serviceId# 
+	</statement>
+
+	<statement id="insert" >
+		insert into umpay.T_SERVICE_STAT(serviceId  
+				<isNotEmpty	property="useCount" prepend=" , "> useCount </isNotEmpty>
+				<isNotEmpty	property="matchType" prepend=" , "> matchType </isNotEmpty>
+			) values(#serviceId#
+                <isNotEmpty	property="useCount" prepend=" , "> #useCount# </isNotEmpty>
+				<isNotEmpty	property="matchType" prepend=" , "> #matchType# </isNotEmpty>
+							)
+	</statement>
+</sqlMap>

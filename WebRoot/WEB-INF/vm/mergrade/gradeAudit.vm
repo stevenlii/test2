@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/mergrade.js"></script>
+<script type="text/javascript">
+
+ 	  var url="$request.contextPath/mergrade/queryaudit.do?queryKey=audit.gradeAudits";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+			    var optStr="${opts}";
+					var opts=optStr.split(',');
+			    jQuery('[code]').each(function () {
+			        var code=$(this).attr("code");
+			        for(var i=0;i<opts.length;i++){
+			        	if(code==opts[i]){
+							   $(this).css('display','inline');						
+							}
+			    		};
+					});
+	
+          jQuery('#grid').omGrid({
+                dataSource : url,
+                width:'100%',
+                height : 455,
+                limit : 15,
+                autoFit : true,
+                colModel : [ {header : '商户名称', name : 'MERNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '商户号', name : 'IXDATA', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '运营状态', name : 'OPERSTATE',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '修改前得分', name : 'OLDVALUE',width : 200, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '修改后得分', name : 'NEWVALUE', width : 200, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				var title = rowData.TITLE;
+				     				return '<a title="'+title+'">'+value+'</a>';
+				     			} },
+                             {header : '运营负责人', name : 'OPERATOR',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}},
+                             {header : '审核人', name : 'MODUSER', width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                  				return "<a title='"+value+"'>"+value+"</a>";
+          					 }}, 
+                             {header : '审核状态', name : 'STATE', width : 60, align : 'left', renderer:function(value , rowData , rowIndex){
+                              	var state = rowData.STATE;
+                              	var name = "";
+                              	if (state==1){
+                              		name = "不通过";
+                              	}else if (state==0){
+                              		name = "待审核";
+                              	}else if (state==2){
+                              		name = "通过";
+             	     			}
+             	             	return "<a title='"+name+"'>"+name+"</a>";
+                             }},
+                             {header : '操作', name:'OPER',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                            	 var state = rowData.STATE;
+                            	 var auditType = rowData.AUDITTYPE;
+                            	 var id = rowData.ID;
+                            	 var result="";
+                            	 if (auditType=='0'){
+                            		 return "<span color='red'>非法数据</span>";
+                            	 } else {
+                            		 if(state==0){  //待审核，操作按钮正常
+                            			 if(optStr.indexOf("011")!=-1){
+                                  			result+="<input name='通过' title='通过' type='image' src='${request.contextPath}/profile/default/images/tool_pass.png' onclick='goPass(&quot;" + id + "&quot;)'/>&nbsp;";
+                                  		}
+                                  		if(optStr.indexOf("012")!=-1){
+                                  			result+="<input name='不通过' title='不通过' type='image' src='${request.contextPath}/profile/default/images/tool_nopass.png' onclick='notPass(&quot;" + id + "&quot;)'/>&nbsp;";
+                                  		}
+             	                 	}else{  //已审核，操作按钮变灰
+             	                 		if(optStr.indexOf("011")!=-1){
+                                 			result+="<input name='通过' title='通过' type='image' src='${request.contextPath}/profile/default/images/tool_pass1.png' />&nbsp;";
+                                 		}
+                                 		if(optStr.indexOf("012")!=-1){
+                                 			result+="<input name='不通过' title='不通过' type='image' src='${request.contextPath}/profile/default/images/tool_nopass1.png' />&nbsp;";
+                                 		}
+             	                 	}
+                            		result+="<input id='detail' name='detail' type='image' title='详细' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showAuditDetail(&quot;" + id + "&quot;," + state + ")' />";
+                                  	return result;
+             	                 }
+                             }}
+                            ]
+            });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+            
+     	     //获取运营负责人列表
+            jQuery('#operator').omCombo({
+                dataSource : '$request.contextPath/option/operatorlist3.do',
+                width:'75px',
+                listMaxHeight:150,
+                emptyText:'全部 ',
+                valueField : 'id',
+                inputField : 'name',
+                optionField : function(data, index) {return data.name;},
+                onSuccess:function(data, textStatus, event){
+       	  			var tmp = $.parseJSON('{"id":"","name":"全部","initials":"qb"}');
+       	  			data.unshift(tmp);
+          		},
+          	  filterStrategy : function(value, data) {
+          			var initials=data.initials+"";
+          			var list=initials.split(",");
+          			for(var i=0;i<list.length;i++){
+          				if(list[i].indexOf(value) == 0)
+          					return true;
+          			}
+                      return false;
+                },
+                filterDelay : 100,
+          	  forceSelection : true
+            });
+     	     
+     	     //运营状态 
+    	  	  $('#operState').omCombo({
+    	          dataSource : [{"value":"","text":"全部"},{"value":"0","text":"试运营"},{"value":"1","text":"正常"}],
+    	          width:'75px',
+    	          listMaxHeight:80,
+    	          emptyText:'全部 ' ,
+    	          forceSelection : true
+    	      });
+     	  	//获取审核人列表   modUser
+     	        $('#modUser').omCombo({
+     	               	dataSource : '$request.contextPath/option/modUserlist.do',
+     	               	width:'85px',
+     	               	listMaxHeight:150,
+     	               	emptyText:'全部 ' ,
+     	               	onSuccess:function(data, textStatus, event){
+     	      	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+     	      	  			data.unshift(tmp);
+     	         		},
+     	         		forceSelection : true,
+     	         		lazyLoad : true
+     	            });
+     	     //审核状态列表
+     	        $('#state').omCombo({
+     	            dataSource : [{"value":"","text":"全部"},{"value":"0","text":"待审核"}
+     	            				,{"value":"1","text":"不通过"},{"value":"2","text":"通过"}],
+     	            width:'85px',
+     	            emptyText:'全部 ' ,
+     	            forceSelection:true
+     	        });
+     	        $('#state').omCombo('value','0');
+     	        
+     	       $('#grid').omGrid("setData", url+"&state=0");
+       });
+
+</script>
+
+</head>
+<body>
+<!--背景-->
+<div class="list_btntool" style="height:1px;"></div>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+      <table width="80%" border="0">
+        <tr>
+          <td  align="left" >
+           <!--查询块区 start-->
+	       <form id="form" action="" method="post">
+             <table width="100%" border="0">
+                 <tr>
+	                 <th width="10%" height="30">商户名称：</th>
+			         <td ><input id="merName" name="merName" type="text" class="input1" /></td>
+				     <th width="10%"> 商户号：</th>
+				     <td ><input id="ixData" name="ixData" type="text" class="input1"/></td>
+				     <th width="10%">运营状态：</th>
+				     <td><input id="operState" name="operState" class="select1"/></td>
+			     </tr>
+			     <tr>
+				     <th>审核状态：</th>
+				     <td><input id="state" name="state" class="select1"/></td>
+				     <th>审核人：</th>
+			         <td><input id="modUser" name="modUser" class="select1" /></td>
+			         <th >运营负责人：</th>
+			         <td><input id="operator" name="operator" class="select1"/></td>
+			     </tr>  
+			    </table>
+               </form>  
+			  </td>    
+			   <td align="left"><input id="query" title="查询" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryAudit();"/>
+               </td>   
+			    </tr>
+             </table>  
+		</div>    
+    </div>			      
+ <!--列表区-->
+  <div>
+       <table id="grid" align="left"></table>
+  <div>
+    
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 渠道商品管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/chnlgoods/query.do</url>
+	</Option>
+	<!-- 添加按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/chnlgoods/save.do</url>
+	</Option>
+	<!-- 禁用按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/chnlgoods/disable.do</url>
+	</Option>
+	<!-- 启用按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/chnlgoods/enable.do</url>
+	</Option>
+	<!-- 商户导出按钮 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/chnlgoods/exportmer.do</url>
+	</Option>
+	<!-- 商品导出按钮 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/chnlgoods/exportgoods.do</url>
+	</Option>
+	
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/chnlgoodsaudit/auditPass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/chnlgoodsaudit/auditNotPass.do</url>
+	</Option>
+</Options>

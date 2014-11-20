@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="${request.contextPath}/js/ui/themes/default/om-all.css"
+	type="text/css">
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/stlcss.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/stl.js"></script>
+
+<script>
+	jQuery(document).ready(function() {
+		jQuery('#dataform').submit(function() {
+			// 设置按钮不可用，防止重复提交
+			$("#sureBtn").attr("disabled", "disabled");
+			jQuery(this).omAjaxSubmit({
+				success : function(res) {
+					window.parent.showSimpleTip(res);
+					if (res == '1') {
+						closeDialog();
+						window.parent.shuaxin();
+					} else {
+						// 设置按钮可用
+						$("#btn_modify").removeAttr("disabled");
+					}
+				}
+			});
+			return false;
+		});
+		
+		jQuery('#expBtn').click(function() {
+			var vIsExport = jQuery('#isExport').val();
+			if (vIsExport == '1') {
+				$.omMessageBox.confirm({
+					title : '确认重复导出',
+					content : '您已经导出该账单，确定要重复导出吗？',
+					onClose : function(value) {
+						if (value) {
+							jQuery('#hiddendataform').submit();
+						}
+					}
+				});
+			}else{
+				jQuery('#isExport').attr("value", "1");
+				jQuery('#hiddendataform').submit();
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<table width="100%" border="0" cellpadding="2" cellspacing="1" bgcolor="d8d8d8">
+	#if ($!{couponMerSet})
+  <tr bgcolor="f2f2f2" class="top_sty" >
+    <td height="26" colspan="19" align="left"><table width="100%" height="16" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="200">&nbsp;</td>
+        <td width="731" height="26" align="left" class="title_clor"><span class="title_clor">$couponMerSet.accName通信账户支付业务${couponMerSet.stlDate}结算账单</span></td>
+        <td width="696" height="26" align="right" >制表日期：${madeDate}</td>
+        <td width="10" align="right" >&nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr bgcolor="f8f8f8">
+    <td width="13%" rowspan="2" align="center">商户号</td>
+    <td width="12%" rowspan="2" align="center">商户名称</td>
+    <td width="12%" rowspan="2" align="center">子商户号</td>
+    <td height="25" colspan="16" align="center">账单明细</td>
+  </tr>
+  <tr bgcolor="f8f8f8">
+    <td height="25" colspan="9" align="center">交易笔数</td>
+    <td width="8%" height="25" align="center">交易金额（元）</td>
+    <td width="8%" height="25" align="center">核减金额（元）</td>
+    <td width="7%" height="25" align="center">商户分成比例</td>
+    <td width="7%" height="25" align="center">不均衡短信条数</td>
+    <td width="8%" height="25" align="center">不均衡金额（元）</td>
+    <td width="8%" height="25" align="center">退费金额（元）</td>
+    <td width="8%" height="25" align="center">结算金额（元）</td>
+  </tr>
+  <tr bgcolor="ffffff">
+    <td align="center">$couponMerSet.accId</td>
+    <td align="center">$couponMerSet.accName</td>
+    <td align="center">$couponMerSet.goodsId</td>
+    <td height="25" colspan="9" align="center">$couponMerSet.succNums</td>
+    <td height="25" align="center">$couponMerSet.succAmts</td>
+    <td height="25" align="center">
+    #if($couponMerSet.muteAmt != $auditCouponMerSet.muteAmt && $auditCouponMerSet.muteAmt != -99999999)
+       	<span style="color:red">
+			$number.format('#0.00',$auditCouponMerSet.muteAmt)
+		</span>
+    #else
+       		$number.format('#0.00',$couponMerSet.muteAmt)
+    #end
+    </td>
+    <td height="25" align="center">$number.format('#0.00',$couponMerSet.ext1)%</td>
+    <td height="25" align="center">
+    #if($couponMerSet.nbsmNum != $auditCouponMerSet.nbsmNum && $auditCouponMerSet.nbsmNum != -99999999)
+       	<span style="color:red">
+			$auditCouponMerSet.nbsmNum
+		</span>
+   	#else
+			$couponMerSet.nbsmNum
+    #end
+    </td>
+    <td height="25" align="center">
+    #if($couponMerSet.nbsmAmt != $auditCouponMerSet.nbsmAmt && $auditCouponMerSet.nbsmAmt != -99999999)
+       	<span style="color:red">
+			$number.format('#0.00',$auditCouponMerSet.nbsmAmt)
+		</span>
+    #else
+           	$number.format('#0.00',$couponMerSet.nbsmAmt)
+    #end
+    </td>
+    <td height="25" align="center">
+	#if($couponMerSet.paybackAmt != $auditCouponMerSet.paybackAmt && $auditCouponMerSet.paybackAmt != -99999999)
+       	<span style="color:red">
+			$number.format('#0.00',$auditCouponMerSet.paybackAmt)
+		</span>
+    #else
+           	$number.format('#0.00',$couponMerSet.paybackAmt)
+    #end
+    </td>
+    <td height="25" align="center">
+    #if($couponMerSet.merStlPay != $auditCouponMerSet.merStlPay && $auditCouponMerSet.merStlPay != -99999999)
+       	<span style="color:red">
+			$number.format('#0.00',$auditCouponMerSet.merStlPay)
+		</span>
+    #else
+           	$number.format('#0.00',$couponMerSet.merStlPay)
+    #end
+    </td>
+  </tr>
+</table>
+#end
+<ul>
+<li>备注：结算周期为
+#if ($!{billCycle})
+	$billCycle
+#end
+</li>
+<li class="tip_sty">结算金额=交易金额*商户分成比例</li>
+<li></li>
+</ul>
+<div class="btm_btn">
+	<form id="dataform" method="post" name="dataform" id="dataform">
+	#if($couponMerSet.state == 0 )
+		<textarea id="resultDesc" name="resultDesc" rows="3" cols="20"></textarea>
+		<input type="hidden" id="auditId" name="auditId" value="$auditId" />
+		</br>
+		 <input id="btn_pass" name="btn_pass" type="button" class="popbtn" value="审核通过" onclick="goPass();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+		 <input id="btn_nopass" name="btn_nopass" type="button" class="popbtn" value="审核拒绝" onclick="goNotPass();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	#end
+		</form>
+</div>
+</body>
+</html>

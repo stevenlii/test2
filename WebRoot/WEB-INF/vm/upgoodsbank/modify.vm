@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/goodsbank.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+  <script>  
+  	 jQuery(document).ready(function() {
+  		//添加自定义的校验方法 
+			$.validator.addMethod("checkVerifytag", function(value) {
+             var regu = /^-1$|^0$|^1$|^2$|^3$/; 
+             var reg = new RegExp(regu);
+             return reg.test(value);  // 二次确认校验码验证 值为  -1,0 ,1 ,2,3
+         }, '必须为-1到3之间的整数');
+       
+  	 	  jQuery("#dataform").validate({
+                rules : {
+                    "amount": {
+                        required : true,
+                         digits : true ,
+                         maxlength : 13
+                    },
+                    "verifyTag": {
+                    	checkVerifytag : true,
+                        required : true
+                    },
+                     "checkDay" : {
+                    	required : true
+                    },
+                     "kstate" : {
+                    	required : true
+                    },
+                    "isRealTime" :{
+                        required :true
+                    },
+                    "bankMerId" : {
+                    	maxlength : 32
+                    },
+                    "bankPosId" : {
+                    	maxlength : 32
+                    },
+                    "desc" : {
+                    	required : true
+                    }
+                },
+                messages : {
+                    "amount": {
+                        required : "请输入商品金额" ,
+                         digits    : "请填写数字" ,
+                         maxlength : "输入的长度超过13位"
+                    },                    
+                    "verifyTag":{
+                      required : "请填写二次确认校验码"
+                    },
+                    "checkDay":{
+                      required : "请填写商品最长计费天数",
+                       digits    : "请填写数字" 
+                    },
+                    "kstate":{
+                      required : "请选择商品开通状态"
+                    },
+                    "isRealTime" :{
+                       required : "请选择下发商品时间"
+                    },
+                    "bankMerId" : {
+                    	maxlength : "输入长度超过32位"
+                    },
+                    "bankPosId" : {
+                    	maxlength : "输入长度超过32位"
+                    },
+                    "desc" :{
+                        required : "请输入操作原因"
+                     }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },          
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	if (!jQuery("#dataform").valid()) { 
+                return false;
+            }
+  	 	 	
+  	 	 	//是否有修改的数据，若无，则不提交
+  	 	 	var amount=$("input[name='amount']").val();
+  	 	 	var verifyTag=$("input[name='verifyTag']").val();
+	 	  	var checkDay=$("input[name='checkDay']").val();
+	 	  	var kState=$('input:radio[name="kState"]:checked').val();
+	  	 	var isRealTime=$('input:radio[name="isRealTime"]:checked').val();
+	  	 	var bankMerId=$("input[name='bankMerId']").val();
+	  	 	var bankPosId=$("input[name='bankPosId']").val();
+	  	 	if("$!{goodsbank.amount}" == amount){
+	  	 		if("$!{goodsbank.verifyTag}" == verifyTag){
+	  	 			if("$!{goodsbank.checkDay}" == checkDay){
+	  	 				if("$!{goodsbank.kState}" == kState){
+	  	 					if("$!{goodsbank.isRealTime}" == isRealTime){
+	  	 						if("$!{goodsbank.bankMerId}" == bankMerId){
+	  	 							if("$!{goodsbank.bankPosId}" == bankPosId){
+	  	 								window.parent.$.omMessageBox.alert({
+  											content:'没有修改，不需提交'
+  										});
+  										return false;
+	  	 					  	 	}
+	  	 				  	 	}
+	  	 			  	 	}
+	  	 		  	 	}
+	  		  	 	}
+		  	 	}
+	  	 	}
+	  	 	$("#isRealTime1").val(isRealTime);
+	         jQuery(this).omAjaxSubmit({ dataType: 'json' , async:  false,success:function(result){
+	        	
+	        	 var msg = "";
+		  			var ty = "";
+	           		if(result.res !='1') {
+	           			ty = 'error';
+	    		  		var msg = result.msg;
+	    		  		
+	    		   }else{
+	    			   ty = 'success';
+	    			   msg = result.msg;
+	    			   closeDialog(); 
+	    			   window.parent.shuaxin();
+	    		   }
+	           		window.parent.$.omMessageBox.alert({
+	           			type : ty,
+	           			title : '操作提示',
+	           			content : msg
+	           		});
+	        	 
+             //       closeDialog();
+				//	window.parent.shuaxin();
+				//	window.parent.showSimpleTip(res);
+	                 }
+	             });
+                  return false; 
+            });  
+  	 });
+  	 function showResponse(responseText, statusText) {
+        var result = eval("("+responseText+")");
+          if(result.code=='0'){
+          	window.parent.fillBackAndCloseDialog(result.msg);
+          }
+        }
+       //关闭窗口方法
+       function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }     
+</script>
+</head>
+<body>
+  <div>
+    <form id ="dataform" method="post" name="dataform" id="dataform" action="${request.contextPath}/upgoodsbank/update.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr>
+         <th width="35%"><span>*</span>商户号：</th>
+         <td width="25%" class="td">
+           <input value="$!{goodsbank.merId}" disabled='disabled' class="input1" />
+           <input id="merId" name="merId" value="$!{goodsbank.merId}" type="hidden" />
+         </td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>商品号：</th>
+         <td  class="td1"> 
+             <input value="$!{goodsbank.goodsId}" disabled='disabled' class="input1"/> 
+             <input id="goodsId" name="goodsId" value="$!{goodsbank.goodsId}" type="hidden"/>
+         </td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>支付银行：</th>
+         <td  class="td" colspan="1" >
+         <input value="$!{goodsbank.bankId}" disabled='disabled' class="input1" />
+         <input id="bankId" name="bankId" value="$!{goodsbank.bankId}" type="hidden"/>
+         </td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th ><span>*</span>商品银行金额：</th> 
+         <td class="td1"><input name="amount" type="text"  value="$!{goodsbank.amount}" maxlength="13" class="input1"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>2次确认校验码：</th>
+        <td class="td"><input name="verifyTag" type="text"  value="$!{goodsbank.verifyTag}" maxlength="5" class="input1"/></td>        
+        <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>商品最长计费天数：</th>
+         <td class="td1" ><input id="checkDay" name="checkDay" value="$!{goodsbank.checkDay}" maxlength="10" class="input1"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+        <tr>
+         <th><span>*</span>商品开通状态：</th>
+         <td class="td" colspan="1">
+         <input type="radio" name="kState" value="11" #if($!{goodsbank.kState}==11)checked #end />
+               只开通新增<br/>
+           <input type="radio" name="kState" value="12" #if($!{goodsbank.kState}==12)checked #end />
+               只保留续费<br/>
+         <input type="radio" name="kState" value="13" #if($!{goodsbank.kState}==13)checked #end/>
+               新增与续费全部开通<br/>
+                <input type="radio" name="kState" value="23" #if($!{goodsbank.kState}==23)checked #end/>
+               新增与续费全部注销<br/>
+               </td>
+          <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span>*</span>下发商品时间：</th>
+         <input id="isRealTime1" name="isRealTime1" value="" type="hidden" />
+           <td class="td1" colspan="1"><input type="radio" name="isRealTime" value="0" #if($!{goodsbank.isRealTime}==0)checked #end/>
+               即时下发<br/>
+           <input type="radio" name="isRealTime" value="1" disabled="disabled" #if($!{goodsbank.isRealTime}==1)checked #end/>
+               智能网异步发货<br/>
+         <input type="radio" name="isRealTime" value="2" disabled="disabled" #if($!{goodsbank.isRealTime}==2)checked #end/>
+      BOSS异步发货<br/>
+         <input type="radio" name="isRealTime" value="3" #if($!{goodsbank.isRealTime}==3)checked #end/>
+               全部异步发货<br/>
+               </td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th>平台在机构商户号：</th>
+         <td class="td"><input name="bankMerId" type="text" value="$!{goodsbank.bankMerId}" maxlength="32" class="input2"/></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th>平台在机构终端号：</th>
+         <td class="td1"><input name="bankPosId" type="text"  value="$!{goodsbank.bankPosId}" maxlength="32" class="input2" /></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+	   	<th><span>*</span>操作原因：</th>
+	   	<td class="td"><input name="desc" type="text" class="input2"  maxlength="32" /></td>
+	   	<td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+	   </tr>
+     </table>
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn" value="确认" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+	   <input name="button" type="button" class="popbtn" value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+  </div>
+</body>
+</html>

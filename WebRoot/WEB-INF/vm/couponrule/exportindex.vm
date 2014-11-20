@@ -1,0 +1,107 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-itemselector.js"></script>
+<script src="$request.contextPath/js/busi/couponrule.js"></script>
+<script>
+ruleid = '';
+jQuery(document).ready(function() {
+	var readonly = false;
+	var channel = '';
+	#if(${exp}=='0')
+         readonly = true;
+		 channel = '${channel}';
+		 //$("#channelTable").hide();
+		 //$("#channellabel").attr("disabled", true);
+    #else
+         readonly = false;
+    #end
+	$('#channellabel').omCombo({
+        dataSource: '$request.contextPath/option/channellist.do',
+        width: '145px',
+		emptyText : '请选择渠道...',
+		readOnly : readonly,
+		value: channel,
+		forceSelection: true,
+		onValueChange: function(target, newValue, oldValue, event) {
+			ruleid = newValue;
+        }
+    });
+});
+function submitForm(){
+	var channellabel = $('#channellabel').val();
+	if(channellabel == ''){
+		$("#error").html('请选择渠道');
+		return;
+	}
+	$("#error").html('');
+	$("#message").html("处理中, 请耐心等待...");
+	$("#Submit").hide();
+	$('#channellabel').omCombo({readOnly : true});
+	
+	$('#FORMID').submit();
+	timer = setInterval("checkprogress()",1000)
+}
+
+function checkprogress()
+{
+	var time = new Date().getTime();
+	var url = '$request.contextPath/couponrule/checkProgress.do?ruleid=${ruleid}&time=' + time;
+    $.ajax({
+        url: url,
+        success: function(data) {
+			if(data == '2'){
+				$("#message").html("处理中, 请耐心等待...");
+			}else if(data == '0'){
+				$("#message").html("请求参数不全, 请重试");
+			}else if(data == '1'){
+				clearInterval(timer);
+				$("#message").html("处理完成，请保存文件");
+				//closeBySub();
+				setTimeout("closeBySub()",2000)
+			}else if(data == '3'){
+				$("#message").html("导出异常, 请与管理员联系");
+			}
+        }
+    });
+}
+
+</script>
+</head>
+<body>
+  <div>
+   <form id="FORMID" action="${request.contextPath}/couponrule/export.do">
+	<input type="hidden" name="ruleid" value="$!{ruleid}"/>
+	<input type="hidden" name="exp" value="$!{exp}"/>
+	<div id="waitting">
+    
+       <table class="infowrite" cellspacing="0" cellpadding="0" id="channelTable">
+    	   <tr>
+             <th><span>*</span>渠道：</th>
+             <td class="td1">
+    			<input id="channellabel" name="channel"/>
+             </td>
+    		 <td class="td"><font id="error" color="red"></font></td>
+           </tr>
+         </table>
+    	 <div class="pop_btn" id="message">
+    	   <input id="Submit" name="Submit" type="button" onclick="submitForm()" class="popbtn" value="导出" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_add" />
+    	 </div>
+    	 </form>
+       
+      </div>
+ </div>
+</body>
+</html>

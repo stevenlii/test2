@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/busi/common.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/busi/feecode.js"></script>
+<style>
+.tooltip{
+    position:absolute;
+    border:1px solid #333;
+    background:#ffffb0;
+    padding:5px;
+    display:none;
+}
+</style>
+<script type="text/javascript">
+	var url ="$request.contextPath/goodscodemng/querygoodscode.do";
+
+	var setting = {
+		data: {simpleData: {enable: true}},
+		callback: {onClick: backfill}
+	};
+
+	jQuery(document).ready(function() {
+		jQuery("#search_div").width(jQuery(window).width()-20);
+		
+		var zNodes1="${zNodes}";
+		var zNodes=eval(zNodes1);
+		$.fn.zTree.init($("#categoryTree"), setting, zNodes);
+		
+		var optStr="${opts}";
+		var opts=optStr.split(',');
+	    jQuery('[code]').each(function () {
+	        var code=$(this).attr("code");
+	        for(var i=0;i<opts.length;i++){
+			   if(code==opts[i]){
+				   $(this).css('display','inline');
+				}
+    		};
+		});
+		
+          jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/goodscodemng/querygoodscode.do?queryKey=code.allGoodsfeecodeManages",    
+                width:'100%',
+                autoFit : true,
+                height : 475,
+                limit : 15,
+                colModel : [ {header : '更新时间', name : 'MODTIME', width : 80,align : 'center',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                			 {header : '商户名称', name : 'MERNAME', width : 80,align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '商户号', name : 'MERID', width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '商品号', name : 'GOODSID', width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '商品名称', name : 'GOODSNAME', width : 80,align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '商品分类', name : 'CATEGORY', width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '价格(分)', name : 'AMOUNT',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var amount = rowData.AMOUNT;
+                             	var name = "";
+                             	if(amount==""){
+                             		name = "-";
+                             	}else {
+                             		name = amount;
+                             	}
+		                     	return "<a title='"+name+"'>"+name+"</a>";
+                             }},
+                             {header : '服务类型', name : 'SERVTYPE', width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var servType = rowData.SERVTYPE;
+                             	var name = "";
+                             	if(servType==2){
+                             		name = "按次";
+                             	}else if (servType == 3){
+                             		name = "包月";
+                             	}
+		                     	return "<a title='"+name+"'>"+name+"</a>";
+                             }},
+                             {header : '计费代码', name : 'SERVICEID', width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+	                         	var serviceId = rowData.SERVICEID;
+	                         	return '<a class="mytipclass" title="" onmouseover="showTip(event,&quot;'+rowData.ALT+'&quot;)">'+serviceId+'</a>';
+	                         }},
+                            {header : '匹配度', name : 'MATCHTYPE', width : 40 , align : 'left',renderer:function(value , rowData , rowIndex){
+                         			var matchType=rowData.MATCHTYPE;
+                         			var name = "";
+                          			if(matchType == 0){
+                          				name = "精配";
+                          			}
+                          			else if(matchType == 1){
+                          				name = "套用";
+                          			}
+                          			else{
+                          				name = "-";
+                          			}
+                          			return "<a title='"+name+"'>"+name+"</a>";
+                 			 }},
+                             {header : '状态', name : 'STATE', width : 40,align : 'center',renderer:function(value , rowData , rowIndex){
+	                         	var state = rowData.STATE;
+	                         	var name = "";
+	                         	if(state==2){
+	                         		name = "启用";
+	                         	}else{ 
+	                         		name = "禁用";
+	                 			}
+	                   			return "<a title='"+name+"'>"+name+"</a>";
+	                         }},
+                             {header : '操作', name : 'oper', width : 80,align : 'left' ,renderer:function(value , rowData , rowIndex){
+                                var merId=rowData.MERID;
+	                            var goodsId=rowData.GOODSID;
+	                            var amount=rowData.AMOUNT;
+	                            var category=rowData.CATEGORY2;
+	                            var servtype=rowData.SERVTYPE;
+	                            var result = "";
+	                            if(optStr.indexOf("007")!=-1){//有分配权限
+	                            	result= "<input  name='分配商品计费代码' title='分配商品计费代码'  type='image'  src='${request.contextPath}/profile/default/images/u_m_add.png' onclick='showAddDialog(&quot;" + merId + "&quot;,&quot;" + goodsId + "&quot;, &quot;" + amount + "&quot;,&quot;" + category + "&quot;,&quot;" + servtype + "&quot;)'/> ";
+	                            }
+	                            result+=" <input name='详情' title='详情' type='image' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetailDialog(&quot;"+rowData.MERID +"&quot; ,&quot;"+rowData.GOODSID+" &quot;)' />";
+                                return  result;
+                             	}
+                             }]
+            });
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+        
+        //获取商户列表
+        $('#merId').omCombo({
+               dataSource : '$request.contextPath/option/merlist.do',
+               width:'120px',
+               listMaxHeight:150,
+               emptyText:'全部 ' ,
+               onSuccess:function(data, textStatus, event){
+      	  			var tmp = $.parseJSON('{"value":"","text":"全部"}');
+      	  			data.unshift(tmp);
+         		},
+         		forceSelection : true
+        });
+        //类型列表
+       	$('#servType').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+            width:'85px',
+            forceSelection : true,
+            emptyText:'全部 '
+        });
+       	//状态       
+    	  $('#state').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+            width:'80px',
+            emptyText:'全部 ',
+            forceSelection : true
+        });
+    	  $('#state').omCombo('value','2');  //回填
+    	//匹配度列表
+        	$('#matchType').omCombo({
+             dataSource : [{"value":"","text":"全部"},{"value":"0","text":"精配"},{"value":"1","text":"套用"}],
+             width:'80px',
+             forceSelection : true,
+             emptyText:'全部 '
+         });
+        
+        
+        $('#grid').omGrid("setData", url+"?queryKey=code.allGoodsfeecodeManages&state=2");
+
+	});
+
+function mouseCoords(ev) { 
+    if(ev.pageX || ev.pageY){ 
+    	return {x:ev.pageX, y:ev.pageY}; 
+	} 
+    return{ 
+	    x:ev.clientX + document.body.scrollLeft - document.body.clientLeft, 
+	    y:ev.clientY + document.body.scrollTop - document.body.clientTop 
+	}; 
+}
+
+function showTip(event,param){
+   var srcElement = event.target||window.event.srcElement;
+   var jquerySrcElement = $(srcElement);
+   jquerySrcElement.attr('title',''); 
+   var ev = mouseCoords(event);
+   var dhtml = $("<div class='tooltip'>"+param+"</div>").css({position:'absolute',top:(ev.y+10)+'px',left:(ev.x+5)+'px',display:'none'}); 
+   dhtml.appendTo('body').fadeIn(); 
+   jquerySrcElement.unbind('mouseout').mouseout(function(){ 
+       jquerySrcElement.attr('title',param); 
+        dhtml.fadeOut(100,function(){$(this).remove()}); 
+   }) ;
+}
+
+	
+  //添加弹出框
+ function add(){
+  $( "#add" ).omDialog("open");
+  $( "#dialog").omDialog("option","width",'750');
+  $( "#dialog").omDialog("option","title",'添加商品支付银行');
+  $( "#dialog").omDialog("option","height",'520');
+  $( "#dialog").omDialog("option", "modal", true);
+  $( "#dialog").omDialog('open');
+  var frameLoc=window.frames[0].location;
+  frameLoc.href='add.do';
+  return false;
+ }
+
+//多条件查询方法
+function query(){
+     
+  var merId = jQuery('#merId').val();
+  var goodsId = jQuery('#goodsId').val();
+  var goodsName = jQuery('#goodsName').val();
+  var category = jQuery('#category').val();
+  var servType = jQuery('#servType').val();
+  var state = jQuery('#state').val();
+  var serviceId = jQuery('#serviceId').val();
+  var matchType = jQuery('#matchType').val();
+
+  var key = "?queryKey=code.allGoodsfeecodeManages";
+  
+   if(merId != "" && merId != "全部"){ 
+        key = key + '&merId=' + encodeURI(merId);
+   }
+   if(goodsId != ""){ 
+    	key = key + '&goodsId=' + encodeURI(goodsId);
+   }
+  if(goodsName != ""){ //没有查询条件，要显示全部数据
+   
+	  key = key + '&goodsName=' + encodeURI(goodsName);
+  }
+   if(category != "" && category != "全部"){ 
+   		key = key + '&category=' + encodeURI(category);
+   }
+   if(servType != ""){ 
+   		key = key + '&servType=' + encodeURI(servType);
+   }
+   if(state != ""){ 
+   		key = key + '&state=' + encodeURI(state);
+   }
+   if(serviceId != ""){ 
+   		key = key + '&serviceId=' + encodeURI(serviceId);
+   }
+   if(matchType != ""){ 
+ 		key = key + '&matchType=' + encodeURI(matchType);
+   }
+   $('#grid').omGrid("setData", url+key);
+}  
+
+function expGoodsFeecode(){
+  var merId = jQuery('#merId').val();
+  var goodsId = jQuery('#goodsId').val();
+  var goodsName = jQuery('#goodsName').val();
+  var category = jQuery('#category').val();
+  var servType = jQuery('#servType').val();
+  var state = jQuery('#state').val();
+  var serviceId = jQuery('#serviceId').val();
+  var matchType = jQuery('#matchType').val();
+
+  var key = "$request.contextPath/goodscodemng/export.do?queryKey=code.allGoodsfeecodeManages";
+  
+   if(merId != "" && merId != "全部"){ //没有查询条件，要显示全部数据
+        key = key + '&merId=' + encodeURI(merId);
+   }
+   if(goodsId != ""){ 
+    	key = key + '&goodsId=' + encodeURI(goodsId);
+   }
+  if(goodsName != ""){ 
+   
+	  key = key + '&goodsName=' + encodeURI(goodsName);
+  }
+   if(category != "" && category != "全部"){ 
+   		key = key + '&category=' + encodeURI(category);
+   }
+   if(servType != ""){ 
+   		key = key + '&servType=' + encodeURI(servType);
+   }
+   if(state != ""){ 
+   		key = key + '&state=' + encodeURI(state);
+   }
+   if(serviceId != ""){ 
+   		key = key + '&serviceId=' + encodeURI(serviceId);
+   }
+   if(matchType != ""){ 
+  		key = key + '&matchType=' + encodeURI(matchType);
+  }
+   window.location.href=key;
+}
+
+//显示添加计费代码方法
+function showAddDialog(merId,goodsId,amount,category,servtype){
+	$( "#dialog").omDialog("option","width",'790');
+      $( "#dialog").omDialog("option","title",'分配计费代码      ('+merId+'-'+goodsId+')');
+      $( "#dialog").omDialog("option","height",'400');
+      $( "#dialog").omDialog("option", "modal", true);
+	  $( "#dialog").omDialog('open');
+	   var frameLoc=window.frames[0].location;
+       frameLoc.href='$request.contextPath/goodscodemng/showAdd.do?flag=u&merId='+merId+'&goodsId='+goodsId+'&amount='+amount+'&category='+category+'&servtype='+servtype;
+       $("#dialog").omDialog({onClose : function(event) {
+      		window.frames[0].location.href='../wait.htm';
+       }});
+       return false;
+}
+
+//显示详情方法
+function showDetailDialog(merId,goodsId){          
+      $( "#dialog").omDialog("option","width",'500');
+      $( "#dialog").omDialog("option","title",'显示商品信息');
+      $( "#dialog").omDialog("option","height",'470');
+      $( "#dialog").omDialog("option", "modal", true);
+	  $( "#dialog").omDialog('open');
+	   var frameLoc=window.frames[0].location;
+       frameLoc.href='$request.contextPath/goodsinf/detail.do?merId='+merId+'&goodsId='+goodsId;
+       $("#dialog").omDialog({onClose : function(event) {
+       		window.frames[0].location.href='../wait.htm';
+       }});
+	  return false;
+}
+</script>
+</head>
+<body>
+ <!--背景-->
+ <div class="list_btntool" style="height:1px;"></div>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="100%" border="0">
+   <tr>
+    <td width="70%">
+      <table width="100%" border="0">
+          <tr>
+            <th width="10%" height="30">商户：</th>
+              <td width="10%"><input id="merId" name="merId" class="select1"/></td>
+           <th width="10%">商品号：</th>
+             <td width="10%"><input id="goodsId" name="goodsId" size="10" class="input1"/></td>
+           <th width="10%">服务类型：</th>
+              <td width="10%"><input id="servType" name="servType" class="select1" /></td>
+           <th width="10%">匹配度：</th>
+              <td width="10%"><input id="matchType" name="matchType" class="select1" /></td>
+           </tr><tr>
+           <th>商品分类：</th>
+              <td>
+	              <span class="om-combo om-widget om-state-default" style="width: 120px;">
+		 	         <input type="text" id="goodsCategory" readonly value="全部" onclick="showMenu(); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 99px;"><span onclick="showMenu(); return false;" class="om-combo-trigger ioi_trigger"></span>
+		          </span>
+	       		  <input type="hidden" id="category" name="category" value="" type="text" />
+              </td>
+           <th>商品名称：</th>
+             <td ><input id="goodsName" name="goodsName" class="input1"/></td>
+           <th>计费代码：</th>
+             <td><input id="serviceId" name="serviceId" class="input1"/></td>
+           <th>状态：</th>
+              <td><input id="state" name="state" class="select1"/></td>
+         </tr>
+        
+        </table> 
+       </td>
+        <td> <input id="query"  name="query" title='查询' type="image" style="display:none" code="001" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"  />
+         	<input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expGoodsFeecode()"/>
+        </td>
+       </tr>
+        </table>
+      </div>
+      </div>
+  
+   <!--列表区-->
+  <div align="center">
+         <table  align="left" id="grid" ></table>
+     </div>
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+	</div>
+<div id="menuContent" class="list_zTree">
+	<ul id="categoryTree" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

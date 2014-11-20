@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/upService.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script type="text/javascript">
+var setting = {
+	data: {simpleData: {enable: true}},
+	callback: {onClick: onClick}
+};
+
+ 	  var url="$request.contextPath/upservice/query.do?queryKey=upservice.query";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+        	
+        	var zNodes1="${zNodes}";
+    		var zNodes=eval(zNodes1);
+    		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        	
+		    var optStr="${opts}";
+			var opts=optStr.split(',');
+		    jQuery('[code]').each(function () {
+		        var code=$(this).attr("code");
+		        for(var i=0;i<opts.length;i++){
+				   if(code==opts[i]){
+					   $(this).css('display','inline');
+				   }
+	    		};
+			});
+		
+          jQuery('#grid').omGrid({
+                dataSource : url,
+                width:'100%',
+                height : 455,
+                limit : 15,
+                autoFit:true,
+                singleSelect : false,
+                colModel : [{header : '更新时间', name : 'MODTIME',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '商户号', name : 'MERID',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '商户名称', name : 'MERNAME',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '商品号', name : 'GOODSID',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '商品名称', name : 'GOODSNAME',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '通道', name : 'GATENAME',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '商品分类', name : 'CATEGORY',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '计费代码1', name : 'SERVICEID',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '计费代码名称1', name : 'SERVICENAME',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+	              			{header : '计费代码2', name : 'SERVICEID1',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '计费代码名称2', name : 'SERVICENAME1',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+	              			{header : '计费代码3', name : 'SERVICEID2',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+			      				return "<a title='"+value+"'>"+value+"</a>";
+			      			}},
+			      			{header : '计费代码名称3', name : 'SERVICENAME2',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+	              			{header : '金额(分)', name : 'AMOUNT',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},  
+	              			{header : '计费类型', name : 'FEETYPE',width : 40, align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+	              			{header : '状态', name : 'STATENAME',width : 40,align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+	              			{header : '修改人', name : 'MODUSER',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+	              				return "<a title='"+value+"'>"+value+"</a>";
+	              			}},
+	              			{header : '操作', name:'oper',width : 60,align : 'left',renderer:function(value , rowData , rowIndex){
+	              				var state = rowData.STATE;
+	              				var merId = rowData.MERID;
+	              				var goodsId = rowData.GOODSID;
+	              				var gateId = rowData.GATEID;
+	              				var key = "&quot;"+merId+"#"+goodsId+"#"+gateId+"&quot;";
+	              				var result="";
+	              				if(optStr.indexOf("007")!=-1){//有修改权限
+	              					result+=" <input name='修改' title='修改' type='image' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='modify(&quot;"+merId+"&quot;,&quot;"+goodsId+"&quot;,&quot;"+gateId+"&quot;)'/> ";
+	              				}
+	              				if(state==2){ //处于启用状态
+	              					if(optStr.indexOf("004")!=-1){
+	              						result+="<input name='启用' title='启用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Enable1.png'/> ";
+	              					}
+	              					if(optStr.indexOf("003")!=-1){
+	              						result+="<input name='禁用' title='禁用' type='image'  src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable("+key+")'/> ";
+	              					}
+	              				}else{ //处于禁用状态
+	              					if(optStr.indexOf("004")!=-1){
+	              						result+="<input name='启用' title='启用' type='image' src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable("+key+")'/> ";
+	              					}
+	              					if(optStr.indexOf("003")!=-1){
+	              						result+="<input name='禁用' title='禁用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Disable1.png' /> ";
+	              					}
+	              				}
+	              				return result;	
+	              			}}]
+            });
+            
+            var dialog = $("#dialog-upload").omDialog({
+      			title:'批量导入',
+	            width: 420,
+                autoOpen : false,
+                modal : true,
+                resizable : false
+	      });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+       		
+       		jQuery('#ipForm').submit(function() {
+	            var file = document.getElementById("file").value;
+	            if(file == ""){
+	            	alert("请输入文件路径！");
+	            	return false;
+	            }
+	            closeDialog();
+	            jQuery(this).omAjaxSubmit({
+	            		dataType : 'json',
+	            		success:function(res){
+	            			if(res.result=='yes'){
+	            				$.omMessageBox.alert({
+				    	        	type:'success',
+				    	            title : '操作提示',
+				    	            content : '操作成功！'
+				    	        }); 
+	            				shuaxin();
+	            			}else if(res.result=='no'){
+	            				shuaxin();
+	            				$.omMessageBox.confirm({
+	            	                title:'下载确认',
+	            	                content:'部分数据导入失败，是否要查看失败列表？',
+	            	                onClose:function(value){
+	            	                    if(value){
+	            	                    	window.location.href = "$request.contextPath/code/download.do?fileName="+res.fileName;
+	            	                    }
+	            	                }
+	            	            });
+	            			}else{
+	            				$.omMessageBox.alert({
+	            					type:'error',
+	            					title : '操作提示',
+	            					content : res.result
+	            				});           
+	            			}
+	                    }
+	             });	             
+                 return false; 
+            });
+       		
+       		//获取商户列表
+            $('#merId').omCombo({
+            	dataSource : '$request.contextPath/option/merlist.do',
+            	listMaxHeight:150,
+            	width:'85px',
+            	emptyText:'全部 ' ,
+            	onSuccess:function(data, textStatus, event){
+	            	var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	            	data.unshift(tmp);
+	            },
+	            onValueChange : function(target,newValue, oldValue, event) {
+					getGoodsId(newValue);
+				},
+	            forceSelection : true
+            });
+          //初始化商品号列表
+			$('#goodsId').omCombo({
+				dataSource : [ {"value" : "","text" : ""} ],
+				emptyText : '全部 ',
+				width:'85px',
+				listMaxHeight : 150,
+				onSuccess : function(data,textStatus, event) {
+					data.sort(function (a, b) { return a["value"] > b["value"] ? 1 : -1 });
+					var tmp = $.parseJSON('{"value":"","text":"全部"}');
+					data.unshift(tmp);
+				},
+				forceSelection : true
+			});
+            
+       	 //初始化计费代码通道
+       	   $('#gateId').omCombo({
+       		   dataSource : '$request.contextPath/option/gateList.do',
+       		   width:'90px',
+       		   listMaxHeight:85,
+       		   emptyText:'全部 ' ,
+       		   onSuccess:function(data, textStatus, event){
+	       		   var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	       		   data.unshift(tmp);
+	       	   },
+	       	   forceSelection : true
+       	   });
+       	   //类型列表
+       	$('#feeType').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+            width:'100px',
+            forceSelection : true,
+            emptyText:'全部 '
+        });
+       	
+       	//状态列表
+       	$('#state').omCombo({
+            dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+            width:'90px',
+            forceSelection : true,
+            emptyText:'全部 '
+        });
+       	
+       });
+
+function openUpload(){
+	var file = document.getElementById("file");
+	file.outerHTML=file.outerHTML.replace(/(value=\").+\"/i,"$1\"");  //初始化file控件为空值
+	$("#dialog-upload").omDialog("open");
+}
+//搜索框列表根据商户号获取商品号
+function getGoodsId(newValue) {
+	var merId = newValue;
+	if (merId != '') {
+		$.ajax({
+			url : '$request.contextPath/goodsbank/getgoodsids.do',
+			type : 'POST',
+			dataType : 'json',
+			data : {
+				'merId' : merId
+			},
+			success : function(goodsIdList) {
+				var data2 = $.parseJSON('{"text":"全部","value":""}');
+				goodsIdList.unshift(data2);
+				$('#goodsId').omCombo('setData', goodsIdList);
+			}
+		});
+	} else {
+		var data = $.parseJSON('{"text":"全部","value":""}');
+		$('#goodsId').omCombo('setData', data);
+	}
+}
+</script>
+
+</head>
+<body>
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+     
+      <table border="0" width="100%">
+        <tr>
+        <td align="left">
+             <input name="禁用" type="image" title='禁用' style="display:none" code="003" src="${request.contextPath}/profile/default/images/btn_Disable.png" onclick="batchDisable();"/>
+             <input name="启用" type="image" title='启用' style="display:none" code="004" src="${request.contextPath}/profile/default/images/btn_Enable.png" onclick="batchEnable();"/></td>
+		<td align="right">
+		     <input name="添加代码" type="image" title='添加代码' style="display:none" code="005" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add();"/>
+		     <!-- 
+      	     <input name="导入" type="image" title='导入' style="display:none" code="010" src="${request.contextPath}/profile/default/images/btn_Import.png" onclick="openUpload();"/>
+		     -->
+      	     <input name="导出" type="image" title='导出' style="display:none" code="002" src="${request.contextPath}/profile/default/images/btn_Export.png" onclick="expService();"/></td>
+         </tr>
+        </table>
+     </div>
+  
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="100%" border="0">
+       <tr>
+        <td  align="left" width="80%">
+          <!--查询块区 start--> 
+           <form id="form" method="post"> 
+            <table width="100%" border="0">
+              <tr>
+		         <th width="10%" height="30">商户号：</th>
+		         <td width="13%"><input id="merId" name="merId" class="select1"/></td>
+		         <th width="10%">商品号：</th>
+		         <td width="13%"><input id="goodsId" name="goodsId" class="select1"/></td>
+		         <th width="10%">商品分类：</th>
+		         <td width="13%">
+			         <span class="om-combo om-widget om-state-default" style="width: 100px;">
+			         	<input type="text" id="goodsCategory" readonly value="全部" onclick="showMenu(); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 81px;"><span onclick="showMenu(); return false;" class="om-combo-trigger ioi_trigger"></span>
+			         </span>
+			         <input type="hidden" id="category" name="category" value="" type="text" />
+		         </td>      
+		         <th width="10%">支付通道：</th>
+		         <td width="13%"><input id="gateId" name="gateId" class="select1"/></td>
+	         </tr>
+	         <tr>
+		         <th>计费代码：</th>
+		         <td><input id="serviceId" name="serviceId" type="text" class="input1" /></td>
+		         <th>代码名称：</th>
+		         <td><input id="serviceName" name="serviceName" type="text" class="input1" /></td>
+		         <th>计费类型：</th>
+		         <td><input id="feeType" name="feeType" class="select1" /></td>
+		         <th>状态：</th>
+		         <td><input id="state" name="state" class="select1" /></td>
+	         </tr>
+        </table>
+        </form> 
+       </td>
+         <td align="left"><input id="query" title="查询" name="submit" type="image" style="display:none" code="001" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </div>
+     </div>
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+ 	<div id="dialog-upload" style="display:none;">
+        <form id="ipForm" method="post" action="$request.contextPath/code/batchImport.do" enctype="multipart/form-data">
+	        <table style="width:390px;">
+	            <tr>
+	                <th width="78px"><span style="color:red;">*</span>文件路径：</th>
+	                <td><input id="file" name="file" type="file" style="width: 295px" class="input2" /></td>
+	            </tr>
+	            <tr><td>&nbsp;</td></tr>
+	        </table>
+	        <div align='center'>
+	            	<input name="Submit" type="submit" class="popbtn" value="提交" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	     			<input name="close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	     	</div>
+        </form>
+    </div>
+<div id="menuContent" class="list_zTree">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

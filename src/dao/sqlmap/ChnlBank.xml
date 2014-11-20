@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ChnlBank">
+	<typeAlias alias="ChnlBank" type="com.umpay.hfmng.model.ChnlBank" />
+	<sql id="select_what">
+	 select * from umpay.t_hf_chnl_bank where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="channelId" prepend=" and ">
+			channelId = #channelId#
+		</isNotEmpty>
+		<isNotEmpty	property="bankId" prepend=" and ">
+			bankId = #bankId#
+		</isNotEmpty>	
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="channelId" prepend=" and ">
+			channelId = #channelId#
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="ChnlBank" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	<statement id="Find" resultClass="ChnlBank" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_hf_chnl_bank
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="updateModLock" resultClass="integer">
+	   update umpay.t_hf_chnl_bank set modLock=#modLock# where channelId=#channelId# and bankId=#bankId#
+	</statement>
+	
+	<statement id="Insert" resultClass="ChnlBank">
+		insert into umpay.t_hf_chnl_bank(channelId, bankId 
+				<isNotEmpty	property="service_user" prepend=" , "> service_user </isNotEmpty>
+			) values(#channelId#, #bankId# 
+				<isNotEmpty	property="service_user" prepend=" , "> #service_user# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update umpay.t_hf_chnl_bank set modLock=0 
+			<isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+			<isNotEmpty	property="service_user" prepend=" , "> service_user=#service_user# </isNotEmpty>
+		 where channelId=#channelId# and bankId=#bankId#
+	</statement>
+	
+</sqlMap>

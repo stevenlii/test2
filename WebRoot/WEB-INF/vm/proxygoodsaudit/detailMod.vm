@@ -1,0 +1,198 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/proxygoodsaudit.js"></script>
+<script>
+jQuery(document).ready(function() {
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+});
+//商户审核通过方法
+function goPass(id){
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	var flag = confirm("确认审核通过此信息？");
+	if (flag){
+		$.ajax({
+				url : '$request.contextPath/proxygoodsaudit/auditPass.do',
+				type : 'POST',
+				dataType: 'text',
+				data : {
+						'id' : id,
+						'resultDesc' : resultDesc
+				},
+				success : function(data){
+					closeDialog();
+					window.parent.shuaxin();
+					 window.parent.showAuditTip(data);
+				}
+		});
+	}
+}
+function goNotPass(id){
+	var resultDesc = document.getElementById("resultDesc").value;
+	if(byteCount(resultDesc)<=0){
+		alert("请填写不通过理由！")
+		return false;
+	}
+	if(byteCount(resultDesc)>64){
+		alert("审核意见最大长度为64个字符！")
+		return false;
+	}
+	var flag = confirm("确认审核不通过此信息？");
+	if (flag){
+		$.ajax({
+			url : '$request.contextPath/proxygoodsaudit/auditNotPass.do',
+			type : 'POST',
+			dataType: 'text',
+			data : {
+					'id' : id,
+					'resultDesc' : resultDesc
+			},
+			success : function(data){
+					closeDialog();
+					window.parent.shuaxin();
+					window.parent.showAuditTip(data);
+			}
+		});
+	}
+}
+</script>
+</head>
+<body>
+<!--商户修改审核详情页面-->
+<form id ="dataform-mod" method="post" name="dataform-mod">
+   <div class="pop_list_sh">
+     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr>
+         <td width="48%" valign="middle" class="td2">修改前</td>
+         <td width="10"></td>
+         <td width="50%" class="td3">修改后</td>
+       </tr>
+       <tr>
+         <td height="10"></td>
+         <td rowspan="2"></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td><table cellpadding="0" cellspacing="0" class="infowrite">
+         <tr>
+		    <th width="45%">二级商户号：</th>
+			<td width="55%" class="td" colspan="2">${audit.subMerId}</td>
+		</tr>
+		<tr>
+		    <th >二级商户名称：</th>
+			<td class="td1" colspan="2">$!{subMerName}</td>
+		</tr>
+		<tr>
+		    <th>代理商户号：</th>
+			<td class="td" colspan="2">$!{audit.merId}</td>
+		</tr>
+		<tr>
+		    <th>代理商品号：</th>
+			<td class="td1" colspan="2">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+			<th>代理商品名称：</th>
+			<td class="td" colspan="2">$!{goodsName}</td>
+	    </tr>
+	    <tr>
+	    	<th>商品天销售数量：</th>
+			<td class="td1" colspan="2">$!{dayLimitOld}</td>
+		</tr>
+		<tr>
+			<th>预警数：</th>
+			<td class="td" colspan="2">$!{alarmLimitOld}</td>
+		</tr>
+		<tr>
+			<th>预警短信号码：</th>
+			<td class="td1" colspan="2"><textarea rows="4" cols="18" disabled="true">$!{alarmTelOld}</textarea></td>
+		</tr>
+         </table></td>
+         <td><table cellpadding="0" cellspacing="0" class="infowrite">
+         <tr>
+		    <th width="45%">二级商户号：</th>
+			<td width="55%" class="td" colspan="2">${audit.subMerId}</td>
+		</tr>
+		<tr>
+		    <th >二级商户名称：</th>
+			<td class="td1" colspan="2">$!{subMerName}</td>
+		</tr>
+		<tr>
+		    <th>代理商户号：</th>
+			<td class="td" colspan="2">$!{audit.merId}</td>
+		</tr>
+		<tr>
+		    <th>代理商品号：</th>
+			<td class="td1" colspan="2">$!{audit.goodsId}</td>
+		</tr>
+		<tr>
+			<th>代理商品名称：</th>
+			<td class="td" colspan="2">$!{goodsName}</td>
+	    </tr>
+	    <tr>
+    		<th>商品天销售数量：</th>
+    		<td class="td1" colspan="2">
+				#if($!{audit.dayLimit} != $!{dayLimitOld})
+					<span>$!{audit.dayLimit}</span>
+				#else
+					$!{audit.dayLimit}
+				#end
+			</td>
+		</tr>
+		<tr>
+			<th>预警数：</th>
+			<td class="td" colspan="2">
+			#if($!{audit.alarmLimit} != $!{alarmLimitOld})
+				<span>$!{audit.alarmLimit}</span>
+			#else
+				$!{audit.alarmLimit}
+			#end
+			</td>
+		</tr>
+		<tr>
+			<th>预警短信号码：</th>
+			<td class="td1" colspan="2">
+				<textarea rows="4" #if($!{audit.alarmTel} != $!{alarmTelOld})style="color:red"#end cols="18" disabled="true">$!{audit.alarmTel}</textarea>
+			</td>
+		</tr>
+        
+         </table></td>
+       </tr>
+       <tr>
+         <td height="63" colspan="3" align="left" valign="bottom"><textarea id="resultDesc" name="resultDesc" rows="3" style="{width:100%;}"></textarea></td>
+       </tr>
+     </table>
+     <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goPass($id)"/>
+	   <input type="button" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="不通过" onclick="goNotPass($id)"/>
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog(0)"/>
+	 </div>
+   </div>
+ </form>
+ </body>
+ </html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="backup">
+	<sql id="getBackupAll">
+	<![CDATA[
+		select a.backup_oper_id,
+		       a.bank_id,
+		       (select t5.bankname
+		          from umpay.t_bank_inf t5
+		         where a.bank_id = t5.bankid fetch first 1 rows only) as bankname,
+		       a.mer_id,
+		       (select t1.mername from umpay.t_mer_inf t1 where a.mer_id = t1.merid) as mername,
+		       (select t4.category
+		          from umpay.t_hfmer_exp t4
+		         where a.mer_id = t4.merid fetch first 1 rows only) as mer_category,
+		       (select t4.busi_attr
+		          from umpay.t_hfmer_exp t4
+		         where a.mer_id = t4.merid fetch first 1 rows only) as mer_busitype,
+		       a.goods_id,
+		       (select t2.goodsname
+		          from umpay.t_goods_inf t2
+		         where a.goods_id = t2.goodsid
+		           and a.mer_id = t2.merid fetch first 1 rows only) as goodsname,
+		       (select t3.category
+		          from umpay.t_hfgoods_exp t3
+		         where a.goods_id = t3.goodsid
+		           and a.mer_id = t3.merid fetch first 1 rows only) as goods_category,
+		       c.servtype,
+		       (select t3.amount
+		          from umpay.t_hfgoods_exp t3
+		         where a.goods_id = t3.goodsid
+		           and a.mer_id = t3.merid fetch first 1 rows only) as amount,
+		       b.company_desc,
+		       b.mer_web,
+		       b.reg_capital,
+		       b.reg_tiem,
+		       b.year_profit,
+		       b.user_scale,
+		       b.busi_desc,
+		       b.support,
+		       b.sale_channel,
+		       b.src_mer,
+		       b.shared_rate
+		  from umpay.t_report_opt a
+		  left join umpay.t_hfmer_exp_attr b
+		    on a.mer_id = b.mer_id
+		  left join umpay.t_goods_inf c
+		    on a.goods_id = c.goodsid
+		   and a.mer_id = c.merid
+		 where a.backup_oper_stat = 9
+		   and a.is_valid = 2
+		#if( $addUserId && $addUserId!='' ) 
+	    	and a.add_user_id = :addUserId
+		#end
+		#if( $merId && $merId!='' ) 
+			and  a.mer_id = :merId
+		#end
+		#if( $goodsId && $goodsId!='' ) 
+			and a.goods_id = :goodsId
+		#end
+		#if( $bankId && $bankId!='' ) 
+			and a.bank_id = :bankId
+		#end
+		#if( $servType && $servType!='' ) 
+			and c.servtype = :servType
+		#end
+		order by a.updt_time desc
+	]]>
+	</sql>
+</mapper> 

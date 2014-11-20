@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="${request.contextPath}/js/ui/themes/default/om-all.css"
+	type="text/css">
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/couponinf.js"></script>
+<style type="text/css">
+.input_text {
+	border: 1px solid #6D869E;
+	height: 17px;
+	vertical-align: middle;
+	width: 50%;
+}
+
+.errorMsg {
+	background: url("$   request.contextPath/ profile/ validate/ images/ alert.png)
+		center no-repeat white;
+	background-position: 5px 50%;
+	background-color: #FCEFE3;
+	text-align: left;
+	padding: 2px 2px 2px 25px;
+	border: 1px solid red;
+	display: none;
+	width: 100px;
+	margin-top: -18px;
+	margin-left: 18px;
+	position: absolute;
+	border-radius: 4px;
+	display
+	：block;
+}
+
+.errorImg {
+	background:
+		url("$request.contextPath/profile/validate/images/invalid.png")
+		no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+	vertical-align: inherit;
+}
+</style>
+<script>
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+             
+  	 	jQuery(document).ready(function() {
+			
+			//初始化兑换券类型列表
+            $('#couponType').omCombo({
+                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponInfTypes',
+                width: '155px',
+                emptyText: '请选择..',
+                forceSelection: true,
+				value: '$!{couponInf.couponType}',
+				onValueChange:function(target,newValue,oldValue,event){ 
+                	// 设置已修改标记
+					$('#modifyTag').attr('value', '1');
+                }
+            });
+			
+			//初始化兑换状态列表
+			if('$!{couponInf.state}' == '0'){
+				$('#state').omCombo({
+	                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponInfStates',
+	                width: '155px',
+	                emptyText: '请选择..',
+	                forceSelection: true,
+					readOnly: $!{stateReadOnly},
+					value: '$!{couponInf.state}'
+	            });
+			}else{
+				$('#state').omCombo({
+	                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponInfStates_MODIFY',
+	                width: '155px',
+	                emptyText: '请选择..',
+	                forceSelection: true,
+					readOnly: $!{stateReadOnly},
+					value: '$!{couponInf.state}'
+	            });
+			}
+            
+			
+			jQuery("#dataform").validate({
+                rules: {
+                    "couponType": {
+						required: true
+                    },
+                    "couponName": {
+                        required: true,
+						maxlength: 32
+                    },
+					"remark": {
+						maxlength: 64
+                    }
+                },
+                messages: {
+                    "couponType": {
+                        required: "请选择兑换券类型"
+                    },
+                    "couponName": {
+                        required: "请输入兑换券名称",
+						maxlength: "超出最大长度"
+                    },
+                    "remark": {
+						maxlength: "超出最大长度"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+	
+		$(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+
+		function getState(o) {
+		    if (o == 2) {
+		        return "已启用";
+		    } else if (o == 4) {
+		        return "不启用";
+		    } else if (o == 0) {
+		        return "待启用";
+		    } else {
+		        return o;
+		    }
+		}
+		
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_modify").attr("disabled", "disabled");
+
+			//记录修改日志
+			if($("#couponType").val()!='${couponInf.couponType}'){
+				$("#operdata").val($("#operdata").val()+"兑换券类型由【${couponInf.couponType}】修改为【"+$("#couponType").val()+"】;");
+			}
+			if($("#couponName").val()!='${couponInf.couponName.trim()}'){
+				$("#operdata").val($("#operdata").val()+"兑换券名称由【${couponInf.couponName.trim()}】修改为【"+$("#couponName").val()+"】;");
+			}
+			if($("#remark").val() != $("#oldremark").val()){
+				$("#operdata").val($("#operdata").val()+"说明由【" + $("#oldremark").val() + "】修改为【"+$("#remark").val()+"】;");
+			}
+			if($("#state").val()!='${couponInf.state}'){
+				$("#operdata").val($("#operdata").val()+"兑换券状态由【"+getState("${couponInf.state}") +"】修改为【" + getState($("#state").val()) + "】;");
+			}
+			if($("#operdata").val()==""){
+				$("#operdata").val("无修改内容");
+			}
+
+			jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					window.parent.showSimpleTip(res);
+					if( res == '1' ){
+						closeDialog();
+						window.parent.shuaxin();
+					}else{
+						// 设置钮可用
+						$("#btn_modify").removeAttr("disabled");
+					}
+                }
+            });
+            return false;
+        });});
+	
+  	 	function showResponse(responseText, statusText) {
+            var result = eval("(" + responseText + ")");
+            if (result.code == '0') {
+                window.parent.fillBackAndCloseDialog(result.msg);
+            }
+        }
+
+      
+  	 	
+</script>
+</head>
+<body>
+	<div>
+		<form id="dataform" method="post" name="dataform" id="dataform"
+			action="${request.contextPath}/couponinf/update.do">
+			<table class="infowrite" cellspacing="0" cellpadding="0">
+				<tr>
+					<th width="20%"><span>*</span>兑换券编号：</th>
+					<td width="58%" class="td">$!{couponInf.couponId} <input
+						type="hidden" id="couponId" name="couponId"
+						value="$!{couponInf.couponId}" /> <input type="hidden"
+						id="modifyTag" value="0" /></td>
+					<td class="td"><span class="errorImg"></span><span
+						class="errorMsg"></span></td>
+				</tr>
+				<tr>
+					<th><span>*</span>兑换券类型：</th>
+					<td class="td1"><input id="couponType" name="couponType" /></td>
+					<td class="td1"><span class="errorImg"></span><span
+						class="errorMsg"></span></td>
+				</tr>
+				<tr>
+					<th><span>*</span>兑换券名称：</th>
+					<td class="td"><input id="couponName" name="couponName"
+						type="text" class="input2" value="$!{couponInf.couponName.trim()}" />
+					</td>
+					<td class="td"><span class="errorImg"></span><span
+						class="errorMsg"></span></td>
+				</tr>
+				<tr>
+					<th>说 明：</th>
+					<td class="td1"><textarea id="remark" name="remark" cols="40"
+							rows="5"
+							style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:90%">$!{couponInf.remark}</textarea>
+						<input id="oldremark" name="oldremark" type="hidden"
+						value="$!{couponInf.remark}" /></td>
+					<td class="td1"><span class="errorImg"></span><span
+						class="errorMsg"></span></td>
+				</tr>
+				<tr>
+					<th><span>*</span>兑换券启用状态：</th>
+					<td class="td"><input id="state" name="state" /></td>
+					<td class="td"><span class="errorImg"></span><span
+						class="errorMsg"></span> <input type="hidden" id="operdata"
+						name="operdata" /></td>
+				</tr>
+			</table>
+			<div class="pop_btn">
+				<input name="Submit" type="submit" class="popbtn" value="修改"
+					onmouseover="this.className='popbtnhover'"
+					onmouseout="this.className='popbtn'" id="btn_modify" /> <input
+					name="close" type="button" class="popbtn" value="取消"
+					onclick="closeDialog();" onmouseover="this.className='popbtnhover'"
+					onmouseout="this.className='popbtn'" />
+			</div>
+		</form>
+	</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MersetSwitch">
+	<typeAlias alias="MersetSwitch" type="com.umpay.hfmng.model.MersetSwitch" />
+	
+	<statement id="selectopen" resultClass="MersetSwitch" >
+		select t.mer_id as merid,t.config_time as configtime from umpay.T_COUPON_MERSET_SWITCH t  
+		where t.is_valid = 2 and t.is_open = 2
+	</statement>
+	
+	<statement id="selectclosed" resultClass="MersetSwitch" >
+		select t.mer_id as merid,t.config_time as configtime from umpay.T_COUPON_MERSET_SWITCH t  
+		where t.is_valid = 2 and t.is_open = 4
+	</statement>
+	<!-- 将有效的修改为无效的 -->
+	<statement id="Update" resultClass="integer">
+	   update umpay.T_COUPON_MERSET_SWITCH set mod_time=CURRENT TIMESTAMP, is_valid = 4
+	    where is_open = 2 
+	</statement>
+	<!-- 将关闭有效的设置为关闭无效 -->
+	<statement id="Update2" resultClass="integer">
+	   update umpay.T_COUPON_MERSET_SWITCH set mod_time=CURRENT TIMESTAMP, is_valid = 4
+	    where is_open = 4 and mer_id = #merid#
+	</statement>
+	<!-- 将关闭有效的设置为关闭无效 -->
+	<statement id="Update3" resultClass="integer">
+	   update umpay.T_COUPON_MERSET_SWITCH set mod_time=CURRENT TIMESTAMP, is_valid = 4
+	    where is_open = 2 and mer_id = #merid#
+	</statement>
+	<statement id="Insert" >
+		insert into umpay.T_COUPON_MERSET_SWITCH(seq_id, mer_id, config_time, is_open, is_valid, mod_time, in_time) 
+		values(#seqid#, #merid#, #configtime#, #isopen#, #isuse#, #modtime#, #intime#)
+	</statement>
+</sqlMap>

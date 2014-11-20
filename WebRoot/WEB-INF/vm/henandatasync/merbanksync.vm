@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css"/>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/henandatasync.js"></script>
+<script type="text/javascript">
+	url = "$request.contextPath/henandatasync/querymerbank.do?queryKey=merbank.henanMerBanks";
+    jQuery(document).ready(function() {
+    	jQuery("#search_div").width(jQuery(window).width()-20);
+    	
+    	jQuery('#grid').omGrid({
+            dataSource : url,
+            width:'100%',
+        	height : 455,
+            limit : 15,
+            colModel : [ {header : '商户号', name : 'MERID',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+				 				return "<a title='"+value+"'>"+value+"</a>";
+				 			}},
+				         {header : '商户名称', name : 'MERNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				 				return "<a title='"+value+"'>"+value+"</a>";
+				 			}},
+			 			 {header : '支付银行', name : 'BANKID', width : 70 , align : 'left',renderer:function(value , rowData , rowIndex){
+                            var result=rowData.BANKNAME+"("+rowData.BANKID+")"; 	
+                            return "<a title='"+result+"'>"+result+"</a>";
+                         	}},
+                         {header : '平台在机构的商户号', name : 'BANKMERID', align : 'left',renderer:function(value , rowData , rowIndex){
+	                    	 	var bankMerId=rowData.BANKMERID;
+	                    	 	return "<a title='"+bankMerId+"'>"+bankMerId+"</a>";
+			     		 }},
+                         {header : '平台在机构的终端号', name : 'BANKPOSID', align : 'left',renderer:function(value , rowData , rowIndex){
+			     			 	var bankPosId=rowData.BANKPOSID;
+			     			 	return "<a title='"+bankPosId+"'>"+bankPosId+"</a>";
+			     		 }},
+                         {header : '状态', name : 'STATE', align : 'left',renderer:function(value , rowData , rowIndex){
+                         	var state = rowData.STATE;
+                         	var name = "";
+                         	if(state==2){
+                         		name = "启用";
+                         	}else {
+                         		name = "禁用";
+	              			}
+	                     	return "<a title='"+name+"'>"+name+"</a>";
+                         }
+                         },
+                         {header : '操作', name:'oper', align : 'left',renderer:function(value , rowData , rowIndex){
+	                         	var merId=rowData.MERID;
+	                         	var merName=rowData.MERNAME;
+                        	 return "<input name='同步发送' title='同步发送'  type='image' src='${request.contextPath}/profile/default/images/ao.png' onclick='singleMerBankSync(&quot;" + merId + "&quot;,&quot;"+ merName+"&quot;);'/>";
+                         }}
+                  ],
+                  autoFit : true
+        });
+        
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+         });
+   });
+    
+    //单个商户银行同步
+    function singleMerBankSync(merId,merName){
+    	flag=confirm("确定同步此商户银行信息？");
+    	if(flag){
+    		var id = merId + '#&' + merName;
+    		$.ajax({
+    			url : 'singleMerBankSync.do',
+    			type : 'POST',
+    			dataType: 'json',
+    			data : {
+    				'id' : id
+    			},
+    			success : function(data){
+					if (data.retCode == '0000'){
+						$.omMessageBox.alert({
+                			type : 'success',
+                			title: '操作提示',
+                			content:data.retMsg
+            			});
+						} else{
+							$.omMessageBox.alert({
+	                			type : 'error',
+	                			title: '操作提示',
+	                			content: data.retMsg
+	            			});
+							}
+     			}
+    		});
+    	}
+    }
+
+</script>
+
+</head>
+<body>
+<!--列表查询区-->
+<div id="search_div">
+<div class="list_search">
+     <table width="40%" height="100%" border="0">
+       <tr>
+         <th>商户号：</th>
+         <td width="60%"><input id="merId" name="merId" type="text" class="input1" /></td>
+         <td><input id="query" title="查询" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryMerBank()"/></td>
+       </tr>
+     </table>
+</div>
+</div>
+<!--列表区-->
+<table id="grid" align="left"></table>
+</body>
+</html>

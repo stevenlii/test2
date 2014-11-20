@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponInf">
+	<typeAlias alias="CouponInf" type="com.umpay.hfmng.model.CouponInf" />
+	<statement id="insert" resultClass="CouponInf">
+		insert into umpay.t_coupon_inf(couponId, couponName, price,
+		couponType, state, submitUser, inTime
+		<isNotEmpty property="auditUser" prepend=" , "> auditUser
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , "> modTime
+		</isNotEmpty>
+		<isNotEmpty property="remark" prepend=" , "> remark
+		</isNotEmpty>
+		) values(#couponId#, #couponName#, #price#, #couponType#,
+		#state#,
+		#submitUser#, #inTime#
+		<isNotEmpty property="auditUser" prepend=" , ">
+			#auditUser#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="remark" prepend=" , "> #remark#
+		</isNotEmpty>
+		)
+	</statement>
+
+	<statement id="get" resultClass="CouponInf">
+		select couponId,
+		       auditUser,
+		       state,
+		       modTime,
+		       couponName,
+		       price,
+		       couponType,
+		       submitUser,
+		       to_char(inTime, 'yyyy-mm-dd hh24:mi:ss') as inTime,
+		       remark
+		  from umpay.t_coupon_inf
+		 where couponId = #couponId :char#
+	</statement>
+
+	<statement id="updateCouponInf" resultClass="integer">
+		update umpay.t_coupon_inf set couponId=#couponId#
+		<isNotEmpty property="couponName" prepend=" , ">
+			couponName=#couponName#
+			</isNotEmpty>
+		<isNotEmpty property="couponType" prepend=" , ">
+			couponType=#couponType#
+			</isNotEmpty>
+		<isNotEmpty property="price" prepend=" , ">
+			price=#price#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , ">
+			state=#state#
+		</isNotEmpty>
+		<isNotEmpty property="submitUser" prepend=" , ">
+			submitUser=#submitUser#
+			</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			inTime=#inTime#
+			</isNotEmpty>
+		<isNotEmpty property="auditUser" prepend=" , ">
+			auditUser=#auditUser#
+			</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime=#modTime#
+			</isNotEmpty>
+		<isNotEmpty property="remark" prepend=" , ">
+			remark=#remark#
+		</isNotEmpty>
+		where couponId=#couponId#
+	</statement>
+	
+	<statement id="getCouponInfs" resultClass="CouponInf">
+    	select couponId, couponName from umpay.T_COUPON_INF
+	</statement>
+</sqlMap>

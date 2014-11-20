@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="code"  >
+	<sql id="feecode"> 
+	<![CDATA[
+		 select tsi.serviceid,tsi.state,tsi.feetype,tsi.amount,tsi.detail,
+         tsi.moduser,tsi.modtime,tsi.intime,tsi.category,tss.usecount,tss.matchType 
+         from umpay.t_service_inf tsi left join umpay.t_service_stat  tss on tsi.serviceid=tss.serviceid  where tsi.state=2
+		 #if( $feetype && $feetype!='' ) 
+		   and  tsi.feetype=:feetype   
+		 #end 
+		 #if( $amount && $amount!='' ) 
+		   and  tsi.amount=:amount  
+		 #end 
+		  #if( $category && $category!='' ) 
+		   and  tsi.category=:category  
+		 #end 
+		  #if( $serviceid && $serviceid!='' ) 
+		   and  tsi.serviceid=:serviceid  
+		 #end 
+		  #if( $detail && $detail!='' ) 
+		   and  tsi.detail like '%$detail%'  
+		 #end 
+		  #if($servtype && $servtype!='' ) 
+		   and   tsi.feetype=:servtype 
+		 #end 
+	
+		
+		 order by tss.usecount,tss.matchtype
+	  ]]>
+	</sql>
+	
+	
+	<sql id="allGoodsfeecodes"> 
+	<![CDATA[
+		select a.merid,a.goodsid,b.modtime,a.goodsname,a.servtype,b.category,b.amount from UMPAY.t_goods_inf a 
+			join UMPAY.t_hfgoods_exp b on a.merid=b.merid and a.goodsid=b.goodsid where b.busitype>'01' 
+			and not exists (select 1 from umpay.T_GOODS_SERVICEID g where g.state=2 and a.merid = g.merid and a.goodsid =g.goodsid)
+		 #if( $merId && $merId!='' ) 
+		   and  a.merId = :merId 
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   and  a.goodsId  = :goodsId 
+		 #end 
+		 #if( $goodsName && $goodsName!='' ) 
+		   and  a.goodsName like '%$goodsName%' 
+		 #end
+		 #if( $category && $category!='' ) 
+		   and  b.category like '$category%' 
+		 #end
+		 #if( $servType && $servType!='' ) 
+		   and  a.servType = :servType 
+		 #end 
+		  order by b.modTime desc
+	  ]]>
+	</sql>
+	<sql id="allGoodsfeecodeManages"> 
+	<![CDATA[
+		select ser.goodsId,exp.modTime,inf.goodsName,inf.merId,exp.category,inf.servType,ser.serviceId,ser.state,
+			 st.matchType,st.useCount,code.amount,code.feeType codeServType,code.detail,code.state codeState,code.category codeCategory 
+			 from umpay.T_SERVICE_INF code  left join umpay.T_SERVICE_STAT st on st.serviceid = code.serviceid, 
+			 umpay.t_goods_inf inf,umpay.t_hfgoods_exp exp,umpay.T_GOODS_SERVICEID ser
+			 where inf.state=2 and code.serviceId=ser.serviceId and inf.merId=ser.merId 
+			 and inf.goodsId=ser.goodsId and exp.merId=ser.merId and exp.goodsId=ser.goodsId 
+		 #if( $state && $state!='' ) 
+		   and  ser.state = :state 
+		 #end
+		 #if( $merId && $merId!='' ) 
+		   and  ser.merId = :merId 
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   and  ser.goodsId  = :goodsId 
+		 #end 
+		 #if( $goodsName && $goodsName!='' ) 
+		   and  inf.goodsName like '%$goodsName%' 
+		 #end
+		 #if( $category && $category!='' ) 
+		   and  exp.category like '$category%' 
+		 #end
+		 #if( $servType && $servType!='' ) 
+		   and  inf.servType = :servType 
+		 #end
+		 #if( $serviceId && $serviceId!='' ) 
+		   and  ser.serviceId = :serviceId 
+		 #end
+		 #if( $matchType && $matchType!='' ) 
+		   and  st.matchType = :matchType 
+		 #end 
+		  order by exp.modTime desc
+	  ]]>
+	</sql>
+	<!-- 查询已经做过配置的商品计费代码 关联表为 t_goods_serviceid 和 t_service_inf 条件为 当前启用状态 -->
+	<sql id="goodsfeecode"> 
+	<![CDATA[
+		 select TG.merId,TG.goodsId, TG.serviceid, TG.priority,TSI.state,TG.moduser,
+		 TG.modtime,TG.intime ,TSI.FEETYPE,TSI.AMOUNT,TSS.USECOUNT,TSS.MATCHTYPE,TSI.CATEGORY
+          from umpay.T_GOODS_SERVICEID TG,UMPAY.T_SERVICE_INF TSI LEFT JOIN umpay.T_SERVICE_STAT  TSS on TSI.serviceid=TSS.serviceid
+           where  TG.STATE=2 AND TG.SERVICEID=TSI.SERVICEID 
+         #if( $merId && $merId!='' ) 
+		   and  TG.merId=:merId   
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   and  TG.goodsId=:goodsId  
+		 #end 
+	  ]]>
+	</sql>
+	<sql id="allCodeMngs"> 
+	<![CDATA[
+		 select service.serviceid,service.state,service.feetype,service.amount,
+		        service.detail,service.moduser,service.modtime,service.intime,service.category    
+		 from umpay.t_service_inf  service where 1=1
+		 #if( $serviceId && $serviceId!='' ) 
+		   and  service.serviceId = :serviceId   
+		 #end 
+		 #if( $amount && $amount!='' ) 
+		   and  service.amount = :amount    
+		 #end 
+		  #if( $state && $state!='' ) 
+		   and  service.state=:state 
+		 #end
+		 #if( $feeType && $feeType!='' ) 
+		   and  service.feeType = :feeType   
+		 #end
+		 #if( $detail && $detail!='' ) 
+		   and service.detail like '%$detail%' 
+		 #end
+		 #if( $category && $category!='' ) 
+		   and  service.category = :category 
+		 #end
+		 order by service.modtime desc
+	  ]]>
+	</sql>
+	<sql id="FeeCodeStats"> 
+	<![CDATA[
+		 select a.serviceId,a.amount,a.state,a.feeType,a.detail,a.category,st.matchType,st.useCount
+		  from umpay.t_service_inf a left join umpay.T_SERVICE_STAT st 
+		  on a.serviceId=st.serviceId
+		  where 1=1 
+		 #if( $serviceId && $serviceId!='' ) 
+		   and  a.serviceId = :serviceId   
+		 #end 
+		 #if( $amount && $amount!='' ) 
+		   and  a.amount = :amount    
+		 #end 
+		  #if( $state && $state!='' ) 
+		   and  a.state=:state 
+		 #end
+		 #if( $feeType && $feeType!='' ) 
+		   and  a.feeType = :feeType   
+		 #end
+		 #if( $detail && $detail!='' ) 
+		   and a.detail=:detail
+		 #end
+		 #if( $category && $category!='' ) 
+		   and  a.category = :category 
+		 #end
+		 #if( $matchType && $matchType!='' ) 
+		   and  st.matchType = :matchType 
+		 #end
+		 order by a.modtime desc
+	  ]]>
+	</sql>
+</mapper> 
+

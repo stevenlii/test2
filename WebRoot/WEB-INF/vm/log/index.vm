@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="$request.contextPath/profile/default/css/common.css">
+<style type="text/css">
+table.altrowstable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #a9c6c9;
+	border-collapse: collapse;
+	word-break: keep-all;
+}
+table.altrowstable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9c6c9;
+	word-break: keep-all;
+}
+table.altrowstable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9c6c9;
+	word-break: keep-all;
+}
+.oddrowcolor{
+	background-color:#d4e3e5;
+}
+.evenrowcolor{
+	background-color:#c3dde0;
+}
+</style>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    $('#logType').omCombo({
+    	dataSource : [
+                {text:'TRADE',value:'TRADE'},
+                {text:'WEB',value:'WEB'},
+                {text:'REST',value:'REST'}
+        ],
+    	editable:false,
+    	forceSelection: true,
+    	value: 'TRADE',
+        lazyLoad:true
+    });
+     
+     jQuery("#dataform").validate({
+                rules : {
+                    "mobile": {
+                        required : true
+                    }
+                },
+                messages : {
+                    "mobile"  : {
+                        required : "请输入手机号"
+                    }
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+      });
+            
+    jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){ 
+                 return false;
+  	 	 	 }
+              jQuery(this).omAjaxSubmit({success:function(res){
+             		$('#result').html('') ;
+             		$('#result').css('display','inline');
+             		$('#result').append(res) ;
+         		}
+            });
+              return false; 
+  	 	});
+        
+  });
+</script>
+</head>
+<body>
+  
+   <!--查询区-->
+	<div class="list_search" style="height: 40px;">
+		<form id="dataform" method="post" name="dataform"
+			action="${request.contextPath}/log/query.do">
+			<table width="100%" border="0">
+				<tr>
+					<th width="10%" height="30">手机号：</th>
+					<td width="22%">
+						<input id="mobile" name="mobile" type="text" class="input2"
+							maxlength="11" />
+					</td>
+					<th width="10%">系统：</th>
+					<td width="25%">
+						<input id="logType" name="logType" class="select1" style="width:150px" />
+					</td>
+					<td>
+						<input id="query" name="query" type="image"
+							src="${request.contextPath}/profile/default/images/Search_bnt.png"
+							onclick="query()" />
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+ <!--列表查询区-->
+<hr/>   
+  <div id="result" style="display:none;width:100%;float:left;height:440px;text-align:left;overflow:scroll;background-color:#E8EEF7;margin-top:10px;">
+  </div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/henandatasync.js"></script>
+<script type="text/javascript">
+	url = "$request.contextPath/henandatasync/querygoodsbank.do?queryKey=goodsbank.henangoodsbank";
+	jQuery(document).ready(function() {
+		
+		jQuery("#search_div").width(jQuery(window).width()-20);
+          jQuery('#grid').omGrid({
+                dataSource : url,              
+                width:'100%',
+                height : 455,
+                limit : 15,
+                colModel : [ {header : '商户号', name : 'MERID',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '商户名称', name : 'MERNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '商品号', name : 'GOODSID', width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '商品名称', name : 'GOODSNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+					 				return "<a title='"+value+"'>"+value+"</a>";
+					 			}},
+                             {header : '支付银行', name : 'BANKID', width : 70 , align : 'left',renderer:function(value , rowData , rowIndex){
+	                            var result=rowData.BANKNAME+"("+rowData.BANKID+")"; 	
+	                            return "<a title='"+result+"'>"+result+"</a>";
+                             	}},
+                             {header : '付款类型', name : 'AMTTYPE',width : 75, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var amtType = rowData.AMTTYPE;
+                             	var name = "";
+                             	if(amtType==01)
+                             		name = "人民币";
+                             	else if (amtType==02){
+                             		name = "移动话费";
+                             	}
+                             	else if (amtType==03){
+                             		name = "移动积分";
+                         	    }
+                             	return "<a title='"+name+"'>"+name+"</a>";
+                             }},
+                             {header : '商品开通状态', name : 'KSTATE',width : 75, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var KSTATE = rowData.KSTATE;
+                             	var name = "";
+                             	if(KSTATE==11)
+                             		name = "只开通新增";
+                             	else if (KSTATE == 12){
+                             		name = "只开通续费";
+                             	}
+                             	else if (KSTATE==13){
+                             		name = "新增与续费全部开通";
+                         	    }
+                             	else if (KSTATE==23){
+                             		name = "新增与续费全部注销";
+                             	}
+                             	return "<a title='"+name+"'>"+name+"</a>";
+                             }},
+                             {header : '操作', name : 'oper', width : 50 , align : 'left' ,renderer:function(value , rowData , rowIndex){
+	                            var merId=rowData.MERID;
+	                            var goodsId=rowData.GOODSID;
+	                            var goodsName=rowData.GOODSNAME;
+	                            result=" <input name='同步发送' alt='同步发送' title='同步发送' type='image' value='ee' src='${request.contextPath}/profile/default/images/ao.png' onclick='singleGoodsBankSync(&quot;"+merId+"&quot;,&quot;"+ goodsId+"&quot;,&quot;"+ goodsName+"&quot;)' />";
+	                            return result;
+                             	}
+                             }                                       
+                            ],
+                            autoFit:true
+            });
+          //初始化商户号列表  	
+          $('#merId').omCombo({
+   		        dataSource : '$request.contextPath/option/merlist.do',
+   		        width:'150px',
+   		        listMaxHeight:150,
+   		        emptyText:'全部 ' ,
+   		        forceSelection : true ,
+   		        onSuccess:function(data, textStatus, event){
+   		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+   		      	  data.unshift(tmp);
+   	            },
+   		        onValueChange:function(target,newValue,oldValue,event){ 
+   				   	getGoodsId(newValue);
+   			 	}
+   	       });
+          //初始化商品号列表
+       $('#goodsId').omCombo({
+          //    dataSource : '$request.contextPath/option/goodslist.do',
+                dataSource : '',
+                width:'150px',
+                emptyText:'全部 ' ,
+                listMaxHeight:150,
+                onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+  	             }
+            });
+       //商品开通状态
+   	  $('#kState').omCombo({
+           dataSource : [{"value":"","text":"全部"},{"value":"11","text":"只开通新增"},{"value":"12","text":"只开通续费"},
+                         {"value":"13","text":"新增与续费全部开通"},{"value":"23","text":"新增与续费全部注销"}],
+           width:'140px',
+           listMaxHeight:150,
+           emptyText:'全部 ' ,
+           forceSelection : true   
+       });   
+      
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+	});
+	  //添加弹出框
+	 function add(){
+      $( "#dialog").omDialog("option","width",'750');
+	  $( "#dialog").omDialog("option","title",'添加商品支付银行');
+	  $( "#dialog").omDialog("option","height",'450');
+	  $( "#dialog").omDialog("option", "modal", true);
+      $( "#dialog").omDialog('open');
+	  var frameLoc=window.frames[0].location;
+      frameLoc.href='add.do';
+      $("#dialog").omDialog({onClose : function(event) {
+     		window.frames[0].location.href='../wait.htm';
+      }});
+	  return false;
+    }
+	//批量添加弹出框
+	 function batchAdd(){
+	     $( "#dialog").omDialog("option","width",'750');
+		  $( "#dialog").omDialog("option","title",'批量添加商品支付银行');
+		  $( "#dialog").omDialog("option","height",'500');
+		  $( "#dialog").omDialog("option", "modal", true);
+	     $( "#dialog").omDialog('open');
+		  var frameLoc=window.frames[0].location;
+	     frameLoc.href='batchAdd.do';
+	     $("#dialog").omDialog({onClose : function(event) {
+	    		window.frames[0].location.href='../wait.htm';
+	     }});
+		  return false;
+   }
+   //批量修改弹出框
+	 function batchMod(){
+      $( "#dialog").omDialog("option","width",'790');
+	  $( "#dialog").omDialog("option","title",'批量修改商品支付银行');
+	  $( "#dialog").omDialog("option","height",'440');
+	  $( "#dialog").omDialog("option", "modal", true);
+      $( "#dialog").omDialog('open');
+	  var frameLoc=window.frames[0].location;
+      frameLoc.href='batchMod.do';
+      $("#dialog").omDialog({onClose : function(event) {
+     		window.frames[0].location.href='../wait.htm';
+      }});
+	  return false;
+    } 
+     //搜索框列表根据商户号获取商品号
+		function getGoodsId(newValue){
+			var merId = newValue;
+			if(merId != ''){
+				$.ajax({
+					url : '$request.contextPath/goodsbank/getgoodsids.do',
+					type : 'POST',
+					dataType: 'json',
+					data : {'merId' : merId},
+					success : function(goodsIdList){	
+						var data2 = $.parseJSON('{"text":"全部","value":""}');
+						goodsIdList.unshift(data2);
+						$('#goodsId').omCombo('setData', goodsIdList);	
+					}
+			    });
+			}else{
+				var data = $.parseJSON('{"text":"全部","value":""}');  
+				$('#goodsId').omCombo('setData', data);	
+			}
+		}
+		
+	    //单个商品银行同步
+	    function singleGoodsBankSync(merId,goodsId,goodsName){
+	    	flag=confirm("确定同步此商品银行信息？");
+	    	if(flag){
+	    		var id = merId+'#&'+goodsId+'#&'+goodsName;
+	    		$.ajax({
+	    			url : 'singleGoodsBankSync.do',
+	    			type : 'POST',
+	    			dataType: 'json',
+	    			data : {
+	    				'id' : id
+	    			},
+	    			success : function(data){
+						if (data.retCode == '0000'){
+							$.omMessageBox.alert({
+	                			type : 'success',
+	                			title: '操作提示',
+	                			content:data.retMsg
+	            			});
+							} else{
+								$.omMessageBox.alert({
+		                			type : 'error',
+		                			title: '操作提示',
+		                			content: data.retMsg
+		            			});
+								}
+	     			}
+	    		});
+	    	}
+	    }
+		
+</script>
+</head>
+<body>
+ <!--列表查询区-->
+ <div  id="search_div">
+ <div class="list_search">
+ <table width="60%" height="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr>
+            <th width="7%">商户号：</td>
+            <td width="13%"><input id="merId" name="merId" class="select1"/></td>
+            <th width="7%">商品号：</td>
+            <td width="13%"><input id="goodsId" name="goodsId" class="select1"/></td>
+            <th width="10%">商品开通状态：</td>
+            <td width="13%" > <input id="kState" name="kState" class="select1" /></td>
+           </tr>
+        </table>
+         </form> 
+       </td>
+        <td> <input id="query" name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryGoodsBank()" />
+        </td>
+       </tr>
+        </table>
+ </div>
+ </div>
+<!--列表区-->
+  <div align="center">
+     <table  align="left" id="grid" ></table>
+ </div>
+</body>
+</html>

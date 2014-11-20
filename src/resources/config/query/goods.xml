@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="goods"  >
+	<sql id="allGoods"> 
+	<![CDATA[
+	select tgi.merid,tgi.goodsid,tgi.goodsname ,tgi.goodstype,tgi.servtype,tgi.pricemode,
+       tgi.pushinf,tgi.mtnum,tgi.cusphone,tgi.goodsdesc,tgi.state,tge.intime,tge.modtime,tgi.moduser,
+       tge.amount,tge.busitype,tge.addway,tge.modlock,tge.category , tmg.servmonth,tmg.conmode,tmg.interval
+       from umpay.t_goods_inf  tgi  inner join umpay.t_hfgoods_exp tge on tgi.merid=tge.merid and tgi.goodsid=tge.goodsid
+      left join umpay.t_mon_goods tmg	on tge.merid=tmg.merid and tge.goodsid=tmg.goodsid
+		  where 1=1 
+		 #if( $merId && $merId!='' ) 
+		   and  tgi.merId = :merId   
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   and  tgi.goodsId = :goodsId   
+		 #end 
+		 #if( $goodsName && $goodsName!='' ) 
+		   and  tgi.goodsname like '%$goodsName%'   
+		 #end 
+		  #if( $state && $state!='' ) 
+		   and  tgi.state=:state 
+		 #end
+		  #if( $servType && $servType!='' ) 
+		   and  tgi.servtype=:servType
+		 #end
+		  #if( $priceMode && $priceMode!='' ) 
+		   and  tgi.priceMode=:priceMode
+		 #end
+		 #if( $cateGory && $cateGory!='' ) 
+		   and  tge.cateGory like '$cateGory%'
+		 #end
+		  #if( $busiType && $busiType!='' ) 
+		   and  tge.busiType=:busiType
+		 #end
+		  #if( $addWay && $addWay!='' ) 
+		   and  tge.addWay=:addWay
+		 #end
+		  #if( $pushInf && $pushInf!='' ) 
+		   and  tgi.pushInf=:pushInf
+		 #end
+		  #if( $mtNum && $mtNum!='' ) 
+		   and  tgi.mtNum=:mtNum
+		 #end
+		 
+		 order by tge.modtime desc
+	  ]]>
+	</sql>
+	<sql id="goodsType"> 
+	<![CDATA[
+		 select goodsType,briefName,isControl,detail from umpay.T_GOODSTYPE 
+	  ]]>
+	</sql>
+	
+	<sql id="exportGoodsRelated"> 
+	<![CDATA[
+	select tgi.merid,tgi.goodsid,tgi.goodsname ,tgi.goodstype,tgi.servtype,tgi.pricemode,
+       tgi.pushinf,tgi.mtnum,tgi.cusphone,tgi.goodsdesc,tgi.state,tge.intime,tge.modtime,tgi.moduser,
+       tge.amount,tge.busitype,tge.addway,tge.modlock,tge.category , tmg.servmonth,tmg.conmode,tmg.interval,
+       tgb.checkDay,tgb.kstate,tgb.bankid
+       from umpay.t_goods_inf tgi
+       inner join umpay.t_hfgoods_exp tge on tgi.merid=tge.merid and tgi.goodsid=tge.goodsid
+       left join umpay.t_mon_goods tmg on tge.merid=tmg.merid and tge.goodsid=tmg.goodsid
+       left join umpay.t_goods_bank tgb	on tge.merid=tgb.merid and tge.goodsid=tgb.goodsid
+         where 1=1 
+		 #if( $merId && $merId!='' ) 
+		   and  tgi.merId = :merId   
+		 #end 
+		 #if( $goodsId && $goodsId!='' ) 
+		   and  tgi.goodsId = :goodsId   
+		 #end 
+		 #if( $goodsName && $goodsName!='' ) 
+		   and  tgi.goodsname like '%$goodsName%'   
+		 #end 
+		  #if( $state && $state!='' ) 
+		   and  tgi.state=:state 
+		 #end
+		  #if( $servType && $servType!='' ) 
+		   and  tgi.servtype=:servType
+		 #end
+		  #if( $priceMode && $priceMode!='' ) 
+		   and  tgi.priceMode=:priceMode
+		 #end
+		 #if( $cateGory && $cateGory!='' ) 
+		   and  tge.cateGory=:cateGory
+		 #end
+		  #if( $busiType && $busiType!='' ) 
+		   and  tge.busiType=:busiType
+		 #end
+		  #if( $addWay && $addWay!='' ) 
+		   and  tge.addWay=:addWay
+		 #end
+		  #if( $pushInf && $pushInf!='' ) 
+		   and  tgi.pushInf=:pushInf
+		 #end
+		  #if( $mtNum && $mtNum!='' ) 
+		   and  tgi.mtNum=:mtNum
+		 #end
+		 
+		 order by tge.modtime desc
+	  ]]>
+	</sql>
+</mapper> 

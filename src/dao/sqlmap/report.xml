@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="report"  >
+<typeAlias alias="ReportInf" type="com.umpay.hfmng.model.ReportInf" />
+	<statement id="insertBackupOp">
+		insert into umpay.T_REPORT_OPT
+		  (BACKUP_OPER_ID,
+		   MER_ID,
+		   GOODS_ID,
+		   BANK_ID,
+		   ADD_USER_ID,
+		   BACKUP_OPER_STAT)
+		  select '' || #backupopid# || '',
+		         report.MER_ID,
+		         report.GOODS_ID,
+		         report.BANK_ID,
+		         '' || #userid# || '',
+		         9
+		    from umpay.T_REPORT_INF report
+		   where report.BACKUP_ID = #backupid#
+	</statement>
+	
+	<!-- 根据报备信息ID更新报备信息表报备状态 -->
+	<statement id="updateReportInfBackupStatByBackupId">
+		update umpay.T_REPORT_INF
+		   set BACKUP_STAT = #backupStat#
+		 where BACKUP_ID = #backupId#
+	</statement>
+	
+	<statement id="updateBackupOp">
+		update umpay.T_REPORT_OPT t
+		   set t.ADD_USER_ID = #userid#,
+		       t.MOD_USER_ID = #userid#,
+		       t.UPDT_TIME   = current timestamp
+		 where t.BACKUP_OPER_STAT = 9
+		   and exists (select 1
+		          from umpay.T_REPORT_INF inf
+		         where inf.MER_ID = t.MER_ID
+		           and inf.GOODS_ID = t.GOODS_ID
+		           and inf.BANK_ID = t.BANK_ID
+		           and t.IS_VALID = 2
+		           and inf.BACKUP_ID = #backupid#)
+	</statement>
+	
+	<statement id="update24">
+		update umpay.T_REPORT_OPT t
+		   set t.BACKUP_OPER_STAT = #optype#,
+		       t.OPER_REASON      = #reason#,
+		       t.MOD_USER_ID      = #user#,
+		       t.VER_TIME         = current timestamp,
+		       t.UPDT_TIME        = current timestamp
+		 where t.BACKUP_OPER_ID in $records$
+	</statement>
+	<statement id="update56">
+		update umpay.T_REPORT_OPT t
+		   set t.BACKUP_OPER_STAT = #optype#,
+		       t.OPER_REASON      = #reason#,
+		       t.MOD_USER_ID      = #user#,
+		       t.BACKUP_TIME      = current timestamp,
+		       t.UPDT_TIME        = current timestamp
+		 where t.BACKUP_OPER_ID in $records$
+	</statement>
+	
+	<!-- 新增商户商品报备信息 -->
+	<statement id="insertReportInf">
+		insert into umpay.T_REPORT_INF
+		  (backup_id, mer_id, goods_id, bank_id, backup_stat)
+		values
+		  (#backupId#, #merId#, #goodsId#, #bankId#, #backupStat#)
+	</statement>
+	
+	<statement id="updateInfo">
+	   update umpay.T_REPORT_INF a set a.BACKUP_STAT = #optype#,a.MOD_USER_ID = #user#, a.UPDT_TIME = current timestamp
+	    where exists (select 1 from umpay.T_REPORT_OPT b 
+	    where a.MER_ID = b.MER_ID
+	    and a.GOODS_ID = b.GOODS_ID
+	    and a.BANK_ID = b.BANK_ID
+	    and b.BACKUP_OPER_ID in $records$
+	    ) 
+	</statement>
+	
+	<statement id="queryForBank" resultClass="ReportInf" >
+	   <![CDATA[
+	   	select max(concat(concat(trim(char(i.BACKUP_ID)),'-'),char(i.BACKUP_STAT))) BACKUPID,i.MER_ID MERID,
+	   	i.GOODS_ID GOODSID,i.BANK_ID BANKID from umpay.T_REPORT_INF i GROUP BY i.MER_ID,i.GOODS_ID,i.BANK_ID
+	   	]]>
+	</statement>
+</sqlMap> 

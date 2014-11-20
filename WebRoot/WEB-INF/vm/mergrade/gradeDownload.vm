@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/mergrade.js"></script>
+<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/mergrade/queryDownload.do?queryKey=docinfo.allDocInfo";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+			    var optStr="${opts}";
+					var opts=optStr.split(',');
+			    jQuery('[code]').each(function () {
+			        var code=$(this).attr("code");
+			        for(var i=0;i<opts.length;i++){
+			        	if(code==opts[i]){
+							   $(this).css('display','inline');						
+							}
+			    		};
+					});
+	
+          jQuery('#grid').omGrid({
+                dataSource : url,
+                width:'100%',
+                height : 455,
+                limit : 15,
+                autoFit : true,
+                colModel : [ {header : '生成时间', name : 'MODTIME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '文件名称', name : 'DOCNAME', width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '操作', name:'OPER',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				var docName = rowData.DOCNAME;
+	                     	    return " <input name='下载' title='下载' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadDoc(&quot;"+docName+"&quot;)'/> ";	
+                             }}
+                            ]
+            });
+          
+       });
+</script>
+
+</head>
+<body>
+<!--背景-->
+<div class="list_btntool" style="height:1px;"></div>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search" align="left" style="height:30px;">
+      <table align="left" width="300px" border="0">
+        <tr>
+          <td align="left" >
+           <!--查询块区 start--> 
+	       <form id="form" method="post">
+             <table width="100%" border="0">
+                 <tr>
+	                 <th width="10%" height="30">文件名称：</th>
+			         <td ><input id="docName" name="docName" type="text" class="input1" /></td>
+			     </tr>  
+		    </table>
+           </form>  
+		  </td>    
+		   <td align="left"><input id="query" title="查询" name="query" type="image" code="001" style="display:none"  src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryDownload();"/>
+           </td>   
+	    </tr>
+     </table>  
+ </div>    
+</div>			      
+ <!--列表区-->
+ <div>
+     <table id="grid" align="left"></table>
+ </div>
+</body>
+</html>

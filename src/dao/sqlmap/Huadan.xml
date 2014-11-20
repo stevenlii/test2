@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Huadan">
+	<typeAlias alias="Huadan" type="com.umpay.hfmng.model.Huadan" />
+	<statement id="Insert" resultClass="Huadan">
+		insert into mobile.txehd(platDate,rpid,funCode
+				<isNotEmpty	property="platTime" prepend=" , "> platTime </isNotEmpty>
+				<isNotEmpty	property="platSeq" prepend=" , "> platSeq </isNotEmpty>
+				<isNotEmpty	property="mobileId" prepend=" , "> mobileId </isNotEmpty>
+				<isNotEmpty	property="bankId" prepend=" , "> bankId </isNotEmpty>
+				<isNotEmpty	property="provCode" prepend=" , "> provCode </isNotEmpty>
+				<isNotEmpty	property="area" prepend=" , "> area </isNotEmpty>
+				<isNotEmpty	property="merId" prepend=" , "> merId </isNotEmpty>
+				<isNotEmpty	property="goodsId" prepend=" , "> goodsId </isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , "> amount </isNotEmpty>
+				<isNotEmpty	property="merName" prepend=" , "> merName </isNotEmpty>
+				<isNotEmpty	property="goodsName" prepend=" , "> goodsName </isNotEmpty>
+				<isNotEmpty	property="reserved" prepend=" , "> reserved </isNotEmpty>
+			) values(#platDate#, #rpid#,#funCode#
+				<isNotEmpty	property="platTime" prepend=" , "> #platTime# </isNotEmpty>
+				<isNotEmpty	property="platSeq" prepend=" , "> #platSeq# </isNotEmpty>
+				<isNotEmpty	property="mobileId" prepend=" , "> #mobileId# </isNotEmpty>
+				<isNotEmpty	property="bankId" prepend=" , "> #bankId# </isNotEmpty>
+				<isNotEmpty	property="provCode" prepend=" , "> #provCode# </isNotEmpty>
+				<isNotEmpty	property="area" prepend=" , "> #area# </isNotEmpty>
+				<isNotEmpty	property="merId" prepend=" , "> #merId# </isNotEmpty>
+				<isNotEmpty	property="goodsId" prepend=" , "> #goodsId# </isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , "> #amount# </isNotEmpty>
+				<isNotEmpty	property="merName" prepend=" , "> #merName# </isNotEmpty>
+				<isNotEmpty	property="goodsName" prepend=" , "> #goodsName# </isNotEmpty>
+				<isNotEmpty	property="reserved" prepend=" , "> #reserved# </isNotEmpty>
+			)
+	</statement>
+</sqlMap>

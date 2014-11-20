@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+<script src="$request.contextPath/js/busi/segmbl.js"></script>
+  <script>
+  	   jQuery(document).ready(function() {
+  		 jQuery("#container").width(jQuery(window).width());
+  	     
+  	 	 jQuery("#dataform").validate({
+  	 		 	onkeyup: false,
+                rules : {
+                    "file" : {
+                    	 required : true
+                    }
+                },
+                messages : {
+                    "file"  : {
+                        required : "请选择上传文件"
+                    }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	
+  	 	 jQuery('#dataform').submit(function() {
+  	 	 	 if (!jQuery("#dataform").valid()){
+  	 	 		 return false;
+  	 	 	 }
+              jQuery(this).omAjaxSubmit({success:function(res){
+            	  		window.parent.showSimpleTip(res,true);
+                   		if(res =='1') {
+                   			window.parent.shuaxin(); 
+            		    }
+               		}
+	             
+               }); 
+        	   
+              return false; 
+            });
+  	 	 
+  	     });       
+       
+  </script>  
+  </head>
+  <body>
+<div id="container">
+          <form id ="dataform" method="post" name="dataform" enctype="multipart/form-data" action="${request.contextPath}/segmbl/importSegMbl.do">
+          <table width="100%" >
+          <tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+              <tr>
+                <th width="25%"><span>*</span>任务类型：</th>
+                <td width="40%" class="td">更新号段</td>
+                <td width="35%" class="td"></td>
+              </tr>
+              <tr>
+                <th><span>*</span>数据文件：</th>
+                <td class="td1"><input id="file" name="file" type="file" style="width:200px" class="input2" /></td>
+                <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+              </tr>
+            <tr>
+                <th><span>*</span>更新方式：</th>
+                <td class="td">
+	                <input type='radio' name='flag' value='0' checked>部分更新&nbsp;&nbsp;&nbsp;
+	                <input type='radio' name='flag' value='1'>全部更新
+                </td>
+                <td class="td"></td>
+            </tr>
+             <tr>
+                <th><span>*</span>网络类型：</th>
+                <td class="td">
+	                <input type='radio' name='netType' value='0' checked>BOSS网&nbsp;&nbsp;&nbsp;
+	                <input type='radio' name='netType' value='1'>智能网
+                </td>
+                <td class="td"></td>
+            </tr>
+            </table>
+            </td></tr><tr><td>
+            	<table align="center">
+            		<tr><td>
+		            	<span style="color:red">注意：</span>
+	            	</td><td><span style="color:red">1.上传文件为TXT文件，且必须小于10M。</span></td>
+	            	</tr><tr>
+            		<td></td>
+            		<td align="left">
+	            		<span style="color:red">
+	            			2.文件内容无表头，内容格式为：</br>&nbsp;&nbsp;
+	            			省名称,地市名称,区号,号段</br>&nbsp;&nbsp;
+	            			例如：</span><span style="color:green">云南,大理,872,1357788</span>
+        			</td></tr>
+    			</table>
+            </td></tr><tr><td>
+            <table width="100%" cellpadding="0" cellspacing="0">
+                 <tr>
+                    <td height="15"></td></tr>
+                 <tr>
+                    <td align="center"><input type="submit" value="添加" class="popbtn"onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+                    <input type="reset" value="关闭" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+                  </tr>
+             </table>
+             </td></tr>
+             <table>
+          </form>
+                  
+</div>
+</body>
+</html>

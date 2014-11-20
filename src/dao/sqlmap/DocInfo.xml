@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="DocInfo">
+	<typeAlias alias="DocInfo" type="com.umpay.hfmng.model.DocInfo" />
+	<statement id="Insert" resultClass="DocInfo">
+		insert into umpay.t_hfdoc(id
+			<isNotEmpty property="docName" prepend=" , "> docName </isNotEmpty>
+			<isNotEmpty property="docType" prepend=" , "> docType </isNotEmpty>
+			<isNotEmpty property="docPath" prepend=" , "> docPath </isNotEmpty>
+			<isNotEmpty property="docDesc" prepend=" , "> docDesc </isNotEmpty>
+			<isNotEmpty property="creator" prepend=" , "> creator </isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" , "> modUser </isNotEmpty>
+		) values(#id#
+			<isNotEmpty property="docName" prepend=" , "> #docName# </isNotEmpty>
+			<isNotEmpty property="docType" prepend=" , "> #docType# </isNotEmpty>
+			<isNotEmpty property="docPath" prepend=" , "> #docPath# </isNotEmpty>
+			<isNotEmpty property="docDesc" prepend=" , "> #docDesc# </isNotEmpty>
+			<isNotEmpty property="creator" prepend=" , "> #creator# </isNotEmpty>
+			<isNotEmpty property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+		)
+	</statement>
+	
+</sqlMap>

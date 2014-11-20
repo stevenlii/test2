@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Category">
+	<typeAlias alias="Category" type="com.umpay.hfmng.model.Category" />
+	<sql id="select_what">
+	 select * from UMPAY.T_HFCATEGORY where 1=1 
+	</sql>
+	<statement id="Find" resultClass="Category" >
+		<include refid="select_what" />
+		and state=2 order by categoryid
+	</statement>
+</sqlMap>

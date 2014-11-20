@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><templates><template autoinsert="true" context="delegatecomment_context" deleted="false" description="Comment for delegate methods" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.delegatecomment" name="delegatecomment">/**
+ * ${tags}
+ * ${see_to_target}
+ */</template><template autoinsert="true" context="constructorcomment_context" deleted="false" description="Comment for created constructors" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.constructorcomment" name="constructorcomment">/**
+ * ${tags}
+ */</template><template autoinsert="false" context="settercomment_context" deleted="false" description="Comment for setter method" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.settercomment" name="settercomment">
+/** ********************************************
+ * method name   : ${enclosing_method} 
+ * description   : 
+ * @return       : the ${bare_field_name}
+ * @param        : ${param} the ${bare_field_name} to set
+ * modified      : ${user} ,  ${date}  ${time}
+ * ********************************************/  </template><template autoinsert="false" context="filecomment_context" deleted="false" description="Comment for created Java files" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.filecomment" name="filecomment">/** *****************  JAVA头文件说明  ****************
+ * file name  :  ${file_name}
+ * owner      :  ${user}
+ * copyright  :  UMPAY
+ * description:  
+ * modified   :  ${date}
+ * *************************************************/ 
+</template><template autoinsert="false" context="methodcomment_context" deleted="false" description="Comment for non-overriding methods" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.methodcomment" name="methodcomment">/** ********************************************
+ * method name   : ${enclosing_method} 
+ * description   : 
+ * @return       : ${return_type}
+ * @param        : ${tags}
+ * modified      : ${user} ,  ${date}  ${time}
+ * @see          : 
+ * ********************************************/      
+</template><template autoinsert="false" context="gettercomment_context" deleted="false" description="Comment for getter method" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.gettercomment" name="gettercomment">
+/** *******************************************
+ * method name   : ${enclosing_method} 
+ * description   : 
+ * @return       : the ${bare_field_name}
+ * @param        : ${field_type}:${field}
+ * modified      : ${user} ,  ${date}  ${time}
+ * ********************************************/  </template><template autoinsert="true" context="fieldcomment_context" deleted="false" description="Comment for fields" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.fieldcomment" name="fieldcomment">/**
+ * 
+ */</template><template autoinsert="false" context="typecomment_context" deleted="false" description="Comment for created types" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.typecomment" name="typecomment">
+/** ******************  类说明  *********************
+ * class       :  ${type_name}
+ * @author     :  ${user}
+ * @version    :  1.0  
+ * description :  
+ * @see        :  ${tags}                      
+ * ************************************************/   
+</template><template autoinsert="false" context="overridecomment_context" deleted="false" description="Comment for overriding methods" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.overridecomment" name="overridecomment">
+/** ********************************************
+ * method name   : ${enclosing_method} 
+ * modified      : ${user} ,  ${date}
+ * @see          : ${see_to_overridden}
+ * ********************************************/     </template></templates>

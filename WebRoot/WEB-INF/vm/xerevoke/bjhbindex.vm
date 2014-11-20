@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script>
+  jQuery(document).ready(function() {
+
+      jQuery('#dataform-file').submit(function() {
+			var file = document.getElementById("file").value;
+			var batchProv = document.getElementById("batchProv").value;
+			//alert(document.getElementById("batchProv").value);
+			if(file == ""){
+				alert("请选择待处理文件!");
+				return false;
+			}
+			if(batchProv == ""){
+				alert("请选择解冻省份!");
+				return false;
+			}		
+	    	jQuery(this).omAjaxSubmit({success:function(result){
+			    		if(result=="yes"){
+							closeDialog();
+						}else{
+							alert(result);
+						}
+		            }
+	            });
+	        return false; 
+	    });
+      
+      //批量解冻省份选择
+      $('#batchProv').omCombo({
+	      dataSource : [{"value":"BJHB","text":"北京"}],
+          width:'140px',
+          listMaxHeight:150,
+          emptyText:'全部 ' ,
+          forceSelection : true  
+      });
+  });
+
+</script>
+</head>
+<body>
+	<form id="dataform-file" method="post" name="dataform-file" action="${request.contextPath}/xerevoke/batchRevokeFromFile.do" enctype="multipart/form-data>
+		<table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+			<tr>
+				<br><br>
+			</tr>
+			<tr>
+				<div style="text-align: center;">
+					<th width="20%"><span>*</span>选择文件：</th>
+					<td width="50%" class="td"><input id="file" name="file" type="file" class="input2" style="width:325px;"/></td>
+					<td width="30%" class="td"><span class="errorImg" align="left"></span><span class="errorMsg"></span></td>
+				</div>
+			</tr>
+	        <tr>
+	        	<br>
+		    </tr>
+		    
+	          <tr>
+				<div style="text-align: center;">
+		            <th><span>*</span>选择省份：</th>
+		            <td><input id="batchProv" name="batchProv"/></td>
+				</div>		            
+	           </tr>
+
+		</table>
+
+		<div class="pop_btn">
+		   <input name="Submit" type="submit" class="popbtn" value="确认发起" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" />
+		   <input name="button" type="reset" class="popbtn" value="重置" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+		</div>
+	</form>
+</body>
+</html>

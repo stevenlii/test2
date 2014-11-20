@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean name="jsonView" class="com.umpay.hfmng.view.AjaxJsonView">   
+       	 <property name="contentType"><value>application/json;charset=UTF-8</value></property>   
+    </bean>
+	<bean name="excelView" class="com.umpay.hfmng.view.ExcelView">     
+    </bean>
+	<bean name="excelViewMer" class="com.umpay.hfmng.view.MerExcelView">     
+	</bean>
+	<bean name="excelViewMerBank" class="com.umpay.hfmng.view.MerBankExcelView">     
+    </bean>
+    <bean name="excelFeeCode" class="com.umpay.hfmng.view.FeeCodeExcel">     
+	</bean>
+	<bean name="excelFeeCodeUseQuery" class="com.umpay.hfmng.view.FeeCodeUseQueryExcel">     
+	</bean>
+	<bean name="excelViewGoodsFeeCodeAdd" class="com.umpay.hfmng.view.GoodsFeeCodeAddExcelView">     
+	</bean>
+	<bean name="excelViewGoodsFeeCodeManage" class="com.umpay.hfmng.view.GoodsFeeCodeManageExcelView">     
+	</bean>
+	<bean name="excelViewFeeCodeImportError" class="com.umpay.hfmng.view.FeeCodeImportErrorView">
+	</bean>
+	<bean name="excelStatsView" class="com.umpay.hfmng.view.ExcelCouponStatsView">
+	</bean>
+	<bean name="couponCodeExcelView" class="com.umpay.hfmng.view.CouponCodeExcelView">
+	</bean>
+	
+	<bean name="bakeupDataView" class="com.umpay.hfmng.view.BakeupDataExcelView">
+	</bean>
+	
+	<bean name="excelMerGrade" class="com.umpay.hfmng.view.MerGradeExcelView">
+	</bean>
+	<bean name="excelMerGradeImportError" class="com.umpay.hfmng.view.MerGradeImportErrorView">
+	</bean>
+	<bean name="excelDownloadDoc" class="com.umpay.hfmng.view.DownloadDocView">
+	</bean>
+	<bean name="excelChnlBank" class="com.umpay.hfmng.view.ChnlBankExcelView">
+	</bean>
+	<bean name="excelViewChnl" class="com.umpay.hfmng.view.ChnlExcelView">     
+	</bean>
+	<bean name="excelChnlGoods" class="com.umpay.hfmng.view.ChnlGoodsExcelView">     
+	</bean>
+	<bean name="excelChnlMer" class="com.umpay.hfmng.view.ChnlMerExcelView">     
+	</bean>
+	<bean name="excelViewSecMer" class="com.umpay.hfmng.view.SecMerExcelView"> </bean>    
+	<bean name="textView" class="com.umpay.hfmng.view.TextView"> 
+	</bean>
+	<bean name="excelProxyOrder" class="com.umpay.hfmng.view.ProxyOrderExcelView"></bean>
+	<bean name="excelMerBusiConf" class="com.umpay.hfmng.view.MerBusiConfView"></bean>
+	<bean name="stlAllBillExcelView" class="com.umpay.hfmng.view.StlAllBillExcelView"></bean>
+	<bean name="stlBjBillExcelView" class="com.umpay.hfmng.view.StlBjBillExcelView"></bean>
+	<bean name="stlSwBillExcelView" class="com.umpay.hfmng.view.StlSwBillExcelView"></bean>
+	<bean name="xlsView" class="com.umpay.hfmng.view.XlsView"></bean>
+	<bean name="upServiceView" class="com.umpay.hfmng.view.UPServiceExcelView"></bean>
+</beans>

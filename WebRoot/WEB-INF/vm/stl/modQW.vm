@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/stlcss.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/stl.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+</script>
+
+<script>
+	jQuery(document).ready(function() {
+		jQuery('#dataform').submit(function() {
+			// 设置按钮不可用，防止重复提交
+			$("#btn_update").attr("disabled", "disabled");
+		    jQuery(this).omAjaxSubmit({
+		        success: function(res) {
+					window.parent.showSimpleTip(res);
+					if( res == '1' ){
+						closeDialog();
+						window.parent.shuaxin();
+					}else{
+						// 设置按钮可用
+						$("#btn_update").removeAttr("disabled");
+					}
+		        }
+		    });
+		    return false;
+		});
+	});
+    
+
+</script>
+</head>
+<body>
+<p class="title_day">制表日期：${madeDate}</p>
+<form id ="dataform" method="post" name="dataform" id="dataform" action="${request.contextPath}/stl/update.do">
+<table width="100%" border="0" cellpadding="2" cellspacing="1" bgcolor="d8d8d8" >
+	#if ($!{couponMerSet})
+  <tr bgcolor="f2f2f2" class="top_sty" >
+    <td height="26" colspan="19" align="left"><table width="658" height="16" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="26%">&nbsp;</td>
+        <td width="74%" height="26" align="left" class="title_clor">$couponMerSet.accName 通信账户支付业务 全网$couponMerSet.stlDate 结算账单</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr bgcolor="f8f8f8">
+    <td height="25" colspan="3" align="center">商户信息</td>
+    <td height="25" colspan="2" align="center">成功计费数据</td>
+    <td height="25" align="center">坏账</td>
+    <td width="25%" colspan="3" height="25" align="center">应结 </td>
+    <td height="25" colspan="2" align="center">不均衡短信</td>
+    <td height="25" colspan="2" align="center">退费</td>
+    <td height="25" align="center">其他</td>
+  </tr>
+  <tr bgcolor="f8f8f8">
+    <td width="6%" height="25" align="center">商户号 </td>
+    <td width="10%" height="25" align="center">商户名称</td>
+    <td width="6%" height="25" align="center">子商户号 </td>
+    <td width="6%" height="25" align="center">条数</td>
+    <td width="8%" height="25" align="center">金额（元） </td>
+    <td width="8%" height="25" align="center">金额（元） </td>
+    <td width="8%" height="25" align="center">平台收入（元）</td>
+    <td width="5%" height="25" align="center">商户分成比例 </td>
+    <td width="8%" height="25" align="center"><p>应结商户信息费（元） </p></td>
+    <td height="6%" align="center">不均衡短信条数 </td>
+    <td width="8%" height="25" align="center">金额（元）</td>
+    <td width="5%" height="25" align="center"> 退费笔数</td>
+    <td width="8%" height="25" align="center">退费金额（元）</td>
+    <td width="8%" height="25" align="center"> 结算金额(元)</td>
+  </tr>
+   <tr bgcolor="ffffff">
+    <td height="25" align="center">$couponMerSet.accId<input type="hidden" id="accId" name="accId" value="$couponMerSet.accId"></td>
+    <td height="25" align="center">$couponMerSet.accName<input type="hidden" id="accName" name="accName" value="$couponMerSet.accName" />  </td>
+    <td height="25" align="center">$couponMerSet.goodsId<input type="hidden" id="goodsId" name="goodsId" value="$couponMerSet.goodsId"></td>
+    <td height="25" align="center"><input type="text" id="billSuccNumm" name="billSuccNumm" value="$couponMerSet.billSuccNumm" size="5" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"></td>
+    <td height="25" align="center"><input type="text" id="billSuccAmtm" name="billSuccAmtm" value="$number.format('#0.00',$couponMerSet.billSuccAmtm)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+    <td height="25" align="center"><input type="text" id="bad_bill" name="bad_bill" value="$number.format('#0.00',$couponMerSet.bad_bill)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+    <td height="25" align="center"><input type="text" id="ump_income" name="ump_income" value="$number.format('#0.00',$couponMerSet.ump_income)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+    <td height="25" align="center">$number.format('#0.00',$couponMerSet.ext3)%</td>
+    <td height="25" align="center"><input type="text" id="merStlAmt" name="merStlAmt" value="$number.format('#0.00',$couponMerSet.merStlAmt)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+    <td height="25" align="center"><input type="text" id="nbsmNum" name="nbsmNum" value="$couponMerSet.nbsmNum" size="5" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"></td>
+    <td height="25" align="center"><input type="text" id="nbsmAmt" name="nbsmAmt" value="$number.format('#0.00',$couponMerSet.nbsmAmt)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+    <td height="25" align="center"><input type="text" id="paybackNum" name="paybackNum" value="$couponMerSet.paybackNum" size="5" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"></td>
+    <td height="25" align="center"><input type="text" id="paybackAmt" name="paybackAmt" value="$number.format('#0.00',$couponMerSet.paybackAmt)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+    <td height="25" align="center"><input type="text" id="balance_amount" name="balance_amount" value="$number.format('#0.00',$couponMerSet.balance_amount)" size="5" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"></td>
+  </tr>
+  #end
+</table>
+<ul>
+<li>备注：结算周期为
+#if ($!{billCycle})
+	$billCycle
+#end
+</li>
+<li class="tip_sty">结算金额=（成功计费金额-坏账）*0.85商户分成比例-不均衡短信费-退费</li>
+<li></li>
+</ul>
+<div class="btm_btn">
+
+<input type="hidden" id="stlCycle" name="stlCycle" value="$couponMerSet.stlCycle">
+<input type="hidden" id="stlDate" name="stlDate" value="$couponMerSet.stlDate">
+<input type="hidden" id="billType" name="billType" value="1">
+<input type="hidden" id="localFlag" name="localFlag" value="0">
+<input type="hidden" id="settStatus" name="settStatus" value="$!couponMerSet.settStatus">
+<input id="btn_update" name="btn_update" type="submit" class="popbtn" value="修改" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+</div>
+</form>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="${request.contextPath}/js/ui/themes/default/om-all.css"
+	type="text/css">
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/busi/goodsbank.js"></script>
+
+<script type="text/javascript">
+	var url = "$request.contextPath/goodsbank/queryoptlog.do?queryKey=goodsbank.optlog";
+
+	jQuery(document)
+			.ready(
+					function() {
+						jQuery("#search_div")
+								.width(jQuery(window).width() - 20);
+
+						var optStr = "${opts}";
+						var opts = optStr.split(',');
+						jQuery('[code]').each(function() {
+							var code = $(this).attr("code");
+							for ( var i = 0; i < opts.length; i++) {
+								if (code == opts[i]) {
+									$(this).css('display', 'inline');
+								}
+							}
+							;
+						});
+
+						jQuery('#grid')
+								.omGrid(
+										{
+											dataSource : "$request.contextPath/goodsbank/queryoptlog.do?queryKey=goodsbank.optlog",
+											width : '100%',
+											autoFit : true,
+											height : 421,
+											limit : 15,
+											colModel : [
+													{
+														header : '修改类型',
+														name : 'AUDITTYPE',
+														width : 60,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															if (value == '1')
+																return "<a title='新增'>新增</a>";
+															else if (value == '2')
+																return "<a title='修改'>修改</a>";
+															else if (value == '3')
+																return "<a title='启用'>启用</a>";
+															else if (value == '4')
+																return "<a title='禁用'>禁用</a>";
+															else if (value == '0')
+																return "<a title='未知'>未知</a>";
+														}
+													},
+													{
+														header : '商户号',
+														name : 'MERID',
+														width : 50,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商品号',
+														name : 'GOODSID',
+														width : 80,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '商品名称',
+														name : 'GOODSNAME',
+														width : 140,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '支付银行',
+														name : 'BANKNAME',
+														width : 140,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"
+																	+ value
+																	+ "("
+																	+ rowData.BANKID
+																	+ ")'>"
+																	+ value
+																	+ "("
+																	+ rowData.BANKID
+																	+ ")</a>";
+														}
+													},
+													{
+														header : '提交人',
+														name : 'CREATOR',
+														width : 65,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '提交时间',
+														name : 'INTIME',
+														width : 120,
+														align : 'center',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													},
+													{
+														header : '操作原因',
+														name : 'DESC',
+														width : 180,
+														align : 'left',
+														renderer : function(
+																value, rowData,
+																rowIndex) {
+															return "<a title='"+value+"'>"
+																	+ value
+																	+ "</a>";
+														}
+													} ],
+											autoFit : true
+										});
+
+						jQuery("#dialog").omDialog({
+							autoOpen : false
+						});
+
+						//初始化银行列表
+						$('#bankId')
+								.omCombo(
+										{
+											dataSource : '$request.contextPath/option/banklist.do',
+											width : '160px',
+											emptyText : '全部 ',
+											listMaxHeight : 150,
+											onSuccess : function(data,
+													textStatus, event) {
+												var tmp = $
+														.parseJSON('{"value":"","text":"全部"}');
+												data.unshift(tmp);
+											}
+										});
+
+						//获取提交人列表
+						$('#creator')
+								.omCombo(
+										{
+											dataSource : '$request.contextPath/option/creatorlist.do',
+											width : '150px',
+											emptyText : '全部 ',
+											listMaxHeight : 150,
+											onSuccess : function(data,
+													textStatus, event) {
+												var tmp = $
+														.parseJSON('{"value":"","text":"全部"}');
+												data.unshift(tmp);
+											},
+											forceSelection : true,
+											lazyLoad : true
+										});
+
+						$('#grid').omGrid("setData", url);
+					});
+</script>
+</head>
+<body>
+
+	<!--列表查询区-->
+	<div id="search_div">
+		<div class="list_search" style="height: 73px;">
+			<table width="100%" border="0">
+				<tr>
+					<td align="left">
+						<!--查询块区 start-->
+						<form id="form" action="" method="post">
+							<table width="100%" border="0">
+								<tr>
+									<td>&nbsp;</td>
+								</tr>
+								<tr>
+									<th width="10%">商户号：</th>
+									<td><input id="merId" name="merId" maxlength="4"
+										class="input1" /></td>
+									<th width="10%">商品名称：</th>
+									<td><input id="goodsName" name="goodsName" class="input2" />
+									</td>
+									<th width="10%">支付银行：</th>
+									<td><input id="bankId" name="bankId" class="input1" /></td>
+								</tr>
+
+								<tr>
+									<th>商品号：</th>
+									<td><input id="goodsId" name="goodsId" maxlength="6"
+										class="input1" /></td>
+									<th width="10%">提交人：</th>
+									<td><input id="creator" name="creator" class="input1" />
+									</td>
+									<th width="10%">提交时间：</th>
+									<td><input type="text" id="from" name="from"
+										onfocus="WdatePicker({startDate:'%y-%M-%d 00:00:00',dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+										class="Wdate" style="width:120px" /> <input type="text"
+										id="to" name="to"
+										onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+										class="Wdate" style="width:120px" /></td>
+								</tr>
+							</table>
+						</form></td>
+					<td align="left">
+						<input id="query" title="查询" name="query"	type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png"
+							onclick="queryOptLog()" />
+						&nbsp;&nbsp;
+						<input id="export" title="导出" name="export" type="image" src="${request.contextPath}/profile/default/images/btn_Export.png"
+							onclick="exportOptLog()" /></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<!--列表区-->
+	<table id="grid" align="left"></table>
+
+	<div id="dialog">
+		<iframe frameborder="0" style="width:100%;height:99%"
+			src="about:blank"></iframe>
+	</div>
+</body>
+</html>

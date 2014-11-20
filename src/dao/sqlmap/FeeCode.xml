@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="FeeCode">
+	<typeAlias alias="FeeCode" type="com.umpay.hfmng.model.FeeCode" />
+	
+	<sql id="select_what">
+		select t.serviceId,t.state,t.feeType,t.amount,t.detail,t.modUser,t.modTime,t.inTime,
+		 t.category from umpay.t_service_inf t where 1=1
+	</sql>
+	
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty	property="serviceId" prepend=" and ">
+				t.serviceId = #serviceId#
+			</isNotEmpty>
+			
+		</dynamic>
+	</sql>
+	
+	<sql id="key_find">
+	   <dynamic prepend=" and ">
+		  t.serviceId=#serviceId#
+	   </dynamic>
+	</sql>
+	
+	<statement id="Get" resultClass="FeeCode" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="FeeCode" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from umpay.t_service_inf  t 
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="updateFeeCodeState" resultClass="integer">
+	   update umpay.t_service_inf set modTime=CURRENT TIMESTAMP 
+		   <isNotEmpty	property="state" prepend=" , "> state=#state# </isNotEmpty>
+		   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where serviceId=#serviceId# 
+	</statement>
+
+	<statement id="updateFeeCode" resultClass="integer">
+	   update umpay.t_service_inf set modTime=CURRENT TIMESTAMP 
+	   <isNotEmpty	property="feeType" prepend=" , "> feeType=#feeType# </isNotEmpty>
+	   <isNotEmpty	property="category" prepend=" , "> category=#category# </isNotEmpty>
+	   <isNotEmpty	property="amount" prepend=" , "> amount=#amount# </isNotEmpty>
+	   <isNotEmpty	property="detail" prepend=" , "> detail=#detail# </isNotEmpty>
+	   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where serviceId=#serviceId# 
+	</statement>
+	
+	<statement id="insertFeeCode" >
+		insert into umpay.t_service_inf(serviceId 
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+				<isNotEmpty	property="category" prepend=" , "> category </isNotEmpty>
+				<isNotEmpty	property="detail" prepend=" , "> detail </isNotEmpty>
+				<isNotEmpty	property="feeType" prepend=" , "> feeType </isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , "> amount </isNotEmpty>
+			) values(#serviceId# 
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+				<isNotEmpty	property="category" prepend=" , "> #category# </isNotEmpty>
+				<isNotEmpty	property="detail" prepend=" , "> #detail# </isNotEmpty>
+				<isNotEmpty	property="feeType" prepend=" , "> #feeType# </isNotEmpty>
+				<isNotEmpty	property="amount" prepend=" , "> #amount# </isNotEmpty>
+			)
+	</statement>
+
+   <!--  获取全网小额支付银行 数据 树形 结构-->
+   <statement id="GetMWXE" resultClass="FeeCode" >
+		select bankid,bankname,banktype,state,timeltd,monltd,dayltd,minamount,
+		tinterval,moduser,modtime,intime,depagenttype
+		from umpay.t_bank_inf   where banktype=3 or banktype=6
+   </statement>
+</sqlMap>

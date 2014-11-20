@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="mers"  >
+	<sql id="allMers"> 
+	<![CDATA[
+		 select   exp.merId,mer.exMerId,mer.merName,mer.merType,mer.state,mer.postal, mer.address,mer.modUser,
+		          exp.modTime,exp.inTime,mer.timeLtd,mer.isSpecial,mer.cusPhone,exp.modLock,exp.busi_attr busiType,
+		          exp.addWay,exp.interType,exp.chnlCheck,exp.operator,exp.category,exp.companyName
+		 from umpay.t_mer_inf  mer,umpay.t_hfmer_exp exp
+		 #if( $operator && $operator!='' ) 
+		   ,umpay.t_hfmer_oper o 
+		 #end
+		  where mer.merId=exp.merId
+		 #if( $operator && $operator!='' ) 
+		   and o.mer_id=exp.merId and o.state=2 and o.operator=:operator 
+		 #end
+		 #if( $merId && $merId!='' )
+		   and  mer.merId = :merId   
+		 #end
+		 #if( $merName && $merName!='' ) 
+		   and  mer.merName like '%$merName%'   
+		 #end 
+		 #if( $state && $state!='' ) 
+		   and  mer.state=:state 
+		 #end
+		 #if( $category && $category!='' ) 
+		   and  exp.category = :category   
+		 #end
+		 #if( $busiType && $busiType!='' ) 
+		   and exp.busi_attr=:busiType
+		 #end
+		 #if( $interType && $interType!='' ) 
+		   and exp.interType=:interType
+		 #end
+		 #if( $addWay && $addWay!='' ) 
+		   and exp.addWay=:addWay
+		 #end
+		 #if( $chnlCheck && $chnlCheck!='' ) 
+		   and  exp.chnlCheck=:chnlCheck
+		 #end
+		 order by exp.modtime desc
+	  ]]>
+	</sql>
+</mapper> 

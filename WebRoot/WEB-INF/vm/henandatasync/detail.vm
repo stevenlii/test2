@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script> 
+   function trim(v){
+	return $.trim(v);
+     }
+     //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }
+
+   function downloadDoc(fileName){
+		if(file == "") {
+			alert('任务文件不存在。')
+		}else{
+			var file=fileName.split(",")[0];
+		   	window.location.href="downloadDoc.do?fileName="+file+".txt";
+		}
+   }
+   
+   function downloadSuccDoc(fileName){
+	var file=fileName.split(",")[1];
+	if(file == "") {
+		alert('此任务没有成功记录文件。')
+	}else {
+		file=fileName.split(",")[0]+"-succ";
+	   	window.location.href="downloadDoc.do?fileName="+file+".txt";
+	}
+   }
+   
+   function downloadFailDoc(fileName){
+		var file=fileName.split(",")[2];
+		if(file == "") {
+			alert('此任务没有失败记录文件。')
+		}else {
+			file=fileName.split(",")[0]+"-fail";
+		   	window.location.href="downloadDoc.do?fileName="+file+".txt";
+		}
+   }
+
+</script>
+</head>
+<body>   
+      <table class="infowrite" cellspacing="0" cellpadding="0" width="300px"  align="center" >
+       <tr >
+         <th width="40%">任务编号：</th>
+         <td  class="td">$!{hnSynTask.taskId}</td>
+          </tr>
+       <tr >
+         <th>任务类别：</th>
+         <td class="td1" id="tasktype">#if ($!{hnSynTask.taskType}==4)  河南小额同步商户银行 #else 河南小额同步商品银行 #end </td>
+       </tr>
+       <tr >
+         <th>发起人：</th>
+         <td class="td">$!{hnSynTask.creator}</td>
+         </tr>
+       <tr >
+         <th>任务状态：</th>
+         <td class="td1">#if ($!{hnSynTask.synState}==0)  初始 #elseif ($!{hnSynTask.synState}==1) 处理中
+          #else 完成 #end </td>
+       </tr>
+       <tr>
+         <th>添加时间：</th>
+         <td class="td" >$!{hnSynTask.inTime} </td>
+         </tr>
+      <tr>
+         <th>最后处理时间：</th>
+         <td class="td1">$!{hnSynTask.modTime}</td>
+       </tr>
+        <tr>
+         <th>处理结果：</th>
+         <td class="td1">#if ($!{hnSynTask.synResult}==0)  初始 #elseif ($!{hnSynTask.synResult}==1) 处理成功 
+         #elseif ($!{hnSynTask.synResult}==2) 部分失败  #else 处理失败 #end </td>
+       </tr>
+       <tr>  
+         <th>处理结果信息：</th>
+         <td class="td1">详见成功、失败日志</td>
+       </tr>
+         <th>下载任务文件：</th>
+         <td class="td"><input name='下载任务文件' title='下载任务文件' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadDoc("$!{hnSynTask.resultDesc}")'/></td>
+         </tr>
+         </tr>
+         <th>下载成功日志：</th>
+         <td class="td"><input name='下载成功日志' title='下载成功日志' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadSuccDoc("$!{hnSynTask.resultDesc}")'/></td>
+         </tr>
+         </tr>
+         <th>下载失败日志：</th>
+         <td class="td"><input name='下载失败日志' title='下载失败日志' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadFailDoc("$!{hnSynTask.resultDesc}")'/></td>
+         </tr>
+     </table>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

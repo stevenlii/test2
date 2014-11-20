@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponBatch">
+	<typeAlias alias="CouponBatch" type="com.umpay.hfmng.model.CouponBatch" />
+	<statement id="insert" resultClass="CouponBatch">
+		insert into umpay.t_coupon_batch(batchId
+		<isNotEmpty property="ruleId" prepend=" , "> ruleId
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , "> modTime
+		</isNotEmpty>
+		<isNotEmpty property="goodsSum" prepend=" , "> goodsSum
+		</isNotEmpty>
+		<isNotEmpty property="saledSum" prepend=" , "> saledSum
+		</isNotEmpty>
+		<isNotEmpty property="sellStartDate" prepend=" , "> sellStartDate
+		</isNotEmpty>
+		<isNotEmpty property="sellEndDate" prepend=" , "> sellEndDate
+		</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , "> useStartDate
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , "> useEndDate
+		</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , "> modUser
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , "> state
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , "> inTime
+		</isNotEmpty>
+		) values(#batchId#
+		<isNotEmpty property="ruleId" prepend=" , ">
+			#ruleId#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSum" prepend=" , ">
+			#goodsSum#
+		</isNotEmpty>
+		<isNotEmpty property="saledSum" prepend=" , ">
+			#saledSum#
+		</isNotEmpty>
+		<isNotEmpty property="sellStartDate" prepend=" , ">
+			#sellStartDate#
+		</isNotEmpty>
+		<isNotEmpty property="sellEndDate" prepend=" , ">
+			#sellEndDate#
+		</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , ">
+			#useStartDate#
+		</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , ">
+			#useEndDate#
+		</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , ">
+			#modUser#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , ">
+			#state#
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			#inTime#
+		</isNotEmpty>
+		)
+	</statement>
+
+	<statement id="get" resultClass="CouponBatch">
+		select * from
+		umpay.T_COUPON_BATCH
+		where batchId = #batchId:char#
+	</statement>
+
+	<statement id="updategoodssum" resultClass="integer">
+		update umpay.T_COUPON_BATCH set batchId=#batchId#
+		<isNotEmpty property="goodsSum" prepend=" , ">
+			goodsSum=goodsSum+#goodsSum#
+			</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , ">
+			modUser=#modUser#
+		</isNotEmpty>
+		where batchId=#batchId#
+	</statement>
+
+	<statement id="update" resultClass="integer">
+		update umpay.T_COUPON_BATCH set batchId=#batchId:char#
+		<isNotEmpty property="ruleId" prepend=" , ">
+			ruleId=#ruleId#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime=#modTime#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSum" prepend=" , ">
+			goodsSum=#goodsSum#
+			</isNotEmpty>
+		<isNotEmpty property="saledSum" prepend=" , ">
+			saledSum=#saledSum#
+			</isNotEmpty>
+		<isNotEmpty property="sellStartDate" prepend=" , ">
+			sellStartDate=#sellStartDate#
+			</isNotEmpty>
+		<isNotEmpty property="sellEndDate" prepend=" , ">
+			sellEndDate=#sellEndDate#
+			</isNotEmpty>
+		<isNotEmpty property="useStartDate" prepend=" , ">
+			useStartDate=#useStartDate#
+			</isNotEmpty>
+		<isNotEmpty property="useEndDate" prepend=" , ">
+			useEndDate=#useEndDate#
+			</isNotEmpty>
+		<isNotEmpty property="modUser" prepend=" , ">
+			modUser=#modUser#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend=" , ">
+			state=#state#
+		</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			inTime=#inTime#
+		</isNotEmpty>
+		where batchId=#batchId:char#
+	</statement>
+
+	<statement id="querydisbatchcount" resultClass="HashMap">
+	<![CDATA[
+		select count(1) as num
+		  from umpay.T_COUPON_BATCH
+		 where ruleId = #ruleId#
+		   and state = #state#
+		   and ((#sellStartDate# >= sellStartDate and #sellEndDate# <= sellEndDate) or
+		       (#sellStartDate# <= sellStartDate and #sellEndDate# <= sellEndDate and #sellEndDate# >= sellStartDate) or
+		       (#sellStartDate# >= sellStartDate and #sellStartDate# <= sellEndDate and #sellEndDate# >= sellEndDate) or
+		       (#sellStartDate# <= sellStartDate and #sellEndDate# >= sellEndDate))
+	]]>
+	</statement>
+	
+	<statement id="findMaxBatchId" resultClass="HashMap">
+	<![CDATA[
+		select max(batchId) as batchId from umpay.T_COUPON_BATCH where ruleId = #ruleId#
+	]]>
+	</statement>
+
+</sqlMap>

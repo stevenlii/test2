@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponLog">
+	<typeAlias alias="CouponLog" type="com.umpay.hfmng.model.CouponLog" />
+	<statement id="Insert" resultClass="CouponLog">
+		insert into umpay.t_coupon_oplog
+		  (logid
+		   <isNotEmpty property = "businessobject" prepend = " , " > businessobject </isNotEmpty>
+		   <isNotEmpty property = "moduser" prepend = " , " > moduser </isNotEmpty>
+		   <isNotEmpty property = "operdata" prepend = " , " > operdata </isNotEmpty>
+		   <isNotEmpty property = "ixdata1" prepend = " , " > ixdata1 </isNotEmpty>
+		   <isNotEmpty property = "ixdata2" prepend = " , " > ixdata2 </isNotEmpty>
+		   <isNotEmpty property = "ixdata3" prepend = " , " > ixdata3 </isNotEmpty>
+		   <isNotEmpty property = "ixdata4" prepend = " , " > ixdata4 </isNotEmpty>
+		   <isNotEmpty property = "ixdata5" prepend = " , " > ixdata5 </isNotEmpty>
+		   <isNotEmpty property = "opertype" prepend = " , " > opertype </isNotEmpty>
+		   <isNotEmpty property = "resultdesc" prepend = " , " > resultdesc </isNotEmpty>)
+		values
+		  (#logid#
+		   <isNotEmpty property = "businessobject" prepend = " , " > #businessobject# </isNotEmpty>
+		   <isNotEmpty property = "moduser" prepend = " , " > #moduser# </isNotEmpty>
+		   <isNotEmpty property = "operdata" prepend = " , " > #operdata# </isNotEmpty>
+		   <isNotEmpty property = "ixdata1" prepend = " , " > #ixdata1# </isNotEmpty>
+		   <isNotEmpty property = "ixdata2" prepend = " , " > #ixdata2# </isNotEmpty>
+		   <isNotEmpty property = "ixdata3" prepend = " , " > #ixdata3# </isNotEmpty>
+		   <isNotEmpty property = "ixdata4" prepend = " , " > #ixdata4# </isNotEmpty>
+		   <isNotEmpty property = "ixdata5" prepend = " , " > #ixdata5# </isNotEmpty>
+		   <isNotEmpty property = "opertype" prepend = " , " > #opertype# </isNotEmpty>
+		   <isNotEmpty property = "resultdesc" prepend = " , " > #resultdesc# </isNotEmpty>)
+	</statement>
+</sqlMap>

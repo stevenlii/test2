@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/couponrule.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+		// 按钮权限控制
+        var optStr = "${opts}";
+        var opts = optStr.split(',');
+        jQuery('[code]').each(function() {
+            var code = $(this).attr("code");
+            for (var i = 0; i < opts.length; i++) {
+                if (code == opts[i]) {
+                    $(this).css('display', 'inline');
+                }
+            };
+        });
+		
+		$(".signin").click(function(e) {
+            e.preventDefault();
+            $("fieldset#signin_menu").toggle();
+            $(".signin").toggleClass("menu-open");
+        });
+		
+		$("fieldset#signin_menu").mouseup(function() {
+			return false
+		});
+		
+		$(document).mouseup(function(e) {
+			if($(e.target).parent("a.signin").length==0) {
+				$(".signin").removeClass("menu-open");
+				$("fieldset#signin_menu").hide();
+			}
+		});	
+		
+		//初始化兑换规则状态列表
+        $('#state').omCombo({
+            dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponRuleStates',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+		
+		//初始化审核状态列表
+        $('#auditState').omCombo({
+            dataSource: '$request.contextPath/option/dropdownlist.do?paraType=auditStates',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+	
+		//初始化兑换券列表
+        $('#couponId').omCombo({
+            dataSource: '$request.contextPath/option/couponinflist.do',
+            width: '150px',
+            emptyText: '全部',
+            forceSelection: true,
+            filterStrategy : 'anywhere',
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+	
+		//初始化商户列表
+        $('#merId').omCombo({
+            dataSource: '$request.contextPath/option/couponmerinflist.do',
+            width: '155px',
+            emptyText: '全部',
+			listAutoWidth: true,
+			onValueChange: function(target, newValue, oldValue, event) {
+				var merId = $('#merId').omCombo('value');
+                // 连级更新商品列表
+				$('#goodsId').omCombo({
+                    dataSource : '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+                    width: '155px',
+                    emptyText: '全部',
+        			listAutoWidth: true,
+        			forceSelection: true,
+        			onSuccess:function(data, textStatus, event){
+        		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+        		      	  data.unshift(tmp);
+        	   		}
+                });
+            },
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+	
+		//初始化商品列表
+        $('#goodsId').omCombo({
+            dataSource: [],
+            width: '155px',
+            emptyText: '全部',
+			listAutoWidth: true,
+			forceSelection: true,
+			onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+		
+        jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/couponrule/query.do?queryKey=couponrule.all",
+            width: '100%',
+            height: 440,
+            limit: 15,
+            colModel: [{
+                header: '规则编号',
+                name: 'ruleId',
+                width: 75,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					if( rowData.RULEID == null ){
+						return "<a title='" + eval("data=" + rowData.MODDATA).ruleId + "'>" + eval("data=" + rowData.MODDATA).ruleId + "</a>";
+					}else{
+						return "<a title='" + rowData.RULEID + "'>" + rowData.RULEID + "</a>";
+					}
+                }
+            },
+        
+            {
+                header: '兑换券',
+                name: 'coupon',
+                width: 150,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					if( rowData.RULEID == null ){
+						return "<a title='" + eval("data=" + rowData.MODDATA).couponId + "'>" + rowData.COUPONNAME + "（" + eval("data=" + rowData.MODDATA).couponId + "）" + "</a>";
+					}else{
+						return "<a title='" + rowData.COUPONID + "'>" + rowData.COUPONNAME + "（" + rowData.COUPONID + "）" + "</a>";
+					}
+                }
+            },
+            {
+                header: '商户',
+                name: 'mer',
+                width: 120,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					if( rowData.RULEID == null ){
+						return "<a title='" + eval("data=" + rowData.MODDATA).merId + "'>" + rowData.MERNAME + "（" + eval("data=" + rowData.MODDATA).merId + "）" + "</a>";
+					}else{
+						return "<a title='" + rowData.MERID + "'>" + rowData.MERNAME + "（" + rowData.MERID + "）" + "</a>";
+					}
+                }
+            },
+            {
+                header: '商品',
+                name: 'goods',
+                width: 134,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					if( rowData.RULEID == null ){
+						return "<a title='" + eval("data=" + rowData.MODDATA).goodsId + "'>" + rowData.GOODSNAME + "（" + eval("data=" + rowData.MODDATA).goodsId + "）" + "</a>";
+					}else{
+						return "<a title='" + rowData.GOODSID + "'>" + rowData.GOODSNAME + "（" + rowData.GOODSID + "）" + "</a>";
+					}
+                }
+            },
+            {
+                header: '兑换券有效期',
+                name: 'useDate',
+                width: 130,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					var data = eval("data=" + rowData.MODDATA);
+					if( rowData.RULEID == null ){
+						if(data.effType == 2){
+							return "售出后" + data.effDays + "天有效";
+						}
+						if(data.useStartDate == ""){
+    						return " -- ";
+    					}else{
+							return "<a title='" + data.useStartDate + " 至 " + data.useEndDate + "'>" + data.useStartDate + " 至 " + data.useEndDate + "</a>";
+						}
+					}else{
+						if(rowData.EFFTYPE == 2){
+							return "售出后" + rowData.EFFDAYS + "天有效";
+						}
+						if(rowData.USESTARTDATE == "" ){
+							return " -- ";
+						}else{
+							return "<a title='" + rowData.USESTARTDATE + " 至 " + rowData.USEENDDATE + "'>" + rowData.USESTARTDATE + " 至 " + rowData.USEENDDATE + "</a>";
+						}
+					}
+                }
+            },
+            {
+                header: '库存数量',
+                name: 'goodsSum',
+                width: 50,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					if( rowData.RULEID == null ){
+						return "<a title='" + eval("data=" + rowData.MODDATA).goodsSum + "'>" + eval("data=" + rowData.MODDATA).goodsSum + "</a>";
+					}else{
+						return "<a title='" + rowData.GOODSSUM + "'>" + rowData.GOODSSUM + "</a>";
+					}
+                }
+            },
+            {
+                header: '启用状态',
+                name: 'state',
+                width: 50,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.STATENAME + "'>" + rowData.STATENAME + "</a>";
+                }
+            },
+            {
+                header: '审核状态',
+                name: 'auditState',
+                width: 50,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+                    return "<a title='" + rowData.AUDITSTATENAME + "'>" + rowData.AUDITSTATENAME + "</a>";
+                }
+            },
+            {
+                header: '添加时间',
+                name: 'auditState',
+                width: 109,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+                    if( rowData.RULEID == null ){
+						return "<a title='" + eval("data=" + rowData.MODDATA).inTime + "'>" + eval("data=" + rowData.MODDATA).inTime + "</a>";
+					}else{
+						return "<a title='" + rowData.INTIME + "'>" + rowData.INTIME + "</a>";
+					}
+                }
+            },
+            {
+                header: '操作',
+                name: 'couponId',
+                width: 110,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+                    var result = "<img title='详情' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetailDialog(\"" + rowData.RULEID + "\",\"" + rowData.AUDITID + "\")' />";
+					// 规则停止后则该规则不允许修改，启用等操作
+					var exportpngb = '';
+					var exportpngg = '';
+					if(rowData.EXPORT == '0'){
+						exportpngb = 'ddown.png';
+						exportpngg = 'ddown_gray.png';
+					}else{
+						exportpngb = 'down.png';
+						exportpngg = 'down_gray.png';
+					}
+					if( rowData.STATE == '4' ){
+						result += "&nbsp;&nbsp;<img title='修改' src='${request.contextPath}/profile/default/images/tool_modify1.png' />";
+						if( optStr.indexOf("001") != -1 ){
+							// 有审核权限
+							result += "&nbsp;&nbsp;<img title='审核' src='${request.contextPath}/profile/default/images/tool_audit1.png' />";
+						}
+						result += "&nbsp;&nbsp;<img title='批次' src='${request.contextPath}/profile/default/images/tool_batch1.png' />";
+						result += "&nbsp;&nbsp;<img title='导出' src='${request.contextPath}/profile/default/images/" + exportpngg +"' />";
+					}else{
+    					result += "&nbsp;&nbsp;<img title='修改' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='showModifyDialog(\"" + rowData.RULEID + "\",\"" + rowData.AUDITID + "\")' />";
+    					
+						if( optStr.indexOf("001") != -1 ){
+							// 有审核权限
+							// 待审核状态的数据才能审核
+        					if(rowData.AUDITSTATE == '0'){
+        						result += "&nbsp;&nbsp;<img title='审核' src='${request.contextPath}/profile/default/images/tool_audit.png' onclick='showAuditDialog(\"" + rowData.AUDITID + "\")' />";
+        					}else{
+        						result += "&nbsp;&nbsp;<img title='审核' src='${request.contextPath}/profile/default/images/tool_audit1.png' />";
+        					}
+						}
+    					// 规则码生成方式为：第三方导入时才能显示批次
+    					if(rowData.GENERATEMETHOD == '1'){
+    						result += "&nbsp;&nbsp;<img title='批次' src='${request.contextPath}/profile/default/images/tool_batch.png' onclick='showCodeBatchDialog(\"" + rowData.RULEID + "\")' />";
+    					}else{
+    						result += "&nbsp;&nbsp;<img title='批次' src='${request.contextPath}/profile/default/images/tool_batch1.png' />";
+    					}
+						//判断是否能导出
+						if(rowData.RULETYPE == '0' || rowData.AUDITSTATE != '2' || rowData.EFFTYPE == '2'){
+							result += "&nbsp;&nbsp;<img title='导出' src='${request.contextPath}/profile/default/images/" + exportpngg + "' />";
+						}else{
+							if(rowData.EXPORT == '0'){
+								result += "&nbsp;&nbsp;<img title='重复导出' src='${request.contextPath}/profile/default/images/" + exportpngb + "' onclick='exportindex(\"" + rowData.RULEID + "\","  + rowData.EXPORT + ")' />";
+							}else{
+								result += "&nbsp;&nbsp;<img title='导出' src='${request.contextPath}/profile/default/images/" + exportpngb + "' onclick='exportindex(\"" + rowData.RULEID + "\","  + rowData.EXPORT + ")' />";
+							}
+						}
+					}
+                    return result;
+                }
+            }]
+        });
+
+        jQuery( "#dialog").omDialog({
+            autoOpen: false,
+			onClose : function(event) {shuaxin();clearInterval(timer);}
+        });
+		
+		$('.errorImg').bind('mouseover',function(){
+        $(this).next().css('display','block');
+		}).bind('mouseout',function(){
+				$(this).next().css('display','none');
+		});
+		
+		jQuery('#dataform').submit(function() {
+			if (!jQuery("#dataform").valid()) 
+				return false;
+			jQuery(this).omAjaxSubmit({success:function(res){
+		      showSimpleTip(res);
+				close();
+			}});
+			
+			return false; 
+		});
+	});
+</script>
+</head>
+<body>
+	<div class="main_list">
+	    <!--列表查询区-->
+	    <div class="list_search" style="height: 80px;">
+	        <table width="100%" border="0">
+	            <tr>
+	                <td>
+	                    <form id="form" action="" method="post">
+	                        <table width="100%" border="0">
+	                            <tr>
+	                                <td>
+	                                    &nbsp;
+	                                </td>
+	                            </tr>
+	                            <tr>
+	                                <th width="8%" height="30">
+	                                    	规则编号：
+	                                </th>
+	                                <td width="8%">
+	                                    <input id="ruleId" name="ruleId" type="text" class="input2" />
+	                                </td>
+	                                <th width="8%">
+	                                    	启用状态：
+	                                </th>
+	                                <td width="8%">
+	                                    <input id="state" name="state" />
+	                                </td>
+	                                <th width="8%">
+	                                    	审核状态：
+	                                </th>
+	                                <td width="8%">
+	                                    <input id="auditState" name="auditState" />
+	                                </td>
+	                                <th width="8%" rowspan="2">
+	                                    	库存预警：
+	                                </th>
+	                                <td width="8%" rowspan="2">
+	                                    <input id="isAlarm" name="isAlarm" type="checkbox" />
+	                                </td>
+	                            </tr>
+	                            <tr>
+	                                <th width="8%" height="30">
+	                                    	兑换券编号：
+	                                </th>
+	                                <td>
+	                                    <input id="couponId" name="couponId" />
+	                                </td>
+	                                <th width="8%">
+	                                    	商户编号：
+	                                </th>
+	                                <td>
+	                                    <input id="merId" name="merId" />
+	                                </td>
+	                                <th width="8%">
+	                                    	商品编号：
+	                                </th>
+	                                <td>
+	                                    <input id="goodsId" name="goodsId" />
+	                                </td>
+	                            </tr>
+	                        </table>
+	                    </form>
+	                </td>
+	                <td rowspan="2">
+	                    <input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png"
+	                    	onclick="query()" />
+	                    &nbsp;&nbsp;&nbsp;&nbsp;
+	                    <input code="002" style="display:none" name="添加兑换券规则" type="image" value="ee"
+	                    	src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add()" />
+	                </td>
+	            </tr>
+	        </table>
+	    </div>
+	    <!--列表查询区-->
+	    <div align="center">
+	        <table align="left" id="grid">
+	        </table>
+	    </div>
+	    <div id="dialog">
+	        <iframe frameborder="0" style="width:100%;height:99%" src="about:blank">
+	        </iframe>
+	    </div>
+	</div>
+</body>
+</html>

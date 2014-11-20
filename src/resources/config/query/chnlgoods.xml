@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="chnlgoods"  >
+	<sql id="allChnlGoods"> 
+	<![CDATA[
+	SELECT B.CHANNELID,B.MERID,B.GOODSID,B.MODTIME,B.SERVICE_USER,B.STATE,B.MODLOCK
+		,M.STATE MERSTATE,G.STATE GOODSSTATE,M.MERNAME,G.GOODSNAME 
+		FROM UMPAY.T_HF_CHNL_GOODS B,UMPAY.T_MER_INF M,UMPAY.T_HFMER_EXP HM,UMPAY.T_GOODS_INF G,UMPAY.T_HFGOODS_EXP HG
+		WHERE B.MERID=HM.MERID AND M.MERID=HM.MERID AND B.MERID=HG.MERID AND B.GOODSID=HG.GOODSID 
+		 	AND G.MERID=HG.MERID AND G.GOODSID=HG.GOODSID 
+		 #if( $channelId && $channelId != '' ) 
+		   AND B.CHANNELID = :channelId 
+		 #end
+		 #if( $merId && $merId != '' ) 
+		   AND B.MERID = :merId 
+		 #end
+		 #if( $goodsId && $goodsId != '' ) 
+		   AND B.GOODSID = :goodsId 
+		 #end
+		 #if( $service_user && $service_user != '' ) 
+		   AND B.SERVICE_USER = :service_user 
+		 #end
+		 #if( $state && $state != '' ) 
+		   AND B.STATE = :state 
+		 #end
+		 #if( $merState && $merState != '' ) 
+		   AND M.STATE = :merState 
+		 #end
+		 #if( $goodsState && $goodsState != '' ) 
+		   AND G.STATE = :goodsState 
+		 #end
+		 #if( $from && $from != '' && $to && $to != '') 
+			AND B.MODTIME BETWEEN '$from' AND '$to' 
+		 #end
+		 ORDER BY B.MODTIME DESC
+	  ]]>
+	</sql>
+	<sql id="allChnlMer"> 
+	<![CDATA[
+	SELECT DISTINCT B.MERID,B.CHANNELID,M.STATE MERSTATE,M.MERNAME 
+		FROM UMPAY.T_HF_CHNL_GOODS B,UMPAY.T_MER_INF M,UMPAY.T_HFMER_EXP HM
+		 WHERE B.MERID=HM.MERID AND M.MERID=HM.MERID 
+		 #if( $channelId && $channelId != '' ) 
+		   AND B.CHANNELID = :channelId 
+		 #end
+		 #if( $merId && $merId != '' ) 
+		   AND B.MERID = :merId 
+		 #end
+		 #if( $merState && $merState != '' ) 
+		   AND M.STATE = :merState 
+		 #end
+		 ORDER BY B.MERID
+	  ]]>
+	</sql>
+</mapper> 

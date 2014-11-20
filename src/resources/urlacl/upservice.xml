@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 综合支付商品计费代码管理 -->
+<Options>
+ <!-- 查询权限 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/upservice/query.do</url>
+	</Option>
+	<!-- 导出操作 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/upservice/export.do</url>
+	</Option>
+	<!-- 启用操作 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/upservice/enable.do</url>
+	</Option>
+	<!-- 禁用操作 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/upservice/disable.do</url>
+	</Option>
+	<!-- 添加操作 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/upservice/add.do</url>
+	</Option>
+	<!-- 修改权限 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/upservice/modify.do</url>
+	</Option>
+	<!-- 导入权限 -->
+	<Option>
+		<code>007</code>
+		<url>hfMngBusi/upservice/import.do</url>
+	</Option>
+	
+</Options>

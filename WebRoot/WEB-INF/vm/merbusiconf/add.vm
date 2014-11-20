@@ -1,0 +1,453 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css"
+        type="text/css">
+        <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-mouse.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-draggable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-position.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-resizable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-dialog.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script src="$request.contextPath/js/busi/merbusiconf.js">
+        </script>
+        <script>
+            jQuery(document).ready(function() {
+                jQuery("#container").width(jQuery(window).width());
+
+                jQuery('#merId').omCombo({
+                    dataSource: '$request.contextPath/option/meridlist.do',
+                    width: '100px',
+                    listMaxHeight: 210,
+                    forceSelection: true,
+                    emptyText: '请选择..',
+                    onValueChange: function(target, newValue, oldValue, event) {
+                        getConf(newValue);
+                    }
+                });
+
+                jQuery("#dataform").validate({
+                    rules: {
+                        "merId": {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        "merId": {
+                            required: "请选择商户号"
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        if (error.html()) {
+                            $(element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.css('display', 'block');
+                                    attentionElement.next().html(error);
+                                    attentionElement.next().css('display', 'block');
+                                }
+                            });
+                        }
+                    },
+                    showErrors: function(errorMap, errorList) {
+                        if (errorList && errorList.length > 0) {
+                            $.each(errorList,
+                            function(index, obj) {
+                                var msg = this.message;
+                                $(obj.element).parents().map(function() {
+                                    if (this.tagName.toLowerCase() == 'td') {
+                                        var attentionElement = $(this).next().children().eq(0);
+                                        attentionElement.show();
+                                        attentionElement.next().html(msg);
+                                    }
+                                });
+                            });
+                        } else {
+                            $(this.currentElements).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    $(this).next().children().eq(0).hide();
+                                    $(this).next().children().eq(1).hide();
+                                }
+                            });
+                        }
+                        this.defaultShowErrors();
+                    },
+                    submitHandler: function() {
+                        jQuery(this).submit();
+                        return false;
+                    }
+                });
+
+                $('#dataform').submit(function() {
+                    if (!$("#dataform").valid()) {
+                        return false;
+                    }
+                    $(this).omAjaxSubmit({
+                        success: function(res) {
+                            var msg = "";
+                            var type = "";
+                            if (res != '1') {
+                                type = 'error';
+                                msg = '操作失败';
+                                if (res != '0') {
+                                    msg = res;
+                                }
+                            } else {
+                                type = 'success';
+                                msg = '操作成功';
+                                closeDialog();
+                            }
+                            window.parent.$.omMessageBox.alert({
+                                type: type,
+                                title: '操作提示',
+                                content: msg
+                            });
+                        }
+                    });
+                    return false;
+                });
+                //
+                $(":checkbox").click(function() {
+                    var biz = "";
+                    var i = 0;
+                    $(":checkbox").each(function() {
+                        var checked = $(this).is(':checked');
+                        if (checked) {
+                            i++;
+                            var thisValue = $(this).val();
+                            biz = biz + "," + thisValue;
+                        }
+                    });
+                    if (biz != "") {
+                        $("#bizType").val(biz.substring(1));
+                    } else {
+                        $("#bizType").val("");
+                    }
+                    var bizType = $('#bizType').val();
+                });
+            });
+            //关闭窗口方法
+            function closeDialog() {
+                window.parent.fillBackAndCloseDialog("#dialog");
+            }
+        </script>
+    </head>
+    
+    <body>
+        <!--商户银行配置页面-->
+        <div id="container">
+            <form id="dataform" method="post" name="dataform" action="${request.contextPath}/merbusiconf/save.do">
+                <div style="width:100%;">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td>
+                                <table cellpadding="0" cellspacing="0" class="infowrite">
+                                    <tr>
+                                        <th>
+                                            <span>
+                                                *
+                                            </span>
+                                            	商户号：
+                                        </th>
+                                        <td class="td">
+                                            <input id="merId" name="merId" class="select1" />
+                                        </td>
+                                        <td class="td" width="140px">
+                                            <span class="errorImg">
+                                            </span>
+                                            <span class="errorMsg">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <span>
+                                                *
+                                            </span>
+                                            	商户名称：
+                                        </th>
+                                        <td class="td1" colspan="2">
+                                            <label id="merName">
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <span>
+                                                *
+                                            </span>
+                                            	支付类型：
+                                        </th>
+                                        <td class="td" colspan="2">
+                                            <input id="bizType" name="bizType" type="hidden" />
+                                            <div style="width:100%;height:260px;text-align:left;overflow:auto;">
+                                                <table>
+                                                    <tr>
+                                                        <td width="55%">
+                                                            <label style="color:blue">
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可控
+                                                            </label>
+                                                        </td>
+                                                        <td width="45%">
+                                                            <label style="color:blue">
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;非可控
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id='bizType0001' value='0001' />
+                                                            	web统一支付页面(0001)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0106' value='0106' />
+                                                            	MO快捷支付(0106)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id='bizType0002' value='0002' />
+                                                            	渠道后台直连(0002)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0108' value='0108' />
+                                                            	话付宝二维码支付(0108)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id='bizType0003' value='0003' />
+                                                            	金山web小页面(0003)
+                                                        </td>
+                                                        <td>
+                                                            <input type="checkbox" id='bizType0201' value='0201' />
+                                                            	无线R1(0201)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id='bizType0004' value='0004' />
+                                                            	江西小额web(0004)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0202' value='0202' />
+                                                        		无线R2(0202)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id='bizType0005' value='0005' />
+                                                            	手机wap统一支付页面(0005)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0203' value='0203' />
+                                                            	无线R3(0203)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0006' value='0006' />
+                                                        		江西小额wap统一支付页面(0006)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0204' value='0204' />
+                                                            	联网SDK(MO)(0204)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0101' value='0101' />
+                                                            	标准MO支付(0101)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0205' value='0205' />
+                                                            	话付宝R5(0205)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0102' value='0102' />
+                                                            	渠道标准MO支付(0102)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0206' value='0206' />
+                                                        		SDK(U付)(0206)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0103' value='0103' />
+                                                            	江西小额MO(0103)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0209' value='0209' />
+                                                            	联网SDK(验证码)(0209)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0104' value='0104' />
+                                                        		特殊商户(优势盈通、体彩福彩)(0104)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0210' value='0210' />
+                                                            	北京小额SDK(0210)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0105' value='0105' />
+                                                            	免二次确认MO(0105)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0211' value='0211' />
+                                                            	联网SDK(无卡支付)(0211)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0207' value='0207' />
+                                                            	北京小额wap页面验证码(0207)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0212' value='0212' />
+                                                            	重庆小额SDK(原R8)(0212)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0208' value='0208' />
+                                                            	手机wap页面验证码(0208)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0213' value='0213' />
+                                                        		特殊商户(掌阅R3)(0213)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0301' value='0301' />
+                                                            	后台直连(0301)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0223' value='0223' />
+                                                            	特殊商户(掌阅新R3)(0223)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0306' value='0306' />
+                                                            	上海短信购(0306)
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0214' value='0214' />
+                                                        		无线标准MO1(新R3)(0214)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0224' value='0224' />
+                                                            	无线标准MO2(新R3)(0224)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0231' value='0231' />
+                                                            	离线SDK(1MO)(0231)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0232' value='0232' />
+                                                            	离线SDK(2MO)(0232)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0302' value='0302' />
+                                                            	小额直连BOSS支付(0302)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0303' value='0303' />
+                                                            	小额清结算支付(0303)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0305' value='0305' />
+                                                            	NFC直接支付(0305)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0307' value='0307' />
+                                                            	海南基地彩票(0307)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+                                                        	<input type="checkbox" id='bizType0109' value='0109' />
+                                                            	渠道验证码支付(0109)
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="pop_btn_sh">
+                        <input type="submit" class="popbtn" onmouseover="this.className='popbtnhover'"
+                        onmouseout="this.className='popbtn'" value="确定" />
+                        <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'"
+                        onmouseout="this.className='popbtn'" value="取消" onclick="closeDialog()"
+                        />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+
+</html>

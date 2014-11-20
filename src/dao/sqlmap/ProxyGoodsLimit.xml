@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ProxyGoodsLimit">
+	<typeAlias alias="ProxyGoodsLimit" type="com.umpay.hfmng.model.ProxyGoodsLimit" />
+	<sql id="select_what">
+		select merId,submerId,goodsid,state,daylimit,alarmlimit,alarmtel,moduser,modtime,intime from UMPAY.T_PROXYGOODS_LIMIT where 1=1 
+    </sql>
+	<sql id="key_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="subMerId" prepend=" and ">
+			subMerId = #subMerId#
+		</isNotEmpty>
+		<isNotEmpty	property="goodsId" prepend=" and ">
+			goodsId = #goodsId#
+		</isNotEmpty>
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="subMerId" prepend=" and ">
+			subMerId = #subMerId# 
+		</isNotEmpty>
+		<isNotEmpty	property="goodsId" prepend=" and ">
+			goodsId = #goodsId# 
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="ProxyGoodsLimit" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="ProxyGoodsLimit" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(1) from UMPAY.T_PROXYGOODS_LIMIT
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Insert" resultClass="ProxyGoods">
+		insert into UMPAY.T_PROXYGOODS_LIMIT(merId,subMerId,goodsId
+				<isNotEmpty	property="dayLimit" prepend=" , "> dayLimit </isNotEmpty>
+				<isNotEmpty	property="alarmLimit" prepend=" , "> alarmLimit </isNotEmpty>
+				<isNotEmpty	property="alarmTel" prepend=" , "> alarmTel </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+			) values(#merId#,#subMerId# ,#goodsId#
+				<isNotEmpty	property="dayLimit" prepend=" , "> #dayLimit# </isNotEmpty>
+				<isNotEmpty	property="alarmLimit" prepend=" , "> #alarmLimit# </isNotEmpty>
+				<isNotEmpty	property="alarmTel" prepend=" , "> #alarmTel# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_PROXYGOODS_LIMIT set modTime=CURRENT TIMESTAMP 
+			    <isNotEmpty	property="dayLimit" prepend=" , ">daylimit=#dayLimit# </isNotEmpty>
+				<isNotEmpty	property="alarmLimit" prepend=" , "> alarmlimit=#alarmLimit# </isNotEmpty>
+				<isNotEmpty	property="alarmTel" prepend=" , "> alarmTel=#alarmTel# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where merId=#merId# and subMerId=#subMerId# and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="updateLock" resultClass="integer">
+	   update UMPAY.T_PROXYGOODS_LIMIT set modLock=#modLock#,modTime=CURRENT TIMESTAMP 
+	   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where merId=#merId# and subMerId=#subMerId#  and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="isOrNotAble" resultClass="integer">
+		update UMPAY.T_PROXYGOODS_LIMIT set state=#state#,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		where merId=#merId# and subMerId=#subMerId# and goodsId=#goodsId#
+	</statement>
+	
+	<statement id="setLock" resultClass="integer">
+	   update UMPAY.T_PROXYGOODS_LIMIT set modLock=#modLock# where merId=#merId# and subMerId=#subMerId# and goodsId=#goodsId#
+	</statement>
+	
+</sqlMap>

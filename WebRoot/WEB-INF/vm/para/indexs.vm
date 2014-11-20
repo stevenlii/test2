@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/para.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        $('#paraType').omCombo({
+            dataSource: '$request.contextPath/para/getTypes.do?paraType=S',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+        jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/para/querys.do?queryKey=para.all",
+            width: '100%',
+            height: 470,
+            limit: 15,
+            colModel: [{
+                header: '类型',
+                name: 'paraType',
+                width: 60,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.PARATYPE + "'>" + rowData.PARATYPE + "</a>";
+                }
+            },
+            {
+                header: '编号',
+                name: 'paraCode',
+                width: 60,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.PARACODE + "'>" + rowData.PARACODE + "</a>";
+                }
+            },
+            {
+                header: '值',
+                name: 'paraValue',
+                width: 100,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.PARAVALUE + "'>" + rowData.PARAVALUE + "</a>";
+                }
+            },
+            {
+                header: '说明',
+                name: 'paraDesc',
+                width: 120,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.PARADESC + "'>" + rowData.PARADESC + "</a>";
+                }
+            },
+            {
+                header: '修改人',
+                name: 'modUser',
+                width: 30,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+            		return "<a title='" + rowData.MODUSER + "'>" + rowData.MODUSER + "</a>";
+                }
+            },
+            {
+                header: '修改时间',
+                name: 'modTime',
+                width: 50,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+            	return "<a title='" + rowData.MODTIME + "'>" + rowData.MODTIME + "</a>";
+                }
+            },
+            {
+                header: '操作',
+                name: 'couponId',
+                width: 30,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+                    var result = "<img title='修改' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='showModifyDialog(\"" + rowData.PARATYPE + "\",\""+ rowData.PARACODE +"\")' />";
+                    return result;
+                }
+            }],
+            autoFit: true
+        });
+
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+		
+		$('.errorImg').bind('mouseover',function(){
+        $(this).next().css('display','block');
+		}).bind('mouseout',function(){
+				$(this).next().css('display','none');
+		});
+		
+		jQuery('#dataform').submit(function() {
+			if (!jQuery("#dataform").valid()) 
+				return false;
+			jQuery(this).omAjaxSubmit({success:function(res){
+		      showSimpleTip(res);
+				close();
+			}
+			});
+			
+			return false; 
+		});
+	});
+</script>
+
+<script>
+    function add(){
+    	$( "#dialog").omDialog("option","width",'650');
+	    $( "#dialog").omDialog("option","title",'添加参数信息');
+	    $( "#dialog").omDialog("option","height",'300');
+	    $( "#dialog").omDialog("option", "modal", true);
+        $( "#dialog").omDialog('open');
+		var frameLoc=window.frames[0].location;
+        frameLoc.href='add.do?paraType=S';
+    }
+    </script>
+</head>
+<body>
+   <!--列表查询区-->
+   <div class="list_search" style="height: 40px;">
+   <table width="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr height="50px">
+          <th width="10%">参数类型：</th>
+		     <td>
+		  	  <input id="paraType" name="paraType" />
+             </td>
+            <th width="10%" >参数编号：</th>
+              <td ><input id="paraCode" name="paraCode" type="text" class="input2" /></td>
+         </tr>
+        </table>
+         </form> 
+       </td>
+        <td>
+			<input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="querys()"  />
+			&nbsp;&nbsp;&nbsp;&nbsp;<input name="添加系统参数" type="image"  value="ee" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add()"/>
+        </td>
+       </tr>
+        </table>
+      </div>
+ <!--列表查询区-->
+
+  <div align="center">
+         <table  align="left" id="grid" ></table>
+     </div>
+    
+  
+ <div id="dialog">
+	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+
+</body>
+</html>

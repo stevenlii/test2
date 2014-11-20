@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/bankinf.js"></script>
+ 	<script type="text/javascript">
+
+ 	  var  url="$request.contextPath/bankinf/query.do?queryKey=bank.allBank";
+        jQuery(document).ready(function() {
+        	jQuery("#search_div").width(jQuery(window).width()-20);
+			    var optStr="${opts}";
+					var opts=optStr.split(',');
+			    jQuery('[code]').each(function () {
+			        var code=$(this).attr("code");
+			        for(var i=0;i<opts.length;i++){
+			        	if(code==opts[i]){
+							   $(this).css('display','inline');						
+							}
+			    		};
+					});
+	
+          jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/bankinf/query.do?queryKey=bank.allBank",
+                width:'100%',
+                height : 455,
+                limit : 15,
+                singleSelect : false,
+                autoFit : true,
+                colModel : [ {header : '支付服务商编号', name : 'BANKID',width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			}}, 
+                             {header : '支付服务商名称', name : 'BANKNAME',width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '支付服务商类型', name : 'BANKTYPE', width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '配置时间', name : 'MODTIME', width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+				     				return "<a title='"+value+"'>"+value+"</a>";
+				     			} },
+                             {header : '状态', name : 'STATE',width : 50,align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	if(state==2)
+                             		state = "启用";
+                             	else 
+                             		state = "禁用";
+                             	return "<a title='"+state+"'>"+state+"</a>";
+                                 } },
+                              {header : '操作', name:'A',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+	                             	var state = rowData.STATE;
+	                             	var result="";
+                             		if(state==2){//开通状态
+                             			if(optStr.indexOf("004")!=-1){
+                             		     result+="<input  name='禁用' title='禁用'  code='003' type='image' value=''  src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable(&quot;"+rowData.BANKID +"&quot;, "+ rowData.STATE +")'  /> ";
+                             			}
+                             			if(optStr.indexOf("005")!=-1){
+                             			result+=" <input  name='修改' title='修改' type='image' value='' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='modify(&quot;"+rowData.BANKID+"&quot;)'/> ";
+                             			  }                             		
+                             			}else{//关闭状态，不能修改
+                             				if(optStr.indexOf("003")!=-1){
+                             			       result+="<input  name='启用' title='启用' type='image'  code='004' value=''  src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable(&quot;"+rowData.BANKID +"&quot;, "+ rowData.STATE +" )'  /> ";
+                             				}
+                             				if(optStr.indexOf("005")!=-1){
+                             				result+=" <input  name='修改' title='修改' type='image' value='' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_modify1.png'/> ";
+                                            }
+                             			}
+                             	    return result;	
+                             }}
+                            ]
+            });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+            
+          //获取支付服务商类型列表
+     	     $('#bankType').omCombo({
+                   dataSource : '$request.contextPath/option/banktype.do',
+                   width:'100px',
+                   emptyText:'全部 ' ,
+                   listMaxHeight:150,
+                   forceSelection : true ,
+                   onSuccess:function(data, textStatus, event){
+					      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+					      	  data.unshift(tmp);
+				   		}
+               });
+     	     //
+     	    //状态 
+     	  	  $('#state').omCombo({
+     	          dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+     	          width:'64px',
+     	          listMaxHeight:80,
+     	          emptyText:'全部 ' ,
+     	          forceSelection : true
+     	      });
+       });
+
+</script>
+
+</head>
+<body>
+
+    <!--增 删 改按钮区-->
+    <div class="list_btntool">
+      <table border="0" width="100%">
+        <tr>
+          <td align="left">
+             <input name="禁用" type="image" title='批量禁用' code="003" style="display:none"  src="${request.contextPath}/profile/default/images/btn_Disable.png" onclick="batchstop();"/>
+             <input name="启用" type="image" title='批量启用' code="004"  style="display:none"  src="${request.contextPath}/profile/default/images/btn_Enable.png" onclick="batchstart();"/>
+          </td>
+		 <td align="right">
+		     <input name="添加支付服务商" type="image" title='添加支付服务商' style="display:none"  code="002" src="${request.contextPath}/profile/default/images/btn_Add.png " onclick="show();"/>
+      	</td>
+       </tr>
+      </table>
+     </div>
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search" align="left" style="height:30px;">
+      <table width="80%" border="0">
+        <tr>
+          <td  align="left" >
+           <!--查询块区 start--> 
+	       <form id="form" action="" method="post">
+             <table width="100%" border="0">
+                 <tr>
+                 <th width="10%" height="30">支付服务商编号：</th>
+		         <td ><input id="bankId" name="bankId" type="text" class="input1" /></td>
+			     <th width="10%" height="30"> 支付服务商名称：</th>    
+			      <td ><input id="bankName" name="bankName" type="text" class="input1"/></td>
+			      <th width="10%" height="30">支付服务商类型：</th>
+			      <td ><input id="bankType" name="bankType" class="select1"/></td>
+			       <th >状态：</th>
+			       <td><input id="state" name="state" class="select1"/></td>
+			     </tr>  
+			    </table>
+               </form>  
+			  </td>    
+			   <td align="left"><input id="query" title="查询" name="query" type="image" code="001" style="display:none"  src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+               </td>   
+			    </tr>
+             </table>  
+		</div>    
+    </div>			      
+ <!--列表区-->
+  <div>
+       <table id="grid" align="left"></table>
+  <div>
+    
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+</body>
+</html>

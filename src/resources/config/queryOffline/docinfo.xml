@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="docinfo"  >
+	<sql id="allDocInfo"> 
+	<![CDATA[
+	SELECT ID,INTIME,DOCNAME,MODTIME,DOCTYPE,DOCPATH,DOCDESC FROM UMPAY.T_HFDOC WHERE 1=1  
+		 #if( $docName && $docName!='' ) 
+		   AND DOCNAME LIKE '%$docName%' 
+		 #end 
+		 ORDER BY MODTIME DESC
+	  ]]>
+	</sql>
+</mapper> 

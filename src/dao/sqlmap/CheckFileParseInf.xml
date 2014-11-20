@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CheckFileParseInf">
+	<typeAlias alias="CheckFileParseInf" type="com.umpay.hfmng.model.CheckFileParseInf" />
+	<sql id="select_what">
+		SELECT FILENAME,
+		       FILETYPE,
+		       FILESTATE,
+		       DEALTIMES,
+		       REMARK,
+		       MODTIME,
+		       INTIME,
+		       STATDATE,
+		       MERID
+		  FROM UMPAY.T_COUPON_FTPFILE
+	</sql>
+
+	<sql id="where_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="fileName" prepend=" and ">
+				fileName=#fileName#
+			</isNotEmpty>
+			<isNotEqual property="fileType" prepend=" and "
+				compareValue="-1">
+				fileType=#fileType#
+			</isNotEqual>
+			<isNotEqual property="fileState" prepend=" and "
+				compareValue="-1">
+				fileState=#fileState#
+			</isNotEqual>
+			<isNotEmpty property="merId" prepend=" and ">
+				merId=#merId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<sql id="key_find">
+		<dynamic prepend=" where ">
+			<isNotEmpty property="fileName" prepend=" and ">
+				fileName=#fileName#
+			</isNotEmpty>
+			<isNotEqual property="fileType" prepend=" and "
+				compareValue="-1">
+				fileType=#fileType#
+			</isNotEqual>
+		</dynamic>
+	</sql>
+
+	<statement id="get" resultClass="CheckFileParseInf">
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+
+	<statement id="find" resultClass="CheckFileParseInf">
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+
+	<statement id="find_count" resultClass="HashMap">
+		select count(*) as num from UMPAY.T_COUPON_FTPFILE
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="delete" resultClass="integer">
+		delete from UMPAY.T_COUPON_FTPFILE
+		<include refid="key_find" />
+	</statement>
+
+	<statement id="insert" resultClass="integer">
+		INSERT INTO UMPAY.T_COUPON_FTPFILE
+		  (fileName,
+		   fileType,
+		   fileState,
+		   statDate,
+		   merId
+		   <isNotEmpty property="dealTimes" prepend=" , "> dealTimes </isNotEmpty>
+		   <isNotEmpty property="remark" prepend=" , "> remark </isNotEmpty>
+		   <isNotEmpty property="modTime" prepend=" , "> modTime </isNotEmpty>
+		   <isNotEmpty property="inTime" prepend=" , "> inTime </isNotEmpty>)
+		VALUES
+		  (#fileName#,
+		   #fileType#,
+		   #fileState#,
+		   #statDate#,
+		   #merId#
+		   <isNotEmpty property="dealTimes" prepend=" , "> #dealTimes# </isNotEmpty>
+		   <isNotEmpty property="remark" prepend=" , "> #remark# </isNotEmpty>
+		   <isNotEmpty property="modTime" prepend=" , "> #modTime# </isNotEmpty>
+		   <isNotEmpty property="inTime" prepend=" , "> #inTime# </isNotEmpty>)
+	</statement>
+
+	<statement id="update" resultClass="integer">
+		update UMPAY.T_COUPON_FTPFILE set fileType=#fileType#
+		<isNotEqual property="fileState" prepend=" , "
+			compareValue="-1">
+			fileState=#fileState#
+		</isNotEqual>
+		<isNotEmpty property="statDate" prepend=" , ">
+			statDate=#statDate#
+		</isNotEmpty>
+		<isNotEmpty property="merId" prepend=" , ">
+			merId=#merId#
+		</isNotEmpty>
+		<isNotEmpty property="dealTimes" prepend=" , ">
+			dealTimes=#dealTimes#
+		</isNotEmpty>
+		<isNotEmpty property="remark" prepend=" , ">
+			remark=#remark#
+		</isNotEmpty>
+		<isNotEmpty property="modTime" prepend=" , ">
+			modTime=#modTime#
+			</isNotEmpty>
+		<isNotEmpty property="inTime" prepend=" , ">
+			inTime=#inTime#
+		</isNotEmpty>
+		where fileName=#fileName# and fileType=#fileType#
+	</statement>
+	
+	<statement id="allMers" resultClass="com.umpay.hfmng.model.MerInfo">
+		select
+		distinct(trim(merinf.merid)) as merid
+		from umpay.t_mer_inf
+		merinf,umpay.t_goods_inf goodsinf,umpay.t_hfmer_exp
+		merexp
+		where
+		merinf.merid=goodsinf.merid and merinf.merid=merexp.merid and
+		merexp.fileDL = 1
+		and merinf.state=2
+		order by merid with ur
+	</statement>
+
+</sqlMap>

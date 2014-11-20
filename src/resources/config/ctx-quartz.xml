@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+ <!--起动Bean-->   
+ <bean id="hfmngJob" lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+    <property name="globalJobListeners">     
+   		<list>     
+    		<ref bean="commonJobListener" />     
+  		</list>     
+  	</property> 
+    <property name="triggers">   
+        <list>   
+            <ref bean="feeCodeCountJobTrigger"/>
+            <ref bean="tradeGradeTrigger"/>
+            <ref bean="reduceDataGradeTrigger"/>
+            <ref bean="calculateGradeTrigger"/>
+            <ref bean="gradeRankTrigger"/>
+        </list>   
+    </property>   
+ </bean>
+ <!--实际的工作Bean-->   
+ <bean id="commonJobListener" class="com.umpay.hfmng.job.CommonJobListener"></bean>
+
+ <bean id="feeCodeCountJob" class="com.umpay.hfmng.job.FeeCodeCountJob" ></bean>
+ <bean id="tradeGradeJob" class="com.umpay.hfmng.job.TradeGradeJob" ></bean>
+ <bean id="reduceDataGradeJob" class="com.umpay.hfmng.job.ReduceDataGradeJob" ></bean>
+ <bean id="calculateGradeJob" class="com.umpay.hfmng.job.CalculateGradeJob" ></bean>
+ <bean id="gradeRankJob" class="com.umpay.hfmng.job.GradeRankJob" ></bean>
+ 
+ <!--jobBean用于设定启动时运用的Bean与方法-->
+ <bean id="feeCodeCountJobDetail"  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+     <property name="targetObject">
+        <ref  bean="feeCodeCountJob"/>
+     </property>
+     <property name="targetMethod">
+         <value>doJob</value>
+     </property>
+ </bean>
+ <bean id="tradeGradeJobDetail"  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+     <property name="targetObject">   
+        <ref  bean="tradeGradeJob"/>
+     </property>
+     <property name="targetMethod">
+         <value>doJob</value>
+     </property>
+ </bean>
+ <bean id="reduceDataGradeJobDetail"  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+     <property name="targetObject">   
+        <ref  bean="reduceDataGradeJob"/>
+     </property>
+     <property name="targetMethod">
+         <value>doJob</value>
+     </property>
+ </bean>
+ <bean id="calculateGradeJobDetail"  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+     <property name="targetObject">   
+        <ref  bean="calculateGradeJob"/>
+     </property>
+     <property name="targetMethod">
+         <value>doJob</value>
+     </property>
+ </bean>
+ <bean id="gradeRankJobDetail"  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+     <property name="targetObject">
+        <ref  bean="gradeRankJob"/>
+     </property> 
+     <property name="targetMethod">
+         <value>doJob</value>
+     </property>
+ </bean>
+ <!--定时器设定起动频率&启动时间-->
+ <bean id="feeCodeCountJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">   
+ 	<property  name="jobDetail">
+ 		<ref bean="feeCodeCountJobDetail"/>    
+ 	</property>   
+ 	<property name="cronExpression">
+ 		<value>0 0 01 * * ?</value>   
+ 		<!-- "0 0 01 * * ?" 每天一点触发-->  
+	</property>   
+ </bean>
+ <bean id="tradeGradeTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+ 	<property  name="jobDetail">
+ 		<ref bean="tradeGradeJobDetail"/>
+ 	</property>
+ 	<property name="cronExpression">
+ 		<value>15 12 5 3 * ?</value>     
+	</property>
+ </bean>
+ <bean id="reduceDataGradeTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+ 	<property  name="jobDetail">
+ 		<ref bean="reduceDataGradeJobDetail"/>
+ 	</property>
+ 	<property name="cronExpression">
+ 		<value>15 32 5 3 * ?</value>     
+	</property>
+ </bean>
+ <bean id="calculateGradeTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+ 	<property  name="jobDetail">
+ 		<ref bean="calculateGradeJobDetail"/>
+ 	</property>
+ 	<property name="cronExpression">
+ 		<value>15 52 5 3 * ?</value>     
+	</property>
+ </bean>
+ <bean id="gradeRankTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+ 	<property  name="jobDetail">
+ 		<ref bean="gradeRankJobDetail"/>
+ 	</property>
+ 	<property name="cronExpression">
+ 		<!-->value>15 2 2 26 * ?</value-->
+ 		<value>10 50 11 6 * ?</value>
+	</property>
+ </bean>
+</beans>

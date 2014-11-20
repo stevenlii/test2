@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponOrder">
+	<typeAlias alias="CouponOrder" type="com.umpay.hfmng.model.CouponOrder" />
+	<statement id="detail" resultClass="CouponOrder">
+		select t.ORDERID as orderId, t.PAIDMOBILEID as phone, t.PAIDAMT / 100 as amount, t.MERID as merId, m.MERNAME as merName, t.GOODSID as goodsId, 
+		g.GOODSNAME as goodsName,       char(t.ACCESSTYPE) as accessType, case when temp.TRANSTATE is null then '0' else char(temp.TRANSTATE) end as payState, char(t.STATE) as orderState, temp.TRANSACTIME as payTime,
+		 t.INTIME as genTime        
+		from UMPAY.T_COUPON_ORDER t join UMPAY.t_mer_inf m on t.MERID = m.MERID join UMPAY.t_goods_inf g on t.GOODSID = g.GOODSID       
+		 left join(  select t.orderid, t.TRANSTATE as transtate, t.TRANSACTIME 
+		  from(  select ORDERID, max(TRANSACTIME) as TRANSACTIME from UMPAY.t_coupon_trans group by  ORDERID  ) c, UMPAY.t_coupon_trans t 
+		 where c.orderid = t.orderid and c.TRANSACTIME = t.transactime )temp on t.ORDERID = temp.ORDERID
+		 where t.MERID = g.MERID
+		 and t.ORDERID = #orderId :char#
+	</statement>
+	<typeAlias alias="CouponOrderItem" type="com.umpay.hfmng.model.CouponOrderItem" />
+	<statement id="items" resultClass="CouponOrderItem">
+		select cc.couponcode, ci.COUPONID, ci.COUPONNAME, usestartdate || ' 至 ' || useenddate as useRange, char(cc.couponcodetype) as couponStyle, char(cc.state) as couponState, cc.state as state, cc.merid as merId 
+			from UMPAY.t_coupon_code cc, UMPAY.t_coupon_inf ci
+			where cc.couponid = ci.COUPONID
+		    and cc.ORDERID = #orderId :char#
+	</statement>
+</sqlMap>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="stl">
+	<sql id="stlLog">
+	<![CDATA[
+	 SELECT A.MODUSER, A.OPERDATA, A.IXDATA1, A.IXDATA2, A.IXDATA3, A.IXDATA4, A.IXDATA5, A.OPERTYPE, A.RESULTDESC, A.INTIME
+	 FROM UMPAY.T_COUPON_OPLOG A
+     WHERE A.BUSINESSOBJECT = 'UMPAY.T_COUPON_MERSET'
+       #if( $stlCycle && $stlCycle!='' ) 
+           and A.IXDATA3 = '$stlCycle'
+       #end
+       #if( $cycleStart && $cycleStart!='' ) 
+           and A.IXDATA1 >= 
+			case when length(trim(A.IXDATA1)) = 6
+			then 
+				substr('$cycleStart', 1, 6)
+			else
+           		'$cycleStart'
+            end 
+       #end
+       #if( $cycleEnd && $cycleEnd!='') 
+           AND A.IXDATA1 <= 
+       	   case when length(trim(A.IXDATA1)) = 6
+		   then 
+		   substr('$cycleEnd', 1, 6)
+		   else
+           '$cycleEnd'
+           end
+       #end
+       #if($merId && $merId!='') 
+           and A.IXDATA4 = '$merId'
+       #end
+       #if($opType && $opType!='') 
+           and A.OPERTYPE = '$opType' 
+       #end
+     order by A.INTIME desc
+	]]>
+	</sql>
+</mapper> 

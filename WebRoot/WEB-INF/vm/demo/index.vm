@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+  <!--     
+  <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+  <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+   -->
+ 	 <script type="text/javascript">
+ 	 	var url ="$request.contextPath/urp/uniquery.do?queryKey=demo.allMers";
+        jQuery(document).ready(function() {
+        
+        var str = new String("001");
+        alert(str);
+        
+        
+            jQuery('#grid').omGrid({
+                dataSource : url,
+                width:1000,
+                height : 500,
+                limit : 10,
+                colModel : [ 
+                             {header : '商户编号', name : 'MERID', width : 100,align : 'left'}, 
+                             {header : '商户名称', name : 'MERNAME', width : 200, align : 'left'},
+                             {header : '客服电话', name : 'CUSPHONE', width : 100, align : 'left'},
+                             {header : '添加时间', name : 'INTIME', width : 100, align : 'left'},
+                             {header : '修改时间', name : 'MODTIME', width : 100, align : 'left'},
+                             {header : '状态', name : 'ID',width : 'autoExpand',align : 'left'}
+                             ]
+
+            });
+
+ 		jQuery( "#dialog").omDialog({
+            autoOpen: false,
+            width:500,
+            height: 400,
+            title:"添加商户信息",
+            modal: true
+        });
+        
+        jQuery('#modify').bind('click', function() {
+                var selections=$('#grid').omGrid('getSelections',true);
+                if (selections.length == 0) {
+                    alert('请至少选择一行记录');
+                    return false;
+                }
+                showModifyDialog(selections[0].MERID);//显示dialog
+            });
+        
+         jQuery('#delete').bind('click', function(e) {
+                var selections=$('#grid').omGrid('getSelections',true);
+                if (selections.length == 0) {
+                    alert('请至少选择一行记录');
+                    return false;
+                }
+                //将选择的记录的id传递到后台去并执行delete操作
+                var toDeleteRecordID=selections[0].ID;
+                jQuery.post('$request.contextPath/dic/deleteDicCategory.do',{cateId:toDeleteRecordID},function(){
+                    jQuery('#grid').omGrid('reload',1);//刷新当前页数据
+                });
+            });
+            
+            
+               jQuery('#query').bind('click', function(e) {
+                var merName=jQuery('#merName').val();
+                //$('#grid').omGrid("setData", url);
+               if(merName == ""){ //没要有查询条件，要显示全部数据
+                    $('#grid').omGrid("setData", url);
+                }else{ //有查询条件，显示查询数据
+                    $('#grid').omGrid("setData", url+'&merName='+encodeURI(merName));
+                }
+            });
+            
+        
+        });
+	
+    </script>
+<script>
+	function del(data){
+		alert(data)
+	}
+	function show(){
+		  $( "#dialog").omDialog('open');
+		   var frameLoc=window.frames[0].location;
+           frameLoc.href='$request.contextPath/demo/add.do';
+		  return false;
+	}
+	function showModifyDialog(id){
+		$( "#dialog").omDialog('open');
+		   var frameLoc=window.frames[0].location;
+           frameLoc.href='$request.contextPath/demo/modify.do?id='+id;
+		  return false;
+	
+	}
+	function fillBackAndCloseDialog(msg){
+		alert(msg);
+		jQuery('#grid').omGrid('reload',1);
+		$( "#dialog").omDialog('close');
+	}
+</script>
+</head>
+
+<body>
+
+
+    <div align="left" id="tbdiv">
+	<input id="create" type="button" value="新增" onclick="show()"/>
+    <input id="modify" type="button" value="修改"/>
+#if($permissionHelper.hasPermission("002-001","删除"))
+        <input id="delete" type="button" value="删除"/>
+#end
+        名称(模糊查询，为空时显示全部)：<input id="merName"></input>
+
+        <input id="query" type="button" value="查询"/>
+
+    </div>
+    <table id="grid"></table>
+    
+    <div id="dialog">
+    	<iframe name="myframe" frameborder="0" style="width:495px;height:99%" src="about:blank"></iframe>
+	</div>
+</body>
+</html>

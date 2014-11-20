@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>商户结算操作日志</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-calendar.js"></script> 
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+	$(document).ready(function(){
+		jQuery( "#dialog-modal").omDialog({
+			autoOpen: false,
+			height: 80,
+			resizable: false,
+			modal: true
+		});
+		jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/stl/querylog.do?queryKey=stl.stlLog",
+            width: '100%',
+            height: 456,
+            limit: 15,
+            colModel: [
+				{
+				    header: '结算周期',
+				    name: 'STLCYCLE',
+				    width: 120,
+				    align: 'left',
+				    renderer: function(value, rowData, rowIndex) {
+						return "<a title='" + rowData.STLCYCLE + "'>" + rowData.STLCYCLE + "</a>";
+                	}
+				},
+				{
+				    header: '商户',
+				    name: 'MER',
+				    width: 80,
+				    align: 'left',
+				    renderer: function(value, rowData, rowIndex) {
+						return "<a title='" + rowData.MER + "'>" + rowData.MER + "</a>";
+                	}
+				},
+	            {
+	                header: '子商户',
+	                name: 'SUBMER',
+	                width: 80,
+	                align: 'left',
+	                renderer: function(value, rowData, rowIndex) {
+						return "<a title='" + rowData.SUBMER + "'>" + rowData.SUBMER + "</a>";
+                	}
+	            },
+	            {
+	                header: '操作内容',
+	                name: 'OPERDATA',
+	                width: 310,
+	                align: 'left',
+					renderer: function(value, rowData, rowIndex) {
+							return "<a title='"+rowData.OPERDATA+"'>" + rowData.OPERDATA + "</a>";
+	                }
+	            },
+	            {
+	                header: '操作类型',
+	                name: 'OPERTYPE',
+	                width: 40,
+	                align: 'center',
+	                renderer: function(value, rowData, rowIndex) {
+						return "<a title='操作类型'>" + rowData.OPERTYPE + "</a>";
+	                }
+	            },
+	            {
+	                header: '操作日期',
+	                name: 'INTIME',
+	                width: 80,
+	                align: 'center'
+	            }],
+            	autoFit: true
+        });
+		$('#merId').omCombo({
+            dataSource: '$request.contextPath/option/couponmerinflist.do',
+            width: '155px',
+            emptyText: '全部',
+            forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+        });
+		$('#cycleStart').omCalendar({
+			dateFormat:'yy-mm-dd',
+			maxDate: new Date(),
+			onSelect : function(date,event) {
+				var d = new Date(date);
+				d.setDate(d.getDate()-1);
+				$('#cycleEnd').omCalendar({minDate : d});
+			}
+		});
+		$('#cycleEnd').omCalendar({
+			dateFormat:'yy-mm-dd',
+			maxDate: new Date(),
+			onSelect : function(date,event) {
+				$('#cycleStart').omCalendar({maxDate : date});
+			}
+		});
+		$('#opType').omCombo({
+		    dataSource: '$request.contextPath/option/dropdownlist.do?paraType=stlStates',
+		    width: '80px',
+		    emptyText: '全部',
+		    forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+		});
+		$('#stlCycle').omCombo({
+		    dataSource: '$request.contextPath/option/dropdownlist.do?paraType=stlCycles',
+		    width: '80px',
+		    emptyText: '全部',
+		    forceSelection: true,
+            onSuccess:function(data, textStatus, event){
+		      	  var tmp = $.parseJSON('{"value":"","text":"全部"}');
+		      	  data.unshift(tmp);
+	   		}
+		});
+	});
+
+	function queryLog(){
+		var key = "querylog.do";
+		var params = $("#FORMID").serialize();
+		key += "?" + params;
+		$('#grid').omGrid("setData", key);
+	}
+</script>
+</head>
+<body>
+ <div class="main_list">
+ 
+   <!--列表查询区-->
+   <div class="list_search" style="height: 40px;">
+   <table width="100%" border="0">
+   <tr>
+    <td height="40px">
+      <form id="FORMID" action="" method="post"> 
+		<input type="hidden" name="queryKey" value="stl.stlLog" />
+        <table width="100%" border="0">
+          <tr>
+           <th width="6%" height="30">结算账期：</th>
+           <td><input id="stlCycle" name="stlCycle" class="input2" style="width: 80px"/></td>
+		   <th width="10%" height="30">结算周期：</th>
+           <td><input id="cycleStart" name="cycleStart" style="width:80px"/>
+           	至<input id="cycleEnd" name="cycleEnd" style="width:80px"/></td>
+		   <th width="6%">商户：</th>
+		   <td><input id="merId" name="merId"/></td>  
+           <th width="6%">操作类型：</th>
+		   <td><input id="opType" name="opType" class="input2" style="width:80px"/></td>
+         </tr>
+        </table>
+         </form> 
+       </td>
+        <td rowspan="2">
+			<input id="query" code="001"  name="query" type="image" value="" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="queryLog()"  />
+        </td>
+       </tr>
+        </table>
+      </div>
+  <!--列表查询区-->
+  <div align="center">
+     <table  align="left" id="grid" ></table>
+  </div>
+  <div id="dialog-modal" title="提示窗口">
+    <p id="result"></p>
+  </div>
+</body>
+</html>

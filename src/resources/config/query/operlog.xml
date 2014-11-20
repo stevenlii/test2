@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="operLog"  >
+	<sql id="allFeeCodeLog"> 
+	<![CDATA[
+	select h.operType,h.detail,h.modUser,h.inTime from umpay.t_hfoper_log h 
+		where h.tableName='UMPAY.T_SERVICE_INF' and h.dataId=:dataId order by h.inTime desc
+	  ]]>
+	</sql>
+	<sql id="allModHistory"> 
+	<![CDATA[
+	select h.detail,h.modUser,h.inTime from umpay.t_hfoper_log h 
+		where h.tableName='UMPAY.T_MER_GRADE' and h.dataId=:dataId order by h.inTime desc
+	  ]]>
+	</sql>
+</mapper>

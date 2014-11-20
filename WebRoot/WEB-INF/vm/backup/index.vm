@@ -1,0 +1,500 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-mouse.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-draggable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-position.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-resizable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-dialog.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagetip.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js">
+        </script>
+        <script src="$request.contextPath/js/busi/stl.js">
+        </script>
+        <style>
+            .input_text { border: 1px solid #6D869E; height: 17px; vertical-align:
+            middle; width: 50%; } .errorMsg { background: url("$request.contextPath/profile/validate/images/alert.png)
+            center no-repeat white; background-position: 5px 50%; background-color:
+            #FCEFE3; text-align: left; padding: 2px 2px 2px 25px; border: 1px solid
+            red; display: none; width: 100px; margin-top: -18px; margin-left: 18px;
+            position: absolute; border-radius: 4px; } .errorImg{ background: url("$request.contextPath/profile/validate/images/invalid.png")
+            no-repeat scroll 0 0 transparent; height: 16px; width: 16px; cursor: pointer;
+            vertical-align: inherit; } /*自定义图标，样式前加上om-messageTip，提高其优先级*/ .om - messageTip.om
+            - messageTip - image - aomsdk { background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+            } .none_underline a{text-decoration:none;} .none_underline a:hover{ text-decoration:underline;}
+            }
+        </style>
+        <script type="text/javascript">
+            function deleteBackInfo(boid) {
+                $.omMessageBox.confirm({
+                    title: '',
+                    content: '确认删除此条报备信息吗？',
+                    onClose: function(value) {
+                        if (value) {
+                            var submitData = {
+                                checkBackupOperId: boid
+                            };
+                            $.post('$request.contextPath/backup/deleteBackUpOper.do?', submitData,
+                            function(data) {
+                                if (data != "0") {
+                                    $.omMessageBox.alert({
+                                        type: 'success',
+                                        title: '操作提示',
+                                        content: '删除成功！'
+                                    });
+                                    $('#grid').omGrid('reload'); //刷新当前页数据
+                                } else {
+                                    $.omMessageBox.alert({
+                                        content: '提交失败'
+                                    });
+                                }
+
+                            });
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+            }
+            jQuery(document).ready(function() {
+                $('#query').omButton({
+                    width: 40
+                });
+                $('#delete').omButton({
+                    width: 40
+                });
+                $('#submitinfo').omButton({
+                    width: 40
+                });
+                $('#grid').omGrid({
+                    dataSource: "$request.contextPath/backup/query.do?queryKey=backup.getBackupAll",
+                    singleSelect: false,
+                    width: '100%',
+                    height: 440,
+                    limit: 15,
+                    colModel: [{
+                        header: '操作',
+                        name: 'operation',
+                        width: "40px",
+                        align: 'center',
+                        renderer: function(colValue, rowData, rowIndex) {
+                            var result = "<img title='删除' src='/hfMngBusi/profile/default/images/close_btn2.png' onclick='deleteBackInfo(\"" + rowData.BACKUP_OPER_ID + "\")' />";
+                            return result;
+                        }
+                    },
+                    {
+                        header: '支付银行',
+                        name: 'BANKNAME',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '商户号',
+                        name: 'MER_ID',
+                        align: 'left',
+                        width: "50px"
+                    },
+                    {
+                        header: '商户名称',
+                        name: 'MERNAME',
+                        align: 'left',
+                        width: "120px"
+                    },
+                    {
+                        header: '商户分类',
+                        name: 'MER_CATEGORY',
+                        align: 'left',
+                        width: "60px"
+                    },
+                    {
+                        header: '业务属性',
+                        name: 'MER_BUSITYPE',
+                        align: 'left',
+                        width: "60px"
+                    },
+                    {
+                        header: '商品号',
+                        name: 'GOODS_ID',
+                        align: 'left',
+                        width: "50px"
+                    },
+                    {
+                        header: '商品名称',
+                        name: 'GOODSNAME',
+                        align: 'left',
+                        width: "120px"
+                    },
+                    {
+                        header: '商品分类',
+                        name: 'GOODS_CATEGORY',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '服务类型',
+                        name: 'SERVTYPE',
+                        width: "60px",
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            var servType = rowData.SERVTYPE;
+                            var name = "";
+                            if (servType == 2) {
+                                name = "按次";
+                            } else if (servType == 3) {
+                                name = "包月";
+                            }
+                            return "<a title='" + name + "'>" + name + "</a>";
+                        }
+                    },
+                    {
+                        header: '价格（分）',
+                        name: 'AMOUNT',
+                        align: 'left',
+                        width: "65px"
+                    },
+                    {
+                        header: '公司介绍',
+                        name: 'COMPANY_DESC',
+                        width: "150px",
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.COMPANY_DESC + "'>" + rowData.COMPANY_DESC + "</a>";
+                        }
+                    },
+                    {
+                        header: '商户网址',
+                        name: 'MER_WEB',
+                        width: "150px",
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.MER_WEB + "'>" + rowData.MER_WEB + "</a>";
+                        }
+                    },
+                    {
+                        header: '注册资本（万元）',
+                        name: 'REG_CAPITAL',
+                        align: 'left',
+                        width: "90px"
+                    },
+                    {
+                        header: '公司成立时间',
+                        name: 'REG_TIEM',
+                        align: 'left',
+                        width: "90px"
+                    },
+                    {
+                        header: '年收益（万元）',
+                        name: 'YEAR_PROFIT',
+                        align: 'left',
+                        width: "80px"
+                    },
+                    {
+                        header: '用户数（人）',
+                        name: 'USER_SCALE',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '业务介绍',
+                        name: 'BUSI_DESC',
+                        width: 150,
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.BUSI_DESC + "'>" + rowData.BUSI_DESC + "</a>";
+                        }
+                    },
+                    {
+                        header: '运营支撑（人）',
+                        name: 'SUPPORT',
+                        align: 'left',
+                        width: "80px"
+                    },
+                    {
+                        header: '自有渠道',
+                        name: 'SALE_CHANNEL',
+                        width: "70px",
+                        align: 'left',
+                        renderer: function(value, rowData, rowIndex) {
+                            return "<a title='" + rowData.SALE_CHANNEL + "'>" + rowData.SALE_CHANNEL + "</a>";
+                        }
+                    },
+                    {
+                        header: '商户来源',
+                        name: 'SRC_MER',
+                        align: 'left',
+                        width: "70px"
+                    },
+                    {
+                        header: '分成比例',
+                        name: 'SHARED_RATE',
+                        align: 'left',
+                        width: "120px",
+                        renderer: function(value, rowData, rowIndex) {
+                        	if(rowData.SHARED_RATE!=null){
+                        		return "<a title='" + rowData.SHARED_RATE + "'>" + rowData.SHARED_RATE + "</a>";
+                            }else{
+                                return "";
+                            }
+                        }
+                    }],
+                    autoFit: true
+                });
+                //查询
+                $('#query').bind('click',
+                function(e) {
+                    var key = "query.do?queryKey=backup.getBackupAll";
+                    var merId = jQuery('#merId').val();
+                    var goodsId = jQuery('#goodsId').val();
+                    var bankId = jQuery('#bankId').val();
+                    var servType = jQuery('#servType').val();
+                    if (merId != "") {
+                        key = key + '&merId=' + encodeURI(merId);
+                    }
+                    if (goodsId != "") {
+                        key = key + '&goodsId=' + encodeURI(goodsId);
+                    }
+                    if (bankId != "") {
+                        key = key + '&bankId=' + encodeURI(bankId);
+                    }
+                    if (servType != "") {
+                        key = key + '&servType=' + encodeURI(servType);
+                    }
+                    $('#grid').omGrid("setData", key);
+                    //$('#grid').omGrid("setData", "$request.contextPath/backup/query.do?queryKey=backup.getBackupAll");
+                });
+                //删除
+                $('#delete').bind('click',
+                function(e) {
+                    var selectedIndexed = $('#grid').omGrid('getSelections');
+                    var checkBackupOperId = "";
+                    if (selectedIndexed == "") {
+                        $.omMessageBox.alert({
+                            content: '请选择待删除的数据'
+                        });
+                        return false;
+                    }
+                    $.omMessageBox.confirm({
+                        title: '',
+                        content: '确认删除这些报备信息吗？',
+                        onClose: function(value) {
+                            if (value) {
+                                for (var i = 0; i < selectedIndexed.length; i++) {
+                                    var str = $("#grid").omGrid("getData").rows[selectedIndexed[i]].BACKUP_OPER_ID;
+                                    checkBackupOperId += $.trim($("#grid").omGrid("getData").rows[selectedIndexed[i]].BACKUP_OPER_ID) + ",";
+                                }
+                                var submitData = {
+                                    checkBackupOperId: checkBackupOperId
+                                };
+                                $.post('$request.contextPath/backup/deleteBackUpOper.do', submitData,
+                                function(data) {
+                                    if (data != "0") {
+                                        $.omMessageBox.alert({
+                                            type: 'success',
+                                            title: '操作提示',
+                                            content: '删除成功！'
+                                        });
+                                        $('#grid').omGrid('reload'); //刷新当前页数据
+                                    } else {
+                                        $.omMessageBox.alert({
+                                            content: '删除失败'
+                                        });
+                                    }
+
+                                });
+                            } else {
+                                return false;
+                            }
+                        }
+                    });
+                });
+                //提交
+                $('#submitinfo').bind('click',
+                function(e) {
+                    var selectedIndexed = $('#grid').omGrid('getSelections');
+                    var checkBackupOperId = "";
+                    if (selectedIndexed == "") {
+                        $.omMessageBox.alert({
+                            content: '请选择待提交的数据'
+                        });
+                        return false;
+                    }
+                    $.omMessageBox.confirm({
+                        title: '',
+                        content: '确认提交这些报备信息吗？',
+                        onClose: function(value) {
+                            if (value) {
+                                for (var i = 0; i < selectedIndexed.length; i++) {
+                                    checkBackupOperId += $.trim($("#grid").omGrid("getData").rows[selectedIndexed[i]].BACKUP_OPER_ID) + ",";
+                                }
+                                var submitData = {
+                                    checkBackupOperId: checkBackupOperId
+                                };
+                                $.post('$request.contextPath/backup/submitBackUpOper.do', submitData,
+                                function(data) {
+                                    if (data != "0") {
+                                        $.omMessageBox.alert({
+                                            type: 'success',
+                                            title: '操作提示',
+                                            content: '报备数据提交成功，请等待审核！<br/>您可以进入报备操作记录页面时时关注报备进度。'
+                                        });
+                                        $('#grid').omGrid('reload'); //刷新当前页数据
+                                    } else {
+                                        $.omMessageBox.alert({
+                                            content: '提交失败'
+                                        });
+                                    }
+
+                                });
+                            } else {
+                                return false;
+                            }
+                        }
+                    });
+                });
+                //初始化商户列表
+                $('#merId').omCombo({
+                    dataSource: '$request.contextPath/option/couponmerinflist.do',
+                    width: '145px',
+                    emptyText: '全部',
+                    listAutoWidth: true,
+                    onValueChange: function(target, newValue, oldValue, event) {
+                        var merId = $('#merId').omCombo('value');
+                        // 连级更新商品列表
+                        $('#goodsId').omCombo({
+                            dataSource: '$request.contextPath/option/getcoupongoodsinflist.do?merId=' + merId,
+                            width: '145px',
+                            emptyText: '全部',
+                            listAutoWidth: true,
+                            forceSelection: true,
+                            onSuccess: function(data, textStatus, event) {
+                                var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                                data.unshift(tmp);
+                            }
+                        });
+                    },
+                    forceSelection: true,
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    }
+                });
+
+                //初始化商品列表
+                $('#goodsId').omCombo({
+                    dataSource: [],
+                    width: '145px',
+                    emptyText: '全部',
+                    listAutoWidth: true,
+                    forceSelection: true,
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    }
+                });
+                //初始化支付银行列表
+                $('#bankId').omCombo({
+                    dataSource: '$request.contextPath/option/xebanklist.do',
+                    width: '145px',
+                    listMaxHeight: 150,
+                    listAutoWidth: true,
+                    emptyText: '全部 ',
+                    onSuccess: function(data, textStatus, event) {
+                        var tmp = $.parseJSON('{"value":"","text":"全部"}');
+                        data.unshift(tmp);
+                    },
+                    forceSelection: true
+                });
+                //服务类型   
+                $('#servType').omCombo({
+                    dataSource: [{
+                        "value": "",
+                        "text": "全部"
+                    },
+                    {
+                        "value": "2",
+                        "text": "按次"
+                    },
+                    {
+                        "value": "3",
+                        "text": "包月"
+                    }],
+                    width: '85px',
+                    listMaxHeight: 80,
+                    emptyText: '全部 ',
+                    forceSelection: true
+                });
+            });
+        </script>
+    </head>
+    
+    <body>
+        <div class="list_search" style="height: 40px;">
+            <!--列表查询区-->
+            <table width="100%" border="0" style="height:30px;margin-top:15px">
+                <tr>
+                    <th width="7%">
+                        	商户编号：
+                    </th>
+                    <td width="12%">
+                        <input id="merId" name="merId" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        	商品编号：
+                    </th>
+                    <td width="12%">
+                        <input id="goodsId" name="goodsId" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        	支付银行：
+                    </th>
+                    <td width="12%">
+                        <input id="bankId" name="bankId" type="text" class="input2" />
+                    </td>
+                    <th width="7%">
+                        	服务类型：
+                    </th>
+                    <td width="12%">
+                        <input id="servType" name="servType" type="text" class="input2" />
+                    </td>
+                    <td>
+                        <input id="query" name="query" type="button" value="查询" />
+                        <input id="delete" name="delete" type="button" value="删除" />
+                        <input id="submitinfo" name="submitinfo" type="button" value="提交" />
+                    </td>
+                </tr>
+            </table>
+            <!--列表查询区-->
+        </div>
+        <div align="center">
+            <table align="left" id="grid">
+            </table>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css"
+			href="${request.contextPath}/profile/default/css/common.css">
+		<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+		<script> 
+		   //关闭窗口方法
+		   function  closeDialog(){
+		       window.parent.fillBackAndCloseDialog("#dialog");
+		   }
+		</script>
+	</head>
+	<body>
+		<div>
+			<table class="infowrite" cellspacing="0" cellpadding="0">
+				<tr>
+					<th width="30%">
+						订单编号：
+					</th>
+					<td class="td">
+						$!{couponCode.orderId}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换券：
+					</th>
+					<td class="td1">
+						$!{couponCode.couponName}（$!{couponCode.couponId}）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						渠  道：
+					</th>
+					<td class="td">
+						$!{couponCode.channelName}（$!{couponCode.channelId}）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						商 户：
+					</th>
+					<td class="td1">
+						$!{couponCode.merName}（$!{couponCode.merId}）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						商 品：
+					</th>
+					<td class="td">
+						$!{couponCode.goodsName}（$!{couponCode.goodsId}）
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换码：
+					</th>
+					<td class="td1">
+						$!{couponCode.couponCode}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						手机号：
+					</th>
+					<td class="td">
+						$!{couponCode.paidMobileId}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换券金额（元）：
+					</th>
+					<td class="td1">
+						$!{couponCode.priceName}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换券有效期：
+					</th>
+					<td class="td">
+						$!{couponCode.useStartDate} 至 $!{couponCode.useEndDate}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换码生成方式：
+					</th>
+					<td class="td1">
+						$!{couponCode.generateMethodName}
+					</td>
+				</tr>								
+				<tr>
+					<th>
+						生成时间：
+					</th>
+					<td class="td">
+						$!{couponCode.inTime.toString().replace('.0', '')}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换时间：
+					</th>
+					<td class="td1">
+						#if( $!{couponCode.state} == 4 )
+							$!{couponCode.exchangeTime.toString().replace('.0', '')}
+						#else
+							--
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>
+						批次名称：
+					</th>
+					<td class="td">
+						$!{couponCode.batchId}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换码状态：
+					</th>
+					<td class="td1">
+						$!{couponCode.stateName}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						兑换方式：
+					</th>
+					<td class="td">
+						#if( $!{couponCode.state} == 4 )
+							$!{couponCode.exchangeTypeName}
+						#else
+							--
+						#end
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="pop_btn">
+			<input name="close" type="button" class="popbtn" value="关闭"
+				onclick="closeDialog();" onmouseover="this.className='popbtnhover'"
+				onmouseout="this.className='popbtn'" />
+		</div>
+	</body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BackUp">
+	<statement id="updateValid" resultClass="integer">
+		update umpay.T_REPORT_OPT
+		   set IS_VALID = 4, UPDT_TIME = CURRENT TIMESTAMP, MOD_USER_ID = #userid#
+		 where BACKUP_OPER_ID in ($operList$)
+	</statement>
+	
+	<statement id="updateBackUpOper" resultClass="integer">
+		update umpay.T_REPORT_OPT
+		   set BACKUP_OPER_STAT = 1,
+		       SUBMIT_TIME      = CURRENT TIMESTAMP,
+		       UPDT_TIME        = CURRENT TIMESTAMP,
+		       MOD_USER_ID      = #userid#,
+		       ADD_USER_ID      = #userid#
+		 where BACKUP_OPER_ID in ($operList$)
+	</statement>
+	
+	<statement id="updateBackUpInfo" resultClass="integer">
+		update umpay.T_REPORT_INF a
+		   set a.BACKUP_STAT = #backupstat#,
+		       a.MOD_USER_ID = #userid#,
+		       UPDT_TIME     = CURRENT TIMESTAMP
+		 where exists (select 1
+		          from umpay.T_REPORT_OPT b
+		         where a.MER_ID = b.MER_ID
+		           and a.GOODS_ID = b.GOODS_ID
+		           and a.BANK_ID = b.BANK_ID
+		           and b.BACKUP_OPER_ID in ($operList$))
+	</statement>
+</sqlMap>

@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script> 
+   function trim(v){
+	return $.trim(v);
+     }
+     //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }
+    </script>
+</head>
+<body>   
+      <table class="infowrite" cellspacing="0" cellpadding="0" width="300px"  align="center" >
+       <tr >
+         <th width="20%">所属商户：</th>
+         <td class="td">$!{goods.merId}--$!{goods.merName}</td>
+          </tr>
+       <tr >
+         <th>商品号：</th>
+         <td class="td1">$!{goods.goodsId}</td>
+          </tr>
+       <tr >
+         <th>商品名称：</th>
+         <td class="td">$!{goods.goodsName}</td>
+         </tr>
+       <tr >
+         <th>业务覆盖：</th>
+         <td class="td1"> #if ($!{goods.busiType.trim()}=="01") 省网 #elseif  ($!{goods.busiType.trim()}=="10")全网  #elseif($!{goods.busiType.trim()}=="11") 省网、全网 #end 
+         </td>
+       </tr>
+       <tr>
+         <th>商品分类：</th>
+         <td class="td" >$!{goods.category.trim()} 
+         </tr>
+          <tr>
+         <th>风控类型：</th>
+         <td class="td1">$!{goods.goodsType.trim()} 
+         </select></td>
+       </tr>
+        <tr>
+         <th>服务类型：</th>
+         <td class="td">  #if ($!{goods.servType}==2)  按次 #else 包月 #end                         
+       </tr>
+     #if($!{goods.servType}==3)
+       <tr>  
+         <th>服务月份：</th>
+         <td class="td1">$!{goods.servMonth}</td>
+       </tr>
+        <tr>
+        <th>续费方式：</th>
+           <td class="td">#if ($!{goods.conMode}=="0") 正向 #elseif ($!{goods.conMode}=="1") 反向  #elseif ($!{goods.conMode}=="2") 取消#end
+             </td>
+        </tr>
+      <tr>   
+         <th>间隔周期：</th>
+         <td class="td1">$!{goods.interval}</td>
+       </tr>
+   #end
+        <tr>
+         <th>价格模式：</th>
+         <td class="td">#if ($!{goods.priceMode}==0)
+                             定价  价格：$!{goods.amount}分  #else
+                             非定价  #end
+         </td>
+       </tr>
+        <tr>
+         <th>商品信息：</th>
+         <td class="td1" > #if ($!{goods.pushInf}==1) 仅下发商品描述
+                         #elseif  ($!{goods.pushInf}==2)仅下发商品信息
+                          #elseif  ($!{goods.pushInf}==3)下发描述+信息
+                          #end
+         </td>
+       </tr>
+         <th>商品描述：</th>
+         <td class="td">$!{goods.goodsDesc}</td>
+         </tr>
+        <tr>
+         <th>客服电话：</th>
+         <td class="td1">$!{goods.cusPhone}</td>
+        </tr>
+     </table>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

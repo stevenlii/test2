@@ -1,0 +1,421 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid-standard.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid-roweditor.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/feecode.js"></script>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery("#container").width(jQuery(window).width());
+		
+		$(document).mouseup(function(e) {
+			if($(e.target).parent("a.signin").length==0) {
+				$(".signin").removeClass("menu-open");
+				$("fieldset#signin_menu").hide();
+			}
+		});	
+          jQuery('#grid').omGrid({
+                dataSource : '',
+                width:  460,
+                height : 240,
+                limit : 10,
+                showIndex : false,
+                singleSelect : false,
+                colModel : [ {header : '代码', name : 'SERVICEID',width : 30, align : 'center',   renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.SERVICEID+"'>"+rowData.SERVICEID+"</a>";
+                             		}
+                             }, 
+                             {header : '计费代码名称', name : 'DETAIL',width : 50, align : 'left' ,  renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.DETAIL+"'>"+rowData.DETAIL+"</a>";
+                             		}},
+                             {header : '类型', name : 'FEETYPE', width : 20, align : 'left',renderer:function(value , rowData , rowIndex){
+                             			var feeType=rowData.FEETYPE;
+                             			if(feeType==2){
+                             			   return  "<a title='按次'>按次</a>";
+                             			}
+                             			if(feeType==3){
+                             			    return "<a title='包月'>包月</a>";
+                             			}
+                             		}
+                             		  },
+                             {header : '分类', name : 'CATEGORY', width : 30, align : 'left',renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '金额', name : 'AMOUNT', width : 25 , align : 'left' ,renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},
+                             {header : '使用', name : 'USECOUNT',width : 15, align : 'left' ,renderer:function(value , rowData , rowIndex){
+				      				return "<a title='"+value+"'>"+value+"</a>";
+				      			}},  
+                             {header : '匹配度', name : 'MATCHTYPE', width : 23 , align : 'left',renderer:function(value , rowData , rowIndex){
+                             			var matchType=rowData.MATCHTYPE;
+                             			if(matchType == 0){
+                             			 return "<a title='精配'>精配</a>";
+                             			}
+                             			else if(matchType == 1){
+                             			return "<a title='套用'>套用</a>";
+                             			}
+                             		    else	if(matchType == 2){
+                             			 return "<a title='-'>-</a>";
+                             			}
+                             			else if(matchType == -99){
+                             			  return "<a title='-'>未知</a>";
+                             			}
+                             			else  return "<a title='-'>-</a>";
+                             		}
+                             }
+                            ],
+								autoFit:true
+                       });
+            jQuery('#grid2').omGrid({
+                dataSource : '',
+                width:  290,
+                height : 240,
+                showIndex : false,
+                limit : 0, 
+                editMode : "insert",
+				autoFit:true,
+                colModel : [ {header : '代码', name : 'SERVICEID',width : 45, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.SERVICEID+"'>"+rowData.SERVICEID+"</a>";
+                             		}
+                             }, 
+                             {header : '类型', name : 'FEETYPE', width : 30, align : 'left',renderer:function(value , rowData , rowIndex){
+                             			var feeType=rowData.FEETYPE;
+                             			if(feeType==2){
+                             			   return  "<a title='按次'>按次</a>";
+                             			}
+                             			if(feeType==3){
+                             			    return  "<a title='包月'>包月</a>";
+                             			}
+                             		}
+                             		  },
+                             {header : '分类', name : 'CATEGORY', width : 30, align : 'left' ,renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.CATEGORY+"'>"+rowData.CATEGORY+"</a>";
+                             		}
+                             },   
+                             {header : '金额', name : 'AMOUNT', width : 30 , align : 'left' , renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.AMOUNT+"'>"+rowData.AMOUNT+"</a>";
+                             		}},
+                             {header : '状态', name : 'TIMES',width : 25, align : 'left' ,renderer:function(value , rowData , rowIndex){
+                             			var state=rowData.STATE;
+                             			if(state==2){
+                             			   return "<a title='启用'>启用</a>";
+                             			}
+                             			if(state==4){
+                             			    return "<a title='禁用'>禁用</a>";
+                             			}
+                             		}
+                             },  
+                            {header : '匹配度', name : 'MATCHTYPE', width : 40 , align : 'left',renderer:function(value , rowData , rowIndex){
+                             			var matchType=rowData.MATCHTYPE;
+                             			if(matchType == 0){
+                             			 return "<a title='精配'>精配</a>";
+                             			}
+                             			else if(matchType == 1){
+                             			return "<a title='套用'>套用</a>";
+                             			}
+                             		    else	if(matchType == 2){
+                             			 return "<a title='-'>-</a>";
+                             			}
+                             			else if(matchType == -99){
+                             			  return "<a title='未知'>未知</a>";
+                             			}
+                             			else return  "<a title='-'>-</a>";
+                             			
+                             		}
+                             }   ,
+                              {header : '操作', name : 'MATCH', width : 30 , align : 'left',renderer:function(value , rowData , rowIndex){
+                             			var ID=rowData.SERVICEID;
+                             			
+	                             		var	result=" <input  name='删除' alt='删除' title='删除' type='image' value='' src='${request.contextPath}/profile/default/images/tool_del.png' onclick='del("+rowIndex+")'/> ";
+                             			 return result;
+                             			}
+                              }                                         
+                            ]
+            });
+         //初始化计费代码分类列表
+  	   $('#category').omCombo({
+              dataSource : '$request.contextPath/option/feecategory.do',
+              width:'75px',
+              listMaxHeight:150,
+              forceSelection: true,
+              onSuccess:function(data, textStatus, event){
+	      	      var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	      	      data.unshift(tmp);
+	      	      $('#category').omCombo('value','$!{category}'); //回填计费代码分类   
+			  }
+            });
+  	  //计费代码类型  
+   	  $('#feetype').omCombo({
+           dataSource : [{"value":"","text":"全部"},{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+           width:'50px',
+           listMaxHeight:80,
+           emptyText:'全部 ' ,
+           forceSelection : true
+       });    
+   	  $('#feetype').omCombo('value','$!{servtype}'); //回填计费代码类型
+  	   
+        $('#amount').val($!{amount});  //回填金额    
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+       var merId=jQuery('#merId').val();
+       var goodsId=jQuery('#goodsId').val();
+       var category=jQuery('#categoryH').val();
+       var amount=jQuery('#amountH').val();
+       var servtype=jQuery('#servtypeH').val();
+      
+       var arr=["001","002","003","004","005","099"];//记录计费代码类型中不包括的商品类型 
+             var i=0;
+             var cat=$!{category.trim()};
+             for(i =0 ;i <arr.length;i++){
+               if(cat == arr[i]){
+                  $('#category').omCombo('value','');
+                  category=""; //将查询条件中的分类置为空
+               }
+             }
+       $('#grid2').omGrid("setData", "querygoodsFeeCode.do?queryKey=code.goodsfeecode&merId="+merId+"&goodsId="+goodsId);
+       $('#grid').omGrid("setData", " querycode.do?queryKey=code.feecode&amount="+amount+"&category="+category+"&servtype="+servtype);
+  //点击添加时数据移动的方法
+     $('#shift').bind('click', function() {
+             var selections = $('#grid').omGrid('getSelections',true);  //选择添加的数据
+             if (selections.length == 0) {
+                    alert('请至少选择一行记录');
+                    return false;
+                }
+             var data2 = $('#grid2').omGrid('getData').rows;  //右侧的记录数
+             var gl = data2.length; //右侧已经存在的长度
+             var tempR = {};  //新建一个临时数组 供添加时使用
+             for(var k = 0; k < gl; k++){   //遍历数组，将已经添加过的值放入临时数组中
+                  	tempR[k] = data2[k];
+                    }
+             for(j = 0; j < selections.length; j++){
+              	var rowData = selections[j];
+                var d = rowData.SERVICEID // 左边选择上的
+                data2.unshift(rowData); // 先放进去
+	            for( i = 0; i < gl; i++ ){
+	               if(d == tempR[i].SERVICEID){
+	                data2.shift(rowData);   //移出已经存在的数据
+	                }
+                   }
+                 }
+                $('#grid2').omGrid('refresh');
+            });
+
+	});
+  function show(){
+      var dels = $('#grid').omGrid('getSelections');
+            	if(dels.length <= 0 ){
+            		alert('请选择删除的记录！');
+            		return;
+            	}
+            	$('#grid').omGrid('deleteRow',dels[0]);
+    }
+  //添加
+  function add(){
+     try{
+          var selectedRecords = $('#grid').omGrid('getSelections',true);
+		 }catch(e){
+			 alert("没有数据！！！");
+			 return false;
+	     }
+       var length= selectedRecords.length;
+        if (length == 0) {
+                    alert('请至少选择一行记录！');
+                    return false;
+                }
+       for(i=0;i<length;i++)
+                {
+               $('#grid2').omGrid('insertRow' , 'end' , {SERVICEID:selectedRecords[i].SERVICEID,TYPE:selectedRecords[i].TYPE,STATE:selectedRecords[i].STATE} , true);
+                }
+  }
+   //删除
+    function del(index){
+           	$('#grid2').omGrid('deleteRow',index);
+            $("#grid2").omGrid("saveChanges");  //保存已经修改过的数据
+            $('#grid2').omGrid('refresh');   //重新刷新数据 避免删除数据是 index索引出错
+    }
+    //添加确认操作
+    function confirmAdd(){
+        var data3 = $('#grid2').omGrid('getData').rows; 
+        var flag=jQuery('#flag').val();  // 页面标示  “n“标示仅仅是新增计费代码 ，”u“标示还有解绑操作
+        var datalength=data3.length;
+        var servtype=jQuery('#servtypeH').val();
+        var amount=jQuery('#amountH').val();
+        //商品第一次做添加计费代码操作 只有增加 没有修改
+        if(flag =='n'){
+        	if(datalength ==0){
+        		alert("请选择要添加的计费代码！");
+        		return false;
+        	}
+        	if(servtype == 3) {
+        		if(datalength >1||data3[0].FEETYPE !=3 ){
+        			alert("包月商品只能配置一个包月计费代码！");
+        			return false;
+        		}
+        	}
+        	if(servtype == 2){
+        		if(amount <= 200){
+        			if(datalength >1){
+        				alert("小额（2元及以下），只能匹配1个按次代码");
+            			return false;
+        			}
+        			else if (datalength == 1){
+        				if(data3[0].FEETYPE != 2 ){
+        					alert("小额（2元及以下），只能匹配1个按次代码");
+                			return false;
+        				}
+        			}
+        		}
+        		else if(amount > 200){
+        			if(datalength >4){
+        				alert("大额（2元以上），最多可匹配4个代码，按次、包月代码皆可");
+            			return false;
+        			}
+        		}
+        	}
+        }
+        // 管理操作，有增加跟绑定两种操作
+        else if(flag =='u'){
+        	if(servtype == 3) {
+        		if(data3.length !=0){
+        		if(datalength >1||data3[0].FEETYPE !=3 ){
+        			alert("包月商品只能配置一个包月计费代码！");
+        			return false;
+        		}
+        		}
+        	}
+        	if(servtype == 2){
+        		if(amount <= 200){
+        			if(datalength >1){
+        				alert("小额（2元及以下），只能匹配1个按次代码");
+            			return false;
+        			}
+        			else if (datalength == 1){
+        				if(data3[0].FEETYPE != 2 ){
+        					alert("小额（2元及以下），只能匹配1个按次代码");
+                			return false;
+        				}
+        			}
+        		}
+        		else if(amount > 200){
+        			if(datalength >4){
+        				alert("大额（2元以上），最多可匹配4个代码，按次、包月代码皆可");
+            			return false;
+        			}
+        		}
+        	}
+        }
+        var feeId="";
+        var merId=jQuery('#merId').val();
+       
+        var goodsId=jQuery('#goodsId').val();
+      
+        for(i = 0 ;i < data3.length ;i++){
+          feeId=feeId+data3[i].SERVICEID+",";
+        }
+     $.ajax({
+		        url : 'add.do',
+		        type : 'POST',
+		        dataType: 'json' , 
+		        data : {
+				     'feeCodes' : feeId ,
+				     'merId' : merId ,
+				     'goodsId' : goodsId
+		                },
+		        success : function(res){
+		                	
+		                		 alert(res.msg);
+		                	
+		            if(res.res == '1'){
+				           closeDialog();
+				           window.parent.shuaxin();
+		            }
+		        }
+	     });
+        }
+</script>
+</head>
+<body>
+<div id="container">
+ <div class="main_list">
+  <table width="100%" border="0" >
+  <tr>
+    <td width="530px">
+      <table border="0">
+                        <tr>
+                          <th  height="15">类型</th>
+                          <td ><input id="feetype" name="feetype" class="select1" /></td>
+                          <th>分类</th>
+                          <td><input id="category" name="category" class="select1" /></td>
+                          
+                          <th>金额</th>
+                          <td><input id="amount" name="amount" type="text" class="input1"  style="width:39px" maxlength="6"/></td>
+                         
+                          <th>代码</th>
+                          <td><input id="serviceid" name="serviceid" type="text" class="input1"  style="width:39px" maxlength="5"/></td>
+                          <th>名称</th>
+                          <td><input id="detail" name="detail" type="text" class="input1"  style="width:49px" maxlength="15"/></td>
+                          <td align=center >
+                           <input id="query"   name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"  />
+                           <input id="merId" name="merId"  type="hidden"   value="$!{merId}" >
+                           <input id="goodsId" name="goodsId"  type="hidden"  value="$!{goodsId}" >
+                             <input id="categoryH" name="categoryH"  type="hidden"   value="$!{category.trim()}" >
+                           <input id="amountH" name="amountH"  type="hidden"  value="$!{amount.trim()}" >
+                            <input id="servtypeH" name="servtypeH"  type="hidden"   value="$!{servtype.trim()}" >
+                            <input id="flag" name="flag"  type="hidden"   value="$!{flag}" > 
+                           </td>
+                           
+                       </tr>
+                     </table>
+    </td>
+    <td width="2px"></td>
+    <td style="font-weight:bold" valign="bottom">
+              已经选择的计费代码
+    </td>
+  </tr>
+  <tr>
+    <td>  <table  align="left" id="grid" >
+             </table>
+    </td>
+    <td></td>
+    <td>
+      <table  align="left" id="grid2" ></table>
+    </td>
+  </tr>
+  <tr>
+    <td height="20px" align="center">
+                <input id="shift"   value="添加" type="image" value="ee" src="${request.contextPath}/profile/default/images/btn_Add.png"/>
+    </td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr >
+     <td height="30px" colspan="3" align="center">
+       <input name="button" type="button" class="popbtn" value="确认" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="confirmAdd()"/>
+    <input name="button" type="reset" class="popbtn" value="取消" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" onclick="closeDialog();"/>
+	</td>
+  </tr>
+  </table>
+  </div>
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+	</div>
+</body>
+</html>

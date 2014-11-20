@@ -1,0 +1,205 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/couponrule.js"></script>
+<script>
+    //关闭窗口方法
+    function closeDialog() {
+        window.parent.fillBackAndCloseDialog("#dialog");
+    }
+	
+	$(document).ready(function() {
+	   if( $!{useCouponRule.generateMethod} == 1 ){
+			// 第三方导入
+		    $("tr.modeDiv").hide();
+		    $("tr.subModeDiv").hide();
+		    $("tr.subModeDiv1").hide();
+	    }else {
+	        // 本平台实时生成
+	    	$("tr.modeDiv").show();
+			if( $!{useCouponRule.effType} == 2 ){
+                // 售出后有效天数
+        	    $("tr.subModeDiv").hide();
+        	    $("tr.subModeDiv1").show();
+            }else{
+                $("tr.subModeDiv1").hide();
+        	    $("tr.subModeDiv").show();
+            }
+	    }
+       
+   });
+</script>
+</head>
+<body>
+<!--兑换券规则修改审核详情页面-->
+<form id ="dataform-mod" method="post" name="dataform-mod">
+   <div class="pop_list_sh">
+     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	   <tr>
+		<td colspan="3" >
+	     <table cellpadding="0" cellspacing="0" class="infowrite">
+			<tr>
+				<th width="17%" >规则编号：</th>
+				<td width="30%" class="td" >$!{useCouponRule.ruleId}</td>
+				<th width="17%">兑换券：</th>
+				<td width="40%" class="td">$!{auditCouponRule.couponName}（$!{useCouponRule.couponId}）</td>
+			</tr>
+            <tr>
+				<th >商      户：</th>
+				<td class="td1">$!{auditCouponRule.merName}（$!{useCouponRule.merId}）</td>
+				<th >商      品：</th>
+				<td class="td1">$!{auditCouponRule.goodsName}（$!{useCouponRule.goodsId}）</td>
+			</tr>
+			<tr>
+				<th >兑换码形式：</th>
+				<td class="td">$!{useCouponRule.couponCodeTypeName}</td>
+				<th >码生成方式：</th>
+				<td  class="td">$!{useCouponRule.generateMethodName}</td>
+			</tr>
+			
+			<tr class="modeDiv">
+                <th>有效期类型：</th>
+                <td class="td1">$!{useCouponRule.effTypeName}</td>
+				<th>库存数量：</th>
+                <td class="td1">$!{useCouponRule.goodsSum}</td>
+            </tr>
+		    <tr class="subModeDiv1">
+                <th >售出后：</th>
+                <td class="td" colspan="3">$!{useCouponRule.effDays}&nbsp;天有效</td>
+            </tr>
+			<tr class="subModeDiv">
+                <th>码有效期：</th>
+                <td class="td" colspan="3">$!{useCouponRule.useStartDate} 至 $!{useCouponRule.useEndDate}</td>
+            </tr>
+			<tr class="subModeDiv">
+				<th >码销售期：</th>
+				<td class="td1" colspan="3">$!{useCouponRule.sellStartDate} 至 $!{useCouponRule.sellEndDate}</td>
+			</tr>
+         </table>
+		</td>
+       </tr>
+	   <tr>
+         <td width="48%" height="10"></td>
+         <td width="10"></td>
+         <td width="50%"></td>
+       </tr>
+       <tr>
+         <td width="48%" valign="middle" class="td2">修改前</td>
+         <td width="10"></td>
+         <td width="50%" class="td3">修改后</td>
+       </tr>
+       <tr>
+         <td height="10"></td>
+         <td rowspan="2"></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td valign="top"><table cellpadding="0" cellspacing="0" class="infowrite" width="100%">
+		   <tr>
+             <th width="95">库存告警阀值：</th>
+             <td class="td" >$!{useCouponRule.switchAmt}</td>
+           </tr>
+		   <tr>
+             <th>库存告警手机：</th>
+             <td class="td1">$!{useCouponRule.alarmMobile}</td>
+            </tr>
+		   <tr>
+             <th>码过期提醒：</th>
+             <td class="td">$!{useCouponRule.effWarnDays}（天）</td>
+            </tr>
+		   <tr>
+             <th>启用状态：</th>
+             <td class="td1">$!{useCouponRule.stateName}</td>
+            </tr>
+			<tr>
+             <th>库存告警邮件：</th>
+             <td class="td" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">$!{useCouponRule.alarmEmail}</td>
+            </tr>
+         </table></td>
+         <td valign="top"><table cellpadding="0" cellspacing="0" class="infowrite" width="100%">
+		   <tr>
+             <th width="95">库存告警阀值：</th>
+             <td class="td">
+				#if($!{auditCouponRule.switchAmt} != $!{useCouponRule.switchAmt})
+             		<span>$!{auditCouponRule.switchAmt}</span>
+             	#else
+             		$!{auditCouponRule.switchAmt}
+             	#end
+			 </td>
+           </tr>
+           
+		   <tr>
+             <th>库存告警手机：</th>
+             <td class="td1">
+             	#if($!{auditCouponRule.alarmMobile} != $!{useCouponRule.alarmMobile})
+             		<span>$!{auditCouponRule.alarmMobile}</span>
+             	#else
+             		$!{auditCouponRule.alarmMobile}
+             	#end
+             </td>
+           </tr>
+		   <tr>
+             <th>码过期提醒：</th>
+             <td class="td">
+             	#if($!{auditCouponRule.effWarnDays} != $!{useCouponRule.effWarnDays})
+             		<span>$!{auditCouponRule.effWarnDays}</span>
+             	#else
+             		$!{auditCouponRule.effWarnDays}
+				#end
+				（天）
+             </td>
+           </tr>
+		   <tr>
+             <th>启用状态：</th>
+             <td class="td1">
+             	#if(${auditCouponRule.state} != ${useCouponRule.state})
+             		<span>
+						${auditCouponRule.stateName}
+					</span>
+             	#else
+             		${auditCouponRule.stateName}
+             	#end
+             </td>
+           </tr>
+		   <tr>
+             <th>库存告警邮件：</th>
+             <td class="td" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">
+             	#if($!{auditCouponRule.alarmEmail} != $!{useCouponRule.alarmEmail})
+             		<span>$!{auditCouponRule.alarmEmail}</span>
+             	#else
+             		$!{auditCouponRule.alarmEmail}
+				#end
+             </td>
+           </tr>
+         </table></td>
+       </tr>
+     </table>
+     <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goPass($auditId)" id="btn_pass" />
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="拒绝" onclick="goNotPass($auditId)" id="btn_nopass" />
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog(0)"/>
+	 </div>
+	 <table class="infowrite" cellspacing="0" cellpadding="0">
+		<tr>
+         <th width="20%">审核意见：</th>
+         <td class="td"><textarea id="resultDesc" name="resultDesc" rows="3" style="color:black;font-family:\5fae\8f6f\96c5\9ed1;padding-left:0px;width:100%"></textarea></td>
+       </tr>
+	</table>
+   </div>
+ </form>
+ </body>
+ </html>

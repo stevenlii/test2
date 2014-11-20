@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- 兑换券管理 -->
+<Options>
+	<!-- 审核按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/couponinf/audit.do</url>
+	</Option>
+	
+	<!-- 添加按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/couponinf/add.do</url>
+	</Option>
+</Options>

@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/profile${currProfile.path}/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes${currProfile.path}/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery-1.6.3.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+ 	 <script type="text/javascript">
+ 	 	var url ="$request.contextPath/query/query.jsp?queryKey=mer.allMersToAudit";
+        jQuery(document).ready(function() {
+            var selectIds = [];
+
+            jQuery('#grid').omGrid({
+                dataSource : url,
+                width : 820,
+                height : 332,
+                limit : 10,
+                singleSelect : false,
+                title:'商户信息列表',
+                colModel : [ 
+                			 {header : '审核类型', name : 'MERID', width : 90, align : 'left',renderer:function(value , rowData , rowIndex){
+                			 	var type = rowData.AUDITTYPE;
+                			 	if(type==0)
+                             		return "新增";
+                             	else if(type==1)
+                             		return "修改";
+                             	else if(type==2)
+                             		return "变更状态";
+                             	else
+                             	return "未知";
+                			 }}, 
+                             {header : '商户编号', name : 'MERID', width : 90, align : 'left'}, 
+                             {header : '商户名称', name : 'MERNAME', align : 'left', width : 'autoExpand'},
+                             {header : '客服电话', name : 'CUSPHONE', align : 'left', width : 80},
+                             {header : '添加时间', name : 'INTIME', align : 'left', width : 120},
+                             {header : '修改时间', name : 'MODTIME', align : 'left', width : 130},
+                             {header : '状态', name : 'ID', align : 'left', width : 60,renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	if(state==2)
+                             		return "<img src='/urp/images/icon/state2.gif'>开通";
+                             	else if(state==0)
+                             		return "<img src='/urp/images/icon/audit_0.gif'>待审核";
+                             	else
+                             	return "<img src='/urp/images/icon/state4.gif'>注销";
+                             }}
+                             ],
+               onRowSelect : function(index, data){
+
+            			if(jQuery.inArray(data.id, selectIds)== -1)
+
+                   			selectIds.push(data.id);
+
+            		},
+
+            		onRowDeselect : function(index, data){
+
+            			var i = jQuery.inArray(data.id, selectIds);
+
+            			selectIds.splice(i,1);
+
+            		},
+
+               
+
+            });
+
+ 		jQuery( "#dialog").omDialog({
+            autoOpen: false,
+            width:500,
+            height: 400,
+            title:"审核商户信息",
+            modal: true
+        });
+        
+        jQuery('#modify').bind('click', function() {
+                var selections=$('#grid').omGrid('getSelections',true);
+                if (selections.length == 0) {
+                    alert('请至少选择一行记录');
+                    return false;
+                }
+        		var ids="";
+        		jQuery.each(selections,function(i,item){
+        			ids = ids+ item.ID+",";
+        		});
+        		ids = ids.substring(0,ids.length-1);
+               showAuditDialog(ids);//显示dialog
+            });
+        
+            
+            
+               jQuery('#query').bind('click', function(e) {
+                var name=jQuery('#merId').val();
+                if(name===""){ //没要有查询条件，要显示全部数据
+                    $('#grid').omGrid("setData", url);
+                }else{ //有查询条件，显示查询数据
+                    $('#grid').omGrid("setData", url+'&merId='+encodeURI(merId));
+                }
+            });
+            
+        
+        });
+	
+    </script>
+<script>
+	function del(data){
+		alert(data)
+	}
+	function show(){
+		  $( "#dialog").omDialog('open');
+		   var frameLoc=window.frames[0].location;
+           frameLoc.href='$request.contextPath/mer/to.action';
+		  return false;
+	}
+	function showAuditDialog(id){
+		$( "#dialog").omDialog('open');
+		   var frameLoc=window.frames[0].location;
+           frameLoc.href='$request.contextPath/mer/toAudit.action?ids='+id;
+		  return false;
+	
+	}
+	function fillBackAndCloseDialog(msg){
+		alert(msg);
+		jQuery('#grid').omGrid('reload',1);
+		$( "#dialog").omDialog('close');
+	}
+</script>
+</head>
+
+<body>
+
+
+    <div align="left" id="tbdiv">
+    #if($permissionHelper.hasPermission("002-001","修改"))
+
+        <input id="modify" type="button" value="审核"/>
+   #end     
+        名称(模糊查询，为空时显示全部)：<input id="merId"></input>
+
+        <input id="query" type="button" value="查询"/>
+
+    </div>
+    <table id="grid"></table>
+    
+    <div id="dialog">
+    	<iframe frameborder="0" style="width:495px;height:99%" src="about:blank"></iframe>
+	</div>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagetip.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-itemselector.js"></script>
+<script src="$request.contextPath/js/busi/couponrule.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<style type="text/css" >
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:   url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 110px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+		display ：block ;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	   
+</style>
+     <script>
+	 
+	 	$.validator.addMethod("Check1",
+        function() {
+			var switchAmt = $('#switchAmt').val();
+			if (switchAmt < 0) {
+            	return false;
+            }
+            return true;
+        }, '告警阀值不能小于0');
+		
+		$.validator.addMethod("Check2",
+        function() {
+			var effWarnDays = $('#effWarnDays').val();
+			if (effWarnDays < 0) {
+            	return false;
+            }
+            return true;
+        }, '提醒天数不能小于0');
+	 
+  	 	jQuery(document).ready(function() {
+			if( $!{couponRule.generateMethod} == 1 ){
+				// 第三方导入
+				$("tr.modeDiv").hide();
+    		    $("tr.subModeDiv").hide();
+    		    $("tr.subModeDiv1").hide();
+    			
+    	    }else {
+    	        // 本平台实时生成
+    	    	$("tr.modeDiv").show();
+    			if( $!{couponRule.effType} == 2 ){
+                    // 售出后有效天数
+            	    $("tr.subModeDiv").hide();
+            	    $("tr.subModeDiv1").show();
+                }else{
+                    $("tr.subModeDiv1").hide();
+            	    $("tr.subModeDiv").show();
+                }
+    	    }
+		
+			//初始化兑换规则状态列表
+			if( '$!{couponRule.state}' == '0' ){
+				$('#state').omCombo({
+	                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponRuleStates',
+	                width: '155px',
+	                emptyText: '请选择..',
+	                forceSelection: true,
+					readOnly: $!{stateReadOnly},
+					value: '$!{couponRule.state}'
+	            });	
+			}else{
+				$('#state').omCombo({
+	                dataSource: '$request.contextPath/option/dropdownlist.do?paraType=couponRuleStates_MODIFY',
+	                width: '155px',
+	                emptyText: '请选择..',
+	                forceSelection: true,
+					readOnly: $!{stateReadOnly},
+					value: '$!{couponRule.state}'
+	            });	
+			}
+            
+		
+			jQuery("#dataform").validate({
+                rules: {
+                    "switchAmt": {
+                        required: true,
+						number: true,
+						Check1: true
+                    },
+                    "alarmEmail": {
+                        required: true,
+						email:true
+                    },
+					"alarmMobile": {
+                        required: true,
+						number: true,
+						rangelength:[11,11]
+                    },
+					"effWarnDays": {
+                        required: true,
+						number: true,
+						Check2: true
+                    },
+					"state": {
+                        required: true
+                    }
+                },
+                messages: {
+					"switchAmt": {
+                        required: "请输入库存告警阀值",
+						number: "请输入合法的阀值"
+                    },
+					"alarmEmail": {
+                        required: "请输入Email地址",
+						email: "Email地址有误"
+                    },
+					"alarmMobile": {
+                        required: "请输入手机号",
+						number: "手机号有误",
+						rangelength: "手机号有误"
+                    },
+                    "effWarnDays": {
+                        required: "请输入提醒天数",
+						number: "请输入合法的天数"
+                    },
+                    "state": {
+                        required: "请选择状态"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+			
+        $(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+
+        function getState(o){
+        	//0-待启用 2-启用 3-暂停 4-停止
+            if(o==0){
+				return "待启用";
+            }else if(o==2){
+				return "启用";
+            }else if(o==3){
+                return "暂停";
+            }else if(o==4){
+                return "停止";
+            }else{
+                return o;
+            }
+        }
+	
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			
+			// 设置按钮不可用，防止重复提交
+			$("#btn_modify").attr("disabled", "disabled");
+			
+			//记录修改日志
+			if($("#switchAmt").val()!='$!{couponRule.switchAmt}'){
+				$("#optdata").val($("#optdata").val()+" 库存告警阀值由  $!{couponRule.switchAmt} 修改为:"+$("#switchAmt").val()+";");
+			};
+			if($("#alarmEmail").val()!='${couponRule.alarmEmail}'){
+				$("#optdata").val($("#optdata").val()+" 库存告警邮件地址由  ${couponRule.alarmEmail} 修改为:"+$("#alarmEmail").val()+";");
+			};
+			if($("#alarmMobile").val()!='${couponRule.alarmMobile}'){
+				$("#optdata").val($("#optdata").val()+" 库存告警手机号由 ${couponRule.alarmMobile} 修改为:"+$("#alarmMobile").val()+";");
+			};
+			if($("#effWarnDays").val()!='${couponRule.effWarnDays}'){
+				$("#optdata").val($("#optdata").val()+" 到期提醒天数由 ${couponRule.effWarnDays} 修改为:"+$("#effWarnDays").val()+"天;");
+			};
+			if($("#state").val()!='${couponRule.state}'){
+				$("#optdata").val($("#optdata").val()+" 兑换券规则状态由 "+getState(${couponRule.state})+" 修改为:"+getState($("#state").val())+";");
+			};
+			if($("#optdata").val()==""){
+				$("#optdata").val("无修改内容");
+			}
+			
+            jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					window.parent.showSimpleTip(res);
+					if( res == '1' ){
+						closeDialog();
+						window.parent.shuaxin();
+					}else{
+						// 设置钮可用
+						$("#btn_modify").removeAttr("disabled");
+					}
+                }
+            });
+            return false;
+        });});
+ 
+       	//关闭窗口方法
+        function closeDialog() {
+            window.parent.fillBackAndCloseDialog("#dialog");
+        }
+		
+</script>
+</head>
+<body>
+  <div>
+   <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/couponrule/update.do">
+   <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr >
+         <th width="23%">兑换券：</th>
+         <td width="50%" class="td">$!{couponRule.couponName}（$!{couponRule.couponId}）
+			<input id="ruleId" name="ruleId" type="hidden" value="$!{couponRule.ruleId}" />
+			<input id="couponId" name="couponId" type="hidden" value="$!{couponRule.couponId}" /></td>
+		 <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr >
+         <th>商      户：</th>
+         <td class="td1">$!{couponRule.merName}（$!{couponRule.merId}）
+			<input id="merId" name="merId" type="hidden" value="$!{couponRule.merId}" /></td>
+		 <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr >
+         <th>商       品：</th>
+         <td  class="td">$!{couponRule.goodsName}（$!{couponRule.goodsId}）
+			<input id="goodsId" name="goodsId" type="hidden" value="$!{couponRule.goodsId}" /></td>
+		 <td class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	<tr >
+     <th>是否为代金劵：</th>
+     <td class="td1">
+		 #if($couponRule.consumetype== 2)
+			是
+         #else
+			否
+		 #end
+		 <input id="consumetype" name="consumetype" type="hidden" value="$!{couponRule.consumetype}" />
+     </td>
+	 <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+   </tr>
+   #if($couponRule.consumetype== 2)
+   <tr>
+     <th>一笔订单中能否使用多个该类型的劵码：</th>
+     <td class="td">
+		#if($couponRule.ismulti== 1)
+			是
+         #else
+			否
+		#end
+		<input id="ismulti" name="ismulti" type="hidden" value="$!{couponRule.ismulti}" />
+     </td>
+	 <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+   </tr>
+   <tr>
+     <th>是否能转赠他人：</th>
+     <td class="td1">
+		#if($couponRule.istransfer== 1)
+			是
+         #else
+			否
+		#end
+		<input id="istransfer" name="istransfer" type="hidden" value="$!{couponRule.istransfer}" />
+     </td>
+	 <td  class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+   </tr>
+   <tr>
+     <th>可兑换商户：</th>
+     <td class="td">
+		#foreach($rmg in $list)
+            $rmg.mername
+			#if($rmg.mername == '全部商户')
+    			#break
+             #end
+			<br/>
+		#end 
+     </td>
+	 <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+   </tr>
+   <tr>
+     <th>可兑换商品：</th>
+     <td class="td">
+		#foreach($rmg in $list)
+            $rmg.goodsname
+			#if($rmg.goodsname == '可兑换商户的全部商品')
+    			#break
+             #end
+			<br/>
+		#end 
+     </td>
+	 <td  class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+   </tr>
+   #end
+	   <tr>
+         <th>兑换码形式：</th>
+         <td class="td1">$!{couponRule.couponCodeTypeName}
+			<input id="couponCodeType" name="couponCodeType" type="hidden" value="$!{couponRule.couponCodeType}" /></td>
+         <td class="td1"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th>兑换码生成方式：</th>
+         <td class="td">$!{couponRule.generateMethodName}
+			<input id="generateMethod" name="generateMethod" type="hidden" value="$!{couponRule.generateMethod}" /></td>
+         <td class="td"> <span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr class="modeDiv">
+         <th >兑换券有效期类型：</th>
+		 <td class="td1">$!{couponRule.effTypeName}
+		 	<input id="effType" name="effType" type="hidden" value="$!{couponRule.effType}" /></td>
+         <td class="td1" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+	   <tr class="subModeDiv1">
+         <th >售出后：</th>
+         <td class="td">$!{couponRule.effDays}&nbsp;天有效
+         	<input id="effDays" name="effDays" type="hidden" value="$!{couponRule.effDays}" /></td>
+		 <td class="td" ><span class="errorImg"></span><span class="errorMsg"></span></td> 
+       </tr>
+       <tr class="subModeDiv">
+         <th >兑换券有效期：</th>
+         <td class="td">
+			$!{couponRule.useStartDate} 至 $!{couponRule.useEndDate}
+			<input id="useStartDate" name="useStartDate" type="hidden" value="$!{couponRule.useStartDate}" />
+			<input id="useEndDate" name="useEndDate" type="hidden" value="$!{couponRule.useEndDate}" />
+		 </td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr class="modeDiv">
+         <th >兑换券销售期：</th>
+         <td class="td1">$!{couponRule.sellStartDate} 至 $!{couponRule.sellEndDate}
+			<input id="sellStartDate" name="sellStartDate" type="hidden" value="$!{couponRule.sellStartDate}" />
+			<input id="sellEndDate" name="sellEndDate" type="hidden" value="$!{couponRule.sellEndDate}" /></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr class="modeDiv">
+         <th >库存数量：</th>
+         <td class="td">$!{couponRule.goodsSum}&nbsp;（注：-1为不限库存数量）</td>
+		 <input id="goodsSum" name="goodsSum" type="hidden" value="$!{couponRule.goodsSum}" />
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   
+	   
+	   <tr>
+         <th><span>*</span>库存告警阀值：</th>
+         <td class="td1" >
+			<input id="switchAmt" name="switchAmt" type="text" class="input3" value="$!{couponRule.switchAmt}"/>&nbsp;<span>（注：0为不告警）</span>
+		 </td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+	   <tr>
+         <th ><span>*</span>库存告警邮件地址：</th>
+         <td class="td"><input id="alarmEmail" name="alarmEmail" type="text" class="input2" value="$!{couponRule.alarmEmail}" /></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+	   <tr>
+         <th ><span>*</span>库存告警短信手机号：</th>
+         <td class="td1"><input id="alarmMobile" name="alarmMobile" type="text" class="input2" value="$!{couponRule.alarmMobile}" /></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+         <th><span>*</span>到期前：</th>
+         <td class="td" ><input id="effWarnDays" name="effWarnDays" type="text" class="input3" value="$!{couponRule.effWarnDays}"/>&nbsp;天短信醒用户码即将过期 <span>（注：0为不提醒）</span></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+	   <tr>
+         <th><span>*</span>启用状态</th>
+         <td class="td1" ><input id="state" name="state" /><input type="hidden" name="optdata" id="optdata"/></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></td>
+       </tr>
+	   <tr>
+         <th>是否需批量导出：</th>
+         <td class="td" >#if(${couponRule.ruletype}=='0')
+         否
+       #else
+         是
+       #end<input id="ruletype" name="ruletype" type="hidden" value="$!{couponRule.ruletype}" class="input3"/></td>
+         <td class="td"></td>
+       </tr>
+	   #if(${couponRule.originalprice}!='0')
+	   <tr>
+         <th>面值：</th>
+         <td class="td1" > #set ( $value = $couponRule.originalprice / 100.00) $value 元
+         <td class="td1"></td>
+       </tr>
+	   #end
+     </table>
+	 <input id="originalprice" name="originalprice" type="hidden" value="$!{couponRule.originalprice}" class="input3"/>
+     <input id="export" name="export" type="hidden" value="$!{couponRule.export}" class="input3"/></td>
+	 <div class="pop_btn">
+       <input name="Submit" type="submit" class="popbtn"  value="修改" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" id="btn_modify" />
+       <input name="close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+   
+  </div>
+ 
+</body>
+</html> 

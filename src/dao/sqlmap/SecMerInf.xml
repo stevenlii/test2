@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SecMerInf">
+	<typeAlias alias="SecMerInf" type="com.umpay.hfmng.model.SecMerInf" />
+	<sql id="select_what">
+	 select * from UMPAY.T_SECMER_INF where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="subMerId" prepend=" and ">
+			subMerId = #subMerId#
+		</isNotEmpty>
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="subMerId" prepend=" and ">
+			subMerId = #subMerId# 
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="SecMerInf" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find" resultClass="SecMerInf" >
+		<include refid="select_what" />
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from UMPAY.T_SECMER_INF
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Insert" resultClass="SecMerInf">
+		insert into UMPAY.T_SECMER_INF(subMerId
+				<isNotEmpty	property="subMerName" prepend=" , "> subMerName </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> modUser </isNotEmpty>
+			) values(#subMerId#
+				<isNotEmpty	property="subMerName" prepend=" , "> #subMerName# </isNotEmpty>
+				<isNotEmpty	property="modUser" prepend=" , "> #modUser# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_SECMER_INF set modLock=0,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="subMerName" prepend=" , "> subMerName=#subMerName# </isNotEmpty>
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+		 where subMerId=#subMerId#
+	</statement>
+	
+	<statement id="updateLock" resultClass="integer">
+	   update UMPAY.T_SECMER_INF set modLock=#modLock#,modTime=CURRENT TIMESTAMP 
+	   <isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+	    where subMerId=#subMerId#
+	</statement>
+	
+	<statement id="isOrNotAble" resultClass="integer">
+		update UMPAY.T_SECMER_INF set state=#state#,modTime=CURRENT TIMESTAMP 
+			<isNotEmpty	property="modUser" prepend=" , "> modUser=#modUser# </isNotEmpty>
+			<isNotEmpty	property="modLock" prepend=" , "> modLock=#modLock# </isNotEmpty>
+		where subMerId=#subMerId#
+	</statement>
+	
+	<statement id="setLock" resultClass="integer">
+	   update UMPAY.T_SECMER_INF set modLock=#modLock# where subMerId=#subMerId# 
+	</statement>
+	
+</sqlMap>

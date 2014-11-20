@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="$request.contextPath/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/mercnf.js"></script>
+<script type="text/javascript">
+  var url="$request.contextPath/mercnf/query.do?queryKey=mercnf.all";
+  jQuery(document).ready(function() {
+    jQuery("#search_div").width(jQuery(window).width()-20);
+    var optStr="${opts}";
+	var opts=optStr.split(',');
+	
+    jQuery('[code]').each(function () {
+      var code=$(this).attr("code");
+      for(var i=0;i<opts.length;i++){
+	    if(code==opts[i]){
+	      $(this).css('display','inline');
+        }
+      };
+    });
+		
+    jQuery('#grid').omGrid({
+      dataSource : url,
+      width:'100%',
+      height : 455,
+      limit : 15,
+      rowClasses : function(rowIndex,rowData){
+		if(rowData.MODLOCK==1){
+			return "lock";
+		}else{
+			return "checkbox";
+		}
+	  },
+      colModel : [{header : '商户名称', name : 'MERNAME',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                    return "<a title='"+value+"'>"+value+"</a>";
+                  }},
+                  {header : '商户号', name : 'MERID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                    return "<a title='"+value+"'>"+value+"</a>";
+                  }},
+                  {header : '合并模式', name : 'MERGER',width : 85, align : 'left',renderer:function(value , rowData , rowIndex){
+               	    var name = "";
+               	    if(value==1){
+               		    name="合并";
+               	    }else if (value==0){
+               		    name="不合并";	
+               	    }
+               	    return "<a title='"+name+"'>"+name+"</a>";
+                  }},
+                  {header : '更新时间', name : 'MODTIME',width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+                    return "<a title='"+value+"'>"+value+"</a>";
+        		  }},
+        		  {header : '添加时间', name : 'INTIME',width : 100, align : 'left',renderer:function(value , rowData , rowIndex){
+                    return "<a title='"+value+"'>"+value+"</a>";
+        		  }},
+                  {header : '操作', name:'oper',width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                    var result="";
+                    if(optStr.indexOf("007")!=-1){//有修改权限
+                      result+=" <input  name='修改' title='修改' type='image' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='modify(&quot;"+rowData.MERID+"&quot;)'/> ";
+                    }
+              	    if(optStr.indexOf("008")!=-1){
+                      result+=" <input name='更新证书' title='更新证书' type='image' src='${request.contextPath}/profile/default/images/tool_configure.png' onclick='modCert(&quot;"+rowData.MERID+"&quot;)' />";
+                    }
+               	    result+=" <input name='详情' title='详情' type='image' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='show(&quot;"+rowData.MERID+"&quot;)' />";
+                    return result;
+                  }}
+                 ],
+      autoFit:true
+    });
+    
+    //初始化商户号列表  	
+    $('#merId').omCombo({
+    	dataSource : '$request.contextPath/option/merlist.do',
+    	width:'150px',
+    	listMaxHeight:150,
+    	emptyText:'全部 ' ,
+    	forceSelection : true ,
+    	onSuccess:function(data, textStatus, event){
+        	var tmp = $.parseJSON('{"value":"","text":"全部"}');
+        	data.unshift(tmp);
+        }
+    });
+    
+    jQuery( "#dialog").omDialog({ autoOpen: false});
+        
+  });
+</script>
+</head>
+<body>
+  <!--增 删 改按钮区-->
+  <div class="list_btntool">
+    <table border="0" width="100%">
+      <tr>
+        <td align="left">
+          <input name="添加配置" type="image" title='添加配置' style="display:none" code="005" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add();"/>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <!--列表查询区-->
+  <div  id="search_div">
+    <div class="list_search">
+      <table width="90%" border="0">
+        <tr>
+          <td align="left" >
+            <form id="form" method="post"> 
+              <table width="50%" border="0">
+                <tr>
+	              <th width="8%">商户号：</th>
+	              <td width="92%"><input id="merId" name="merId" class="select2"/></td>
+		        </tr>
+              </table>
+            </form> 
+          </td>
+          <td align="left">
+            <input id="query" title="查询" name="submit" type="image" style="display:none" code="001" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>  
+   
+  <!--列表区-->
+  <table id="grid" align="left"></table>
+    
+  <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+  </div>
+</body>
+</html>

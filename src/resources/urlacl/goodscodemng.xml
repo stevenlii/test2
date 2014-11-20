@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商品计费代码管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/goodscodemng/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/goodscodemng/export.do</url>
+	</Option>
+	<!-- 分配商品计费代码按钮 -->
+	<Option>
+		<code>007</code>
+		<url>hfMngBusi/goodscodemng/update.do</url>
+	</Option>
+</Options>

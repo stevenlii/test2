@@ -1,0 +1,49 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+  <script>
+   //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     } 
+  </script>  
+  </head>
+  <body>
+    <table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+      <tr>
+            <th width="30%" align="left">支付服务商编号：</th>
+            <td class="td">$!{bank.bankId}</td>
+      </tr>
+      <tr>
+            <th width="18%" align="left">支付服务商名称：</th>
+            <td class="td1">$!{bank.bankName}</td>
+      </tr>
+       <tr>
+            <th width="18%" align="left">支付服务商类型：</th>
+            <td class="td">$!{bank.bankType}</td>
+      </tr>
+     <tr>
+            <th width="18%" align="left">支付次限额：</th>
+            <td class="td1">$!{bank.timelTd}</td>
+      </tr>
+     <tr>
+            <th width="18%" align="left">支付日限额：</th>
+            <td class="td"> $!{bank.daylTd} </td>
+      </tr>
+      <tr>
+            <th width="18%" align="left">支付月限额：</th>
+            <td  class="td1"> $!{bank.monlTd}  </td>
+      </tr>
+      </table>
+  <div class="pop_btn">
+      <input name="close" type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog();"/>
+  </div>
+  </body>
+  </html>
+                     

@@ -1,0 +1,111 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript"
+	src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script>
+	//关闭窗口方法
+	function closeDialog() {
+		window.parent.fillBackAndCloseDialog("#dialog");
+	}
+</script>
+</head>
+<body>
+	<div>
+		<table width="100%" cellpadding="0" cellspacing="0" class="infowrite">
+			<tr>
+				<th width="30%">商户号：</th>
+				<td class="td">$!{mer.merId}</td>
+			</tr>
+			<tr>
+				<th>商户名称：</th>
+				<td class="td1">$!{mer.merName}</td>
+			</tr>
+			<tr>
+				<th>业务属性：</th>
+				<td class="td">$!{mer.busiType}</td>
+			</tr>
+			<tr>
+				<th>商户分类：</th>
+				<td class="td1">$!{mer.category}</td>
+			</tr>
+			<tr>
+				<th>接口类型：</th>
+				<td class="td">#if ($!{mer.interType}==0) 标准 #else 特殊 #end</td>
+			</tr>
+			<tr>
+				<th>是否渠道报备：</th>
+				<td class="td1">#if ($!{mer.chnlCheck}==0) 否 #else 是 #end</td>
+			</tr>
+			<tr>
+				<th>开通对账文件下载：</th>
+				<td class="td">#if ($!{mer.fileDL} == 0) 否 #else 是 #end</td>
+			</tr>
+			<tr>
+				<th>运营负责人：</th>
+				<td class="td1">$!{mer.operator}</td>
+			</tr>
+			<tr>
+				<th>公司名称：</th>
+				<td class="td">$!{mer.companyName}</td>
+			</tr>
+			<tr>
+				<th>公司介绍：</th>
+				<td class="td1" colspan="2">$!{mer.companyDesc}</td>
+			</tr>
+			<tr>
+				<th>业务介绍：</th>
+				<td class="td" colspan="2">$!{mer.busiDesc}</td>
+			</tr>
+			<tr>
+				<th>商户网址：</th>
+				<td class="td1" colspan="2">$!{mer.merWeb}</td>
+			</tr>
+			<tr>
+				<th>自有营销渠道：</th>
+				<td class="td" colspan="2">$!{mer.saleChannel}</td>
+			</tr>
+			<tr>
+				<th>注册资本：</th>
+				<td class="td1" colspan="2">$!{mer.regCapital}&nbsp;万元</td>
+			</tr>
+			<tr>
+				<th>注册时间：</th>
+				<td class="td" colspan="2">$!{mer.regTime}</td>
+			</tr>
+			<tr>
+				<th>商户来源：</th>
+				<td class="td1" colspan="2">$!{mer.srcMer}</td>
+			</tr>
+			<tr>
+				<th>年收益：</th>
+				<td class="td" colspan="2">$!{mer.yearProfit}&nbsp;万元</td>
+			</tr>
+			<tr>
+				<th>用户规模：</th>
+				<td class="td1" colspan="2">$!{mer.userScale}&nbsp;人</td>
+			</tr>
+			<tr>
+				<th>运营支撑：</th>
+				<td class="td" colspan="2">$!{mer.support}&nbsp;人</td>
+			</tr>
+			<tr>
+				<th>分成比例：</th>
+				<td class="td1" colspan="2">$!{mer.sharedRate}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="pop_btn">
+		<input name="close" type="button" class="popbtn"
+			onmouseover="this.className='popbtnhover'"
+			onmouseout="this.className='popbtn'" value="关闭"
+			onclick="closeDialog();" />
+	</div>
+</body>
+</html>

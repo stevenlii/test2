@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-position.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-button.js"></script>
+    <script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+	<script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+    <script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+    <script src="$request.contextPath/js/busi/couponorder.js"></script>
+<script>
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.closeDialog("#dialog");
+	   $(window.parent.document).find('#grid').omGrid('reload');
+   }
+   function perRequest(formData, jqForm, options) {
+        return true;
+    }
+    function showResponse(responseText, statusText, xhr, $form) {
+        var res = ('status: ' + statusText + '\n\nresponseText: \n'
+                + responseText);
+        var json = eval('(' + responseText + ')');
+		var msg = json.msg;                
+        $("#result").html(msg);
+		$('#grid').omGrid('reload');
+        $( "#dialog-modal").omDialog('open');
+    }
+   $(document).ready(function() {
+	   // 按钮权限控制
+	   var optStr = "${opts}";
+	   var opts = optStr.split(',');
+	   jQuery('[code]').each(function() {
+	       var code = $(this).attr("code");
+	       for (var i = 0; i < opts.length; i++) {
+	           if (code == opts[i]) {
+	               $(this).css('display', 'inline');
+	           }
+	       };
+	   });
+	   
+        var options = {
+            beforeSubmit : perRequest, 
+            success : showResponse
+        };
+        $('#formID').submit(function() {
+            $(this).omAjaxSubmit(options);
+            return false;
+        });
+        $( "#dialog-modal").omDialog({
+			autoOpen: false,
+			height: 80,
+			resizable: false,
+			modal: true
+		});
+
+		var url = "$request.contextPath/couponorder/querycouponcodes.do?queryKey=couponorder.couponcodes&orderId=" + $('#hiddenOrderId').val();
+		jQuery('#grid').omGrid({
+            dataSource: url,
+			method: 'POST',
+            width: '100%',
+            height: 260,
+			title: '兑 换 码 信 息 列 表',
+            colModel: [{
+                header: '兑换码',
+				name: 'COUPONCODE',
+                width: 50,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+            		return "<a title='" + rowData.COUPONCODE + "'>" + rowData.COUPONCODE + "</a>";
+                }
+            },
+            {
+                header: '兑换劵',
+                name: 'COUPON',
+                width: 85,
+                align: 'center',
+    			renderer: function(value, rowData, rowIndex) {
+            		return "<a title='" + rowData.COUPONID + "'>" + rowData.COUPONNAME + "（" + rowData.COUPONID + "）</a>";
+                }
+            },
+            {
+                header: '兑换劵有效期',
+                name: 'USERANGE',
+                width: 85,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+    				return "<a title='" + rowData.USERANGE + "'>" + rowData.USERANGE + "</a>";
+                }
+            },
+            {
+                header: '兑换码形式',
+                name: 'COUPONSTYLE',
+                width: 30,
+                align: 'center',
+				renderer: function(value, rowData, rowIndex) {
+    				return "<a title='" + rowData.COUPONSTYLE + "'>" + rowData.COUPONSTYLE + "</a>";
+                }
+            },
+            {
+                header: '码状态',
+                name: 'COUPONSTATE',
+                width: 30,
+                align: 'center',
+				renderer: function(value, rowData, rowIndex) {
+    				return "<a title='" + rowData.COUPONSTATENAME + "'>" + rowData.COUPONSTATENAME + "</a>";
+                }
+            },
+            {
+                header: '操作',
+                name: 'oprs',
+                width: 25,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					var result = "";
+
+					if( optStr.indexOf("001") != -1 ){
+						// 有补发权限
+						if( rowData.COUPONSTATE == '2' ){
+							// 当兑换码状态为【已支付】时才能进行 补发/注销 操作
+							result += "<img title='补发' src='${request.contextPath}/profile/default/images/toggle_down_light.png' onclick='regive(\"" + rowData.COUPONCODE + "\")' />&nbsp;&nbsp;";
+						}else{
+							result += "<img title='补发' src='${request.contextPath}/profile/default/images/toggle_down_light1.png' />&nbsp;&nbsp;";
+						}
+					}
+
+					if( optStr.indexOf("002") != -1 ){
+						// 有注销权限
+						if( rowData.COUPONSTATE == '2' ){
+							// 当兑换码状态为【已支付】时才能进行 补发/注销 操作
+							result += "<img title='注销' src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='cancel(\"" + rowData.COUPONCODE + "\")' />";
+						}else{
+							result += "<img title='注销' src='${request.contextPath}/profile/default/images/tool_Disable1.png' />";
+						}
+					}
+					
+					return result;
+                }
+            }],
+            autoFit: true
+        });
+		$('#grid').omGrid("setData", url);
+    });
+	
+   function postForm(code, op){
+   		$("#couponCode").val(code);
+   		$("#op").val(op);
+   		$('#formID').submit();
+   }
+</script>
+</head>
+<body>
+	<div >
+		<table cellpadding="0" cellspacing="0" class="infowrite" style="float:none;width:100%" >
+                <tr>
+                    <th width="15%">平台订单号：</th>
+                    <td width="32%" class="td">
+						$!{couponGcOrder.orderId}
+						<input id="hiddenOrderId" name="hiddenOrderId" type="hidden" value="$!{couponGcOrder.orderId}"/>
+					</td>
+					<th width="15%">手&nbsp;机&nbsp;号：</th>
+                    <td width="38%" class="td">$!{couponGcOrder.mobileId}</td>
+                </tr>
+				<tr>
+                    <th>商&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户：</th>
+                    <td class="td1">
+                        $!{couponGcOrder.merName}（$!{couponGcOrder.merId}）
+                    </td>
+					<th>商&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;品：</th>
+                    <td class="td1">
+                        $!{couponGcOrder.goodsName}（$!{couponGcOrder.goodsId}）
+                    </td>
+                </tr>
+				<tr>
+					<th >渠&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;道：</th>
+                    <td class="td">$!{couponGcOrder.channelName}（$!{couponGcOrder.channelId}）</td>
+					<th width="15%">订单状态：</th>
+                    <td class="td">$!{couponGcOrder.stateName}</td>
+                </tr>
+				<tr>
+					<th width="15%">订单时间：</th>
+                    <td class="td1" colspan="2">$!{couponGcOrder.inTime.toString().replace('.0', '')}</td>
+				</tr>
+            </table>
+	</div>
+	<br />
+	
+	<!-- 列表查询区 -->
+    <div align="center">
+        <table align="left" id="grid">
+        </table>
+    </div>
+	
+	<div>
+	<form id="formID" action="couponOp.do" method="post">
+        <div>
+            <input type="hidden" name="couponCode" id="couponCode"/>
+            <input type="hidden" name="op" id="op"/>
+            <input type="hidden" name="type" id="gc" value="gc"/>
+            <input type="hidden" name="merId" id="merId" value="$!{couponGcOrder.merId}"/>
+            <input type="hidden" name="orderId" id="orderId" value="$!{couponGcOrder.orderId}"/>
+            <input type="hidden" name="phone" id="phone" value="$!{couponGcOrder.phone}"/>
+        </div>
+    </form>
+   </div>
+    <div id="dialog-modal" title="提示窗口">
+        <p id="result"></p>
+    </div>
+   
+</body>
+</html>
+ 

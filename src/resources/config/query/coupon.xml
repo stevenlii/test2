@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="coupon">
+	<sql id="all">
+	<![CDATA[
+		select *
+		  from (select id         as auditId,
+		               ixData,
+		               modData,
+		               auditType,
+		               state      as auditState,
+		               resultDesc
+		          from umpay.T_HFAUDIT
+		         where id in (select max(id) as auditId
+		                        from umpay.T_HFAUDIT
+		                       where tableName = 'UMPAY.T_COUPON_INF'
+		                       group by ixData)) a
+		  full join umpay.T_COUPON_INF b
+		    on a.ixData = b.couponId
+	]]>
+	</sql>
+
+</mapper> 

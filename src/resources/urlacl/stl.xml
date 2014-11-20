@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- 兑换券规则管理 -->
+<Options>
+	<!-- 审核链接 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/stl/auditDetail.do</url>
+	</Option>
+	
+	<!-- 修改链接 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/stl/toMod.do</url>
+	</Option>
+	
+	<!-- 确认账单按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/stl/sureBill.do</url>
+	</Option>
+	
+	<!-- 关闭账单按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/stl/closeBill.do</url>
+	</Option>
+	
+	<!-- 作废账单按钮 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/stl/invalidBill.do</url>
+	</Option>
+	
+		<!-- 隐藏数据和取消隐藏按钮 -->
+	<Option>
+		<code>006</code>
+		<url>hfMngBusi/stl/updateIsvalid.do</url>
+	</Option>
+</Options>

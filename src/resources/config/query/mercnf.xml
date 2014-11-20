@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="mercnf" >
+	<sql id="all"> 
+	<![CDATA[
+		 select mi.merName,mc.merId,mc.merGer,mc.modTime,mc.inTime
+		 from umpay.t_mer_cnf mc left join umpay.t_mer_inf mi on mi.merId=mc.merId
+		 where 1=1
+		 #if( $merId && $merId!='' )
+		   and mc.merId = :merId   
+		 #end
+		 order by mc.modtime desc
+	  ]]>
+	</sql>
+</mapper> 

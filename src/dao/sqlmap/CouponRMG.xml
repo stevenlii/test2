@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CouponRMG">
+	<typeAlias alias="CouponRMG" type="com.umpay.hfmng.model.CouponRMG" />
+	<statement id="insert" resultClass="CouponRMG">
+		insert into umpay.t_coupon_rmg(ruleid, merid, goodsid
+		<isNotEmpty property="state" prepend=" , "> state
+		</isNotEmpty>
+		<isNotEmpty property="moduser" prepend=" , "> moduser
+		</isNotEmpty>
+		<isNotEmpty property="modtime" prepend=" , "> modtime
+		</isNotEmpty>
+		<isNotEmpty property="intime" prepend=" , "> intime
+		</isNotEmpty>
+		) values(#ruleid#, #merid#, #goodsid#
+		<isNotEmpty property="state" prepend=" , "> #state#
+		</isNotEmpty>
+		<isNotEmpty property="moduser" prepend=" , "> #moduser#
+		</isNotEmpty>
+		<isNotEmpty property="modtime" prepend=" , "> #modtime#
+		</isNotEmpty>
+		<isNotEmpty property="intime" prepend=" , "> #intime#
+		</isNotEmpty>
+		)
+	</statement>
+	<delete id="delete">  
+	    delete from umpay.t_coupon_rmg where ruleid=#ruleid#
+	</delete> 
+	<statement id="get" resultClass="CouponRMG">
+		select t.ruleid, t.merid, t.goodsid, t.state from umpay.t_coupon_rmg t where t.ruleid=#ruleid#
+	</statement>
+</sqlMap>

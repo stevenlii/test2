@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="nbsmpayback">
+	<sql id="nbsmdetail">
+	<![CDATA[
+		select t.STLMONTH AS STLDATE, sum(t.MONUM) AS MONUM, sum(t.MTNUM1) AS MTNUM, sum(t.NBNUM) AS NBSMNUM from umpay.T_HS_MNSMSTL t where 1 = 1
+	 	#if($merid && $merid!='')
+           AND t.INSTID = '$merid'
+        #end
+		#if($startDate && $startDate!='')
+			and t.STLMONTH >= 
+			case when length(trim(t.STLMONTH)) = 6
+			then 
+				substr('$startDate', 1, 6)
+			else
+           		'$startDate'
+            end 
+        #end
+        #if($endDate && $endDate!='')
+        	AND t.STLMONTH <= 
+        	case when length(trim(t.STLMONTH)) = 6
+			then 
+			substr('$endDate', 1, 6)
+			else
+            '$endDate'
+            end
+        #end
+        group by t.STLMONTH 
+		order by t.STLMONTH desc
+	]]>
+	</sql>
+	<sql id="paybackdetail">
+	<![CDATA[
+	 select t.UNDODATE, t.MOBILEID, t.PROVNAME, t.REFUNDAMOUNT, t.MERNAME, t.ACCID, t.GOODSID, t.GOODSNAME, t.WITHDRAWREASON, t.DESC from umpay.T_COUPON_PAYBACK t 
+	 where 1 = 1
+	 	#if($merid && $merid!='')
+           AND t.ACCID = '$merid'
+        #end
+        #if($startDate && $startDate!='')
+			and t.UNDODATE >= 
+			case when length(trim(t.UNDODATE)) = 6
+			then 
+				substr('$startDate', 1, 6)
+			else
+           		'$startDate'
+            end 
+        #end
+        #if($endDate && $endDate!='')
+        	AND t.UNDODATE <= 
+        	case when length(trim(t.UNDODATE)) = 6
+			then 
+			substr('$endDate', 1, 6)
+			else
+            '$endDate'
+            end
+        #end
+		order by t.UNDODATE desc
+	]]>
+	</sql>
+</mapper> 

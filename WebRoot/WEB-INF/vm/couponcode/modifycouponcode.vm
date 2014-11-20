@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="${request.contextPath}/js/ui/themes/default/om-all.css"
+	type="text/css">
+<link rel="stylesheet" type="text/css"
+	href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<style type="text/css">
+.input_text {
+	border: 1px solid #6D869E;
+	height: 17px;
+	vertical-align: middle;
+	width: 50%;
+}
+
+.errorMsg {
+	background: url("$   request.contextPath/ profile/ validate/ images/ alert.png)
+		center no-repeat white;
+	background-position: 5px 50%;
+	background-color: #FCEFE3;
+	text-align: left;
+	padding: 2px 2px 2px 25px;
+	border: 1px solid red;
+	display: none;
+	width: 100px;
+	margin-top: -18px;
+	margin-left: 18px;
+	position: absolute;
+	border-radius: 4px;
+	display
+	：block;
+}
+
+.errorImg {
+	background:
+		url("$request.contextPath/profile/validate/images/invalid.png")
+		no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+	vertical-align: inherit;
+}
+</style>
+<script>
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+        
+   		$.validator.addMethod("Check1",
+	        function() {
+				var useStartDate = $('#useStartDate').val();
+				var useEndDate = $('#useEndDate').val();
+				if ( useStartDate >= useEndDate ) {
+	            	return false;
+	            }
+	            return true;
+	        }, '');
+   		
+  	 	jQuery(document).ready(function() {
+			
+			jQuery("#dataform").validate({
+                rules: {
+                	"useStartDate": {
+                        required: true,
+						Check1: true
+                    },
+					"useEndDate": {
+                        required: true,
+						Check1: true
+                    }
+                },
+                messages: {
+                	"useStartDate": {
+                        required: "请选择有效期",
+						Check1: "开始时间必须小于结束时间"
+                    },
+                    "useEndDate": {
+                        required: "请选择有效期",
+						Check1: "开始时间必须小于结束时间"
+                    }
+                },
+            
+                errorPlacement: function(error, element) {
+                    if (error.html()) {
+                        $(element).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                var attentionElement = $(this).next().children().eq(0);
+                                attentionElement.css('display', 'block');
+                                attentionElement.next().html(error);
+                            }
+                        });
+                    }
+                },
+                showErrors: function(errorMap, errorList) {
+                    if (errorList && errorList.length > 0) {
+                        $.each(errorList,
+                        function(index, obj) {
+                            var msg = this.message;
+                            $(obj.element).parents().map(function() {
+                                if (this.tagName.toLowerCase() == 'td') {
+                                    var attentionElement = $(this).next().children().eq(0);
+                                    attentionElement.show();
+                                    attentionElement.next().html(msg);
+                                }
+                            });
+                        });
+                    } else {
+                        $(this.currentElements).parents().map(function() {
+                            if (this.tagName.toLowerCase() == 'td') {
+                                $(this).next().children().eq(0).hide();
+                            }
+                        });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler: function() {
+                    jQuery(this).submit();
+                    return false;
+                }
+            });
+	
+		$(".errorImg").bind('mouseover', function() {
+            $(this).next().css('display', 'block');
+        }).bind('mouseout', function() {
+            $(this).next().css('display', 'none');
+        });
+		
+		jQuery('#dataform').submit(function() {
+            if (!jQuery("#dataform").valid()) {
+                return false;
+            }
+			// 设置按钮不可用，防止重复提交
+			$("#btn_modify").attr("disabled", "disabled");
+
+			//记录修改日志
+			if( $("#useStartDate").val() != '$!{couponCode.useStartDate}' ){
+				$("#operdata").val($("#operdata").val()+ "有效期起始日期由【$!{couponCode.useStartDate}】修改为:【" + $("#useStartDate").val() + "】;");
+			};
+			if( $("#useEndDate").val() != '$!{couponCode.useEndDate}' ){
+				$("#operdata").val($("#operdata").val() + "有效期结束日期由【$!{couponCode.useEndDate}】修改为:【" + $("#useEndDate").val() + "】;");
+			};
+			if( $("#operdata").val() == "" ){
+				$("#operdata").val("无修改内容");
+			}
+
+			jQuery(this).omAjaxSubmit({
+                success: function(res) {
+					window.parent.showSimpleTip1(res);
+					if( res == '1' ){
+						closeDialog();
+						window.parent.shuaxin();
+					}else{
+						// 设置钮可用
+						$("#btn_modify").removeAttr("disabled");
+					}
+                }
+            });
+            return false;
+        });});
+	
+  	 	function showResponse(responseText, statusText) {
+            var result = eval("(" + responseText + ")");
+            if (result.code == '0') {
+                window.parent.fillBackAndCloseDialog(result.msg);
+            }
+        }
+
+      
+  	 	
+</script>
+</head>
+<body>
+	<div>
+		<form id="dataform" method="post" name="dataform" id="dataform"
+			action="${request.contextPath}/couponcode/update.do">
+			<table class="infowrite" cellspacing="0" cellpadding="0">
+				<tr>
+					<th width="20%">兑换券：</th>
+					<td width="48%" class="td">$!{couponCode.couponName}（$!{couponCode.couponId}）</td>
+					<td class="td"></td>
+				</tr>
+				<tr>
+					<th width="20%">渠        道：</th>
+					<td width="48%" class="td1">$!{couponCode.channelName}（$!{couponCode.channelId}）</td>
+					<td class="td1"></td>
+				</tr>
+				<tr>
+					<th width="20%">商        户：</th>
+					<td width="48%" class="td">$!{couponCode.merName}（$!{couponCode.merId}）</td>
+					<td class="td"></td>
+				</tr>
+				<tr>
+					<th width="20%">商        品：</th>
+					<td width="48%" class="td1">$!{couponCode.goodsName}（$!{couponCode.goodsId}）</td>
+					<td class="td1"></td>
+				</tr>
+				<tr>
+					<th width="20%">兑换码：</th>
+					<td width="48%" class="td">$!{couponCode.couponCode}</td>
+					<td class="td"></td>
+				</tr>
+				<tr>
+					<th>手机号：</th>
+					<td width="48%" class="td1">$!{couponCode.paidMobileId}
+						<input type="hidden" id="orderId" name="orderId" value="$!{couponCode.orderId}" />
+						<input type="hidden" id="couponCode" name="couponCode" value="$!{couponCode.couponCode}" />
+						<input type="hidden" id="merId" name="merId" value="$!{couponCode.merId}" />
+						<input type="hidden" id="paidMobileId" name="paidMobileId" value="$!{couponCode.paidMobileId}" />
+						<input type="hidden" id="operdata" name="operdata" /></td>
+					<td class="td1"></td>
+				</tr>
+				<tr>
+			         <th ><span>*</span>兑换码有效期：</th>
+			         <td width="45%" class="td">
+						<input value="$!{couponCode.useStartDate}" type="text" id="useStartDate" name="useStartDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/>
+			     		至
+						<input value="$!{couponCode.useEndDate}" type="text" id="useEndDate" name="useEndDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+			         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+		       </tr>
+			</table>
+			<div class="pop_btn">
+				<input name="Submit" type="submit" class="popbtn" value="修改"
+					onmouseover="this.className='popbtnhover'"
+					onmouseout="this.className='popbtn'" id="btn_modify" /> <input
+					name="close" type="button" class="popbtn" value="取消"
+					onclick="closeDialog();" onmouseover="this.className='popbtnhover'"
+					onmouseout="this.className='popbtn'" />
+			</div>
+		</form>
+	</div>
+</body>
+</html>

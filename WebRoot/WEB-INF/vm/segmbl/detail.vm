@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/busi/segmbl.js"></script>
+<script src="$request.contextPath/js/busi/common.js"></script>
+</head>
+<body>   
+      <table class="infowrite" cellspacing="0" cellpadding="0" width="300px"  align="center" >
+       <tr >
+         <th width="30%">任务编号：</th>
+         <td  class="td">$!{task.taskId}</td>
+          </tr>
+       <tr >
+         <th>任务类别：</th>
+         <td class="td1">#if ($!{task.taskType}==6) 更新号段 #end </td>
+       </tr>
+       <tr >
+         <th>发起人：</th>
+         <td class="td">$!{task.creator}</td>
+         </tr>
+       <tr >
+         <th>任务状态：</th>
+         <td class="td1">#if ($!{task.synState}==0)  初始 #elseif ($!{task.synState}==1) 处理中
+          #else 完成 #end </td>
+       </tr>
+       <tr>
+         <th>添加时间：</th>
+         <td class="td" >$!{task.inTime} </td>
+         </tr>
+      <tr>
+         <th>最后处理时间：</th>
+         <td class="td1">$!{task.modTime}</td>
+       </tr>
+        <tr>
+         <th>处理结果：</th>
+         <td class="td">#if ($!{task.synResult}==0)  初始 #elseif ($!{task.synResult}==1) 处理成功 
+         #elseif ($!{task.synResult}==2) 部分失败  #else 处理失败 #end </td>
+       </tr>
+       <tr>  
+         <th>处理结果信息：</th>
+         <td class="td1">
+         	#if($!{task.synResult}==0)暂无#else $!{task.resultDesc} #end
+         </td>
+       </tr>
+         <th>下载任务文件：</th>
+         <td class="td"><input name='下载任务文件' title='下载任务文件' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadDoc(&quot;$!{task.taskId}&quot;)'/></td>
+         </tr>
+         <tr>
+         <th>下载成功日志：</th>
+         <td class="td1">
+         	#if($!{task.synResult}==1 || $!{task.synResult}==2)
+         		<input name='下载成功日志' title='下载成功日志' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadSuccDoc(&quot;$!{task.taskId}&quot;)'/>
+     		#end
+         </td>
+         </tr>
+         <tr>
+         <th>下载失败日志：</th>
+         <td class="td">
+         	#if($!{task.synResult}==2 || $!{task.synResult}==3)
+         		<input name='下载失败日志' title='下载失败日志' type='image' src='${request.contextPath}/profile/default/images/down.png' onclick='downloadFailDoc(&quot;$!{task.taskId}&quot;)'/></td>
+     		#end
+         </tr>
+     </table>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

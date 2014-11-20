@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/goodsInf.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+<script type="text/javascript">
+var setting = {
+	data: {simpleData: {enable: true}},
+	callback: {onClick: onClick}
+};
+ 	 	var url ="$request.contextPath/goodsinf/query.do";
+	jQuery(document).ready(function() {
+		jQuery("#search_div").width(jQuery(window).width()-20);
+		var zNodes1="${zNodes}";
+		var zNodes=eval(zNodes1);
+		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+		
+		var optStr="${opts}";
+		var opts=optStr.split(',');
+        jQuery('[code]').each(function () {
+        var code=$(this).attr("code");
+        for(var i=0;i<opts.length;i++){
+					if(code==opts[i]){
+					   $(this).css('display','inline');						
+					}
+    		};
+		});
+		
+          jQuery('#grid').omGrid({
+                dataSource : "$request.contextPath/goodsinf/query.do?queryKey=goods.allGoods",
+                width:'100%',
+                height : 455,
+                limit : 15,
+                singleSelect : false,
+                rowClasses : function(rowIndex,rowData){
+                       						if(rowData.MODLOCK==1){
+                           					return "lock";
+                       						}else{
+                           					return "checkbox";
+                       						}
+                   					},
+                colModel : [ {header : '更新时间', name : 'MODTIME',width : 100, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.MODTIME+"'>"+rowData.MODTIME+"</a>";
+                             		}
+                             }, 
+                             	
+                             {header : '商户名称', name : 'MERNAME',width : 120, align : 'left',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.MERNAME+"'>"+rowData.MERNAME+"</a>";
+                             		}
+                             },
+                             {header : '商户号', name : 'MERID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.MERID+"'>"+rowData.MERID+"</a>";
+                             		}
+                             },
+                             {header : '商品号', name : 'GOODSID', width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+rowData.GOODSID+"'>"+rowData.GOODSID+"</a>";
+                             		}
+                             },
+                             {header : '商品名称', name : 'GOODSNAME', width : 100 , align : 'left',renderer:function(value , rowData , rowIndex){
+		                             	return "<a title='"+rowData.GOODSNAME+"'>"+rowData.GOODSNAME+"</a>";
+                             		}
+                              },
+                             {header : '业务覆盖', name : 'BUSITYPE',width : 75, align : 'left',renderer:function(value , rowData , rowIndex){
+		                             	var busiType = rowData.BUSITYPE;
+		                             	if(busiType==01)
+		                             		return "<a title='省网'>省网</a>";
+		                             	else if (busiType == 10)
+		                             		return "<a title='全网'>全网</a>";
+		                             	else if (busiType == 11)
+		                             		return "<a title='全网、省网'>全网、省网</a>";
+                             		}
+                             },  
+                             {header : '商品分类', name : 'CATEGORY', width : 85 , align : 'left',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}
+                             },
+                             {header : '服务类型', name : 'SERVTYPE', width : 80, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var servType = rowData.SERVTYPE;
+                             	if(servType==2)
+                             		return "<a title='按次'>按次</a>";
+                             	else 
+                             		return "<a title='包月'>包月</a>";
+                             }},
+                             {header : '价格模式', name : 'PRICEMODE', width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var priceMode = rowData.PRICEMODE;
+                             	if(priceMode==0)
+                             		return "<a title='定价'>定价</a>";
+                             	else 
+                             	return "<a title='非定价'>非定价</a>";
+                             }
+                             },
+                             {header : '商品短信', name : 'PUSHINF', width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var pushInf = rowData.PUSHINF;
+                             	var mtNum = rowData.MTNUM;
+                             	var pushmt=pushInf+mtNum;
+                             
+                             	if(pushmt==1){
+                             		return "<a title='商品描述'>商品描述</a>";}
+                             	else if(pushmt==2)
+                             	return "<a title='商品信息'>商品信息</a>";
+                             	else if(pushmt==3)
+                             	return "<a title='描述信息'>描述信息</a>";
+                             	else return "";
+                             }},
+                             {header : '添加方式', name : 'ADDWAY',width : 60, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var addWay = rowData.ADDWAY;
+                             	if(addWay==0)
+                             		return "<a title='本地'>本地</a>";
+                             	else 
+                             	return "<a title='基地'>基地</a>";
+                             }},
+                             {header : '状态', name : 'state',width : 50, align : 'left',renderer:function(value , rowData , rowIndex){
+                             	var state = rowData.STATE;
+                             	if(state==2)
+                             		return "<a title='启用'>启用</a>";
+                             	else 
+                             	return "<a title='禁用'>禁用</a>";
+                             }
+                             },
+                             {header : '操作', name : 'oper', width : 70 , align : 'left',renderer:function(value , rowData , rowIndex){
+	                             	var state = rowData.STATE;
+	                             	var modLock=rowData.MODLOCK;
+	                             	var servType = rowData.SERVTYPE;
+	                             	var result="";
+	                             	if(optStr.indexOf("007")!=-1){//有修改权限
+	                             		if(modLock==0 )
+	                             			result+=" <input  name='修改' alt='修改' title='修改' type='image' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='showModifyDialog("+"1"+rowData.MERID +" ,"+"1"+ rowData.GOODSID+","+rowData.SERVTYPE+" )'/> ";
+	                             		else
+	                             			result+=" <input  name='修改' alt='修改' title='修改' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_modify1.png'/> ";
+	                             	}
+	                             	
+	                             	if(modLock==0){// 正常
+	                             		if(state==2){//启用状态
+	                             			if(optStr.indexOf("003")!=-1){//有禁用权限，返回修改、禁用、详情按钮
+	                             				result+="<input  name='禁用' alt='禁用' title='禁用' type='image' src='${request.contextPath}/profile/default/images/tool_Disable.png' onclick='singleDisable("+"1"+rowData.MERID +" ,"+"1"+ rowData.GOODSID+","+ rowData.MODLOCK +" )'  /> ";  			                             				
+	                             			}
+	                             		}else{//禁用状态，不能修改
+	                             			if(optStr.indexOf("004")!=-1){//有启用权限，返回修改、启用、详情按钮
+	                             				result+="<input  name='启用' alt='启用' title='启用' type='image' src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='singleEnable("+"1"+rowData.MERID +" ,"+"1"+ rowData.GOODSID+", "+ rowData.MODLOCK +")'  /> ";
+	                                  }
+	                             		}
+	                             	}else{//锁定，无法修改、启用或禁用
+	                             		if(state==2){//启用状态
+	                             			if(optStr.indexOf("003")!=-1){//有禁用权限，返回修改（不可用变灰）、禁用（不可用变灰）、详情按钮
+	                             				result+="<input  name='禁用' alt='禁用' title='禁用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Disable1.png' onclick='singleDisable("+"1"+rowData.MERID +" ,"+"1"+ rowData.GOODSID+","+ rowData.MODLOCK +" )'  /> ";
+	                             			}
+	                             		}else{//禁用状态
+	                             			if(optStr.indexOf("004")!=-1){//有启用权限，返回修改（不可用变灰）、启用（不可用变灰）、详情按钮
+	                             				result+="<input  name='启用' alt='启用' title='启用' type='image' disabled='disabled' src='${request.contextPath}/profile/default/images/tool_Enable1.png' onclick='singleEnable("+"1"+rowData.MERID +" ,"+"1"+ rowData.GOODSID+", "+ rowData.MODLOCK +")'  /> ";
+	                             			}
+	                             		}
+	                             	}  
+	                             	
+	                             	result+=" <input name='详情' alt='详情' title='详情' type='image' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='showDetailDialog("+"1"+rowData.MERID +" ,"+"1"+ rowData.GOODSID+","+servType+" )' />";
+	                             	return result;
+                             	}
+                             }                                          
+                            ],
+								autoFit:true
+            });
+
+  	   //业务覆盖
+  	  $('#busiType').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"10","text":"全网"},{"value":"01","text":"省网"},{"value":"11","text":"省网、全网"}],
+          width:'65px',
+          listMaxHeight:100,
+          emptyText:'全部 ' ,
+          forceSelection : true   
+      });
+  	  //服务类型   
+  	  $('#servType').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"2","text":"按次"},{"value":"3","text":"包月"}],
+          width:'60px',
+          listMaxHeight:80,
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+  	  //价格模式  
+  	  $('#priceMode').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"0","text":"定价"},{"value":"1","text":"非定价"}],
+          width:'60px',
+          listMaxHeight:80,
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+  	  //商品短信 
+  	  $('#pushInfAndmtNum').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"12","text":"描述信息"},{"value":"11","text":"商品信息"},{"value":"01","text":"商品描述"}],
+          width:'60px',
+          listMaxHeight:100,
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+  	  //添加方式 
+  	  $('#addWay').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"0","text":"本地"},{"value":"1","text":"基地"}],
+          width:'90px',
+          listMaxHeight:80,
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+  	  //状态       
+  	  $('#state').omCombo({
+          dataSource : [{"value":"","text":"全部"},{"value":"2","text":"启用"},{"value":"4","text":"禁用"}],
+          width:'65px',
+          listMaxHeight:80,
+          emptyText:'全部 ' ,
+          forceSelection : true
+      });
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+
+        jQuery( "#dialog-batchMod").omDialog({
+            autoOpen: false,
+            width: 500,
+            height: 400,
+            title:"修改客服电话",
+            modal: true
+        });
+        
+        $.validator.addMethod("notEmptyBY", function(value) {
+        	if($("input[name='pushInfBY']:checked").val()=="11"){
+        		return true;
+      		}else{
+      			if(value==""){
+      				return false;
+      			}
+      		}
+        	return true;
+        }, '请填写商品描述');
+        $.validator.addMethod("notChinese", function(value) {
+		 	var words = value.split("");
+		 	for (var i=0;i<words.length;i++) {
+				if(words[i].charCodeAt(0)>256){
+					return false;
+				}
+			}
+	        return true;
+	    }, "客服电话只能为数字或字符");
+		jQuery("#dataform").validate({
+				rules : {
+                    "cusPhone" :{
+                       required:true,
+                       notChinese:true
+                    }
+                },
+                messages : {
+                    "cusPhone":{
+                      required : "请填写客服电话"
+                     }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                            $(this).next().children().eq(1).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+		
+		jQuery('#dataform').submit(function() {
+			if (!jQuery("#dataform").valid()) 
+				return false;
+			jQuery(this).omAjaxSubmit({success:function(res){
+				var msg = "";
+	  			var ty = "";
+           		if(res !='1') {
+           			ty = 'error';
+    		  		var msg = '修改客服电话失败';
+    		  		if(result != '0'){
+    		  			msg = result;
+    		  		}
+    		   }else{
+    			   ty = 'success';
+    			   msg = '修改客服电话成功';
+    			   close(); 
+    		   }
+           		$.omMessageBox.alert({
+           			type : ty,
+           			title : '操作提示',
+           			content : msg
+           		});
+                 }
+             });
+			return false; 
+		});
+	});
+    function add(){
+    	 $( "#dialog").omDialog("option","width",'650');
+         $( "#dialog").omDialog("option","title",'添加商品信息');
+         $( "#dialog").omDialog("option","height",'580');
+        $( "#dialog").omDialog("option", "modal", true);
+        $( "#dialog").omDialog('open');
+        var frameLoc=window.frames[0].location;
+        frameLoc.href='add.do';
+        $("#dialog").omDialog({onClose : function(event) {
+     		window.frames[0].location.href='../wait.htm';
+      }});
+    
+    }
+
+    </script>
+</head>
+<body>
+    <!--增 删 改按钮区-->
+   <div class="list_btntool">
+     <table border="0" width="100%">
+     <tr>
+     	<td align="left">
+     	<input name="禁用" title="禁用" style="display:none"  code="003" type="image" src="${request.contextPath}/profile/default/images/btn_Disable.png" onclick="batchstop()" />
+        <input name="启用" title="启用" code="004" style="display:none"  type="image" src="${request.contextPath}/profile/default/images/btn_Enable.png" onclick="batchstart()"/>
+        <input name="修改客服电话" title="修改客服电话" style="display:none"  code="006" type="image" value="修改客服电话"  src="${request.contextPath}/profile/default/images/btn_tel.png" onclick="batchMod()"/></td>
+        <td  align="right">
+        <input name="添加商品" title="添加商品" style="display:none"  code="005" type="image"  src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add()"/>
+        <a name="全网商品导出" title="全网商品导出" style="display:none" code="002" target="_blank" href="${request.contextPath}/goodsinf/download.do?fileName=MW"><img border="0" src="${request.contextPath}/profile/default/images/btn_qwsp.png" /></a>
+        <a name="小额商品导出" title="小额商品导出" style="display:none" code="002" target="_blank" href="${request.contextPath}/goodsinf/download.do?fileName=XE"><img border="0" src="${request.contextPath}/profile/default/images/btn_xesp.png" /></a>
+        </td>
+       </tr>
+     </table>
+   </div>
+ 
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr>
+            <th width="8%" height="30">商户号：</th>
+              <td width="10%"><input id="merId" name="merId" type="text" class="input1" style="width:60px"/></td>
+           <th width="8%">商品号：</th>
+             <td width="10%"><input id="goodsId" name="goodsId" type="text" class="input1" style="width:60px"  /></td>
+           <th width="10%">商品名称：</th>
+             <td width="10%"><input id="goodsName" name="goodsName" type="text" class="input1" style="width:60px"/></td>
+           <th width="10%">商品分类：</th>
+             <td width="13%">
+	             <span class="om-combo om-widget om-state-default" style="width: 90px;">
+		             <input type="hidden" id="category" value="" type="text" />
+		             <input type="text" id="goodsCategory" readonly value="全部" onclick="showMenu(''); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 69px;"><span onclick="showMenu(''); return false;" class="om-combo-trigger ioi_trigger"></span>
+	             </span>
+             </td>
+           <th width="10%">业务覆盖：</th>
+             <td width="10%"> <input id="busiType" name="busiType" class="select1"/></td>
+         </tr>
+         <tr>
+            <th height="30">服务类型：</th> 
+                <td> <input id="servType" name="servType" class="select1"/></td> 
+            <th>价格模式：</th>
+                 <td> <input id="priceMode" name="priceMode" class="select1"/></td>
+            <th>商品短信：</th>
+                <td> <input id="pushInfAndmtNum" name="pushInfAndmtNum" class="select1"/></td>
+            <th>添加方式：</th>
+                 <td> <input id="addWay" name="addWay" class="select1"/></td>
+             <th>状态：</th>
+                  <td><input id="state" name="state" class="select1"/></td> 
+         </tr>
+        </table>
+         </form> 
+       </td>
+        <td> <input id="query" style="display:none"  code="001"  name="query" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"  />
+         
+        </td>
+       </tr>
+        </table>
+      </div>
+      </div>
+ <!--列表查询区-->
+ <div align="center">
+         <table  align="left" id="grid" ></table>
+     </div>
+ <div id="dialog">
+    	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+	</div>
+<div id="dialog-batchMod" style="display:none;">
+    <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/goodsinf/modCusPhone.do">
+    	<input type="hidden" id="ID" name="ID"/>
+    	<table class="infowrite" cellspacing="0" cellpadding="0">
+    		<tr>
+    			<th style="width:20%"><span>*</span>所选商品：</th>
+    			<td style="width:48%"><div id="goodsView"><div></td>
+    			<td style="width:32%"></td>
+    		</tr> 
+    		<tr>
+         		<th><span>*</span>客服电话：</th>
+         		<td><input id="cusPhone" name="cusPhone" type="text" maxlength="32" class="input2" /></td>
+         		<td><span class="errorImg"></span><span class="errorMsg"></span></td>
+       		</tr> 
+    	</table>
+    	<div class="pop_btn">
+	   		<input name="Submit" type="submit" class="button_1" value="修改" />
+	   		<input name="cancel" type="button" class="button_2" onclick="javascript:self.close();" value="取消" />
+	 </div>
+    </form>
+</div>	
+<div id="menuContent" class="list_zTree">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+</body>
+</html>

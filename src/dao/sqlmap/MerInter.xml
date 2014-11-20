@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MerInter">
+	<typeAlias alias="MerInter" type="com.umpay.hfmng.model.MerInter" />
+	<sql id="select_what">
+	 select * from UMPAY.T_MER_INTER where 1=1 
+	</sql>
+	<sql id="key_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId#
+		</isNotEmpty>
+		<isNotEmpty	property="inFunCode" prepend=" and ">
+			inFunCode = #inFunCode#
+		</isNotEmpty>
+		<isNotEmpty	property="inVersion" prepend=" and ">
+			inVersion = #inVersion#
+		</isNotEmpty>
+	</sql>
+	<sql id="where_find">
+		<isNotEmpty	property="merId" prepend=" and ">
+			merId = #merId# 
+		</isNotEmpty>
+		<isNotEmpty	property="state" prepend=" and ">
+			state = #state# 
+		</isNotEmpty>
+	</sql>
+	<statement id="Get" resultClass="MerInter" >
+		<include refid="select_what" />
+		<include refid="key_find" />
+	</statement>
+	
+	<statement id="Find_count" resultClass="integer">
+		select count(*) from UMPAY.T_MER_INTER
+		<include refid="where_find" />
+	</statement>
+	
+	<statement id="Insert" resultClass="MerInter">
+		insert into UMPAY.T_MER_INTER(merId,inFunCode,inVersion
+				<isNotEmpty	property="protocol" prepend=" , "> protocol </isNotEmpty>
+				<isNotEmpty	property="state" prepend=" , "> state </isNotEmpty>
+				<isNotEmpty	property="address" prepend=" , "> address </isNotEmpty>
+				<isNotEmpty	property="addressDesc" prepend=" , "> addressDesc </isNotEmpty>
+			) values(#merId#,#inFunCode#,#inVersion#
+				<isNotEmpty	property="protocol" prepend=" , "> #protocol# </isNotEmpty>
+				<isNotEmpty	property="state" prepend=" , "> #state# </isNotEmpty>
+				<isNotEmpty	property="address" prepend=" , "> #address# </isNotEmpty>
+				<isNotEmpty	property="addressDesc" prepend=" , "> #addressDesc# </isNotEmpty>
+			)
+	</statement>
+	
+	<statement id="Update" resultClass="integer">
+		update UMPAY.T_MER_INTER set protocol=#protocol# 
+			<isNotEmpty	property="address" prepend=" , "> address=#address# </isNotEmpty>
+			<isNotEmpty	property="addressDesc" prepend=" , "> addressDesc=#addressDesc# </isNotEmpty>
+		 where merId=#merId# and inFunCode=#inFunCode# and inVersion=#inVersion#
+	</statement>
+	
+	<statement id="updateState" resultClass="integer">
+		update UMPAY.T_MER_INTER set state=#state# 
+		where merId=#merId# and inFunCode=#inFunCode# and inVersion=#inVersion#
+	</statement>
+	
+</sqlMap>

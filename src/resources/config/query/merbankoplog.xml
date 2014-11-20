@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="merbankoplog"  >
+	<sql id="allmerbankoplogs"> 
+	<![CDATA[
+		 select audit.id,audit.tableName,audit.ixdata,audit.ixdata2,audit.moddata,audit.auditType,
+		  audit.state,audit.creator,audit.modTime,audit.modUser,audit.resultDesc,audit.inTime
+		  from umpay.t_hfaudit audit where audit.tableName='UMPAY.T_MER_BANK' 
+		 #if( $ixData && $ixData!='' ) 
+		   and  audit.ixdata like '%$ixData%'   
+		 #end 
+		 #if( $creator && $creator != '' ) 
+		   and  audit.creator = :creator 
+		 #end
+		 #if( $submitstart && $submitstart != '' ) 
+		   and  audit.inTime >= timestamp('$submitstart') 
+		 #end
+		 #if( $submitend && $submitend != '' ) 
+		   and  audit.inTime <= timestamp('$submitend') 
+		 #end
+		 order by audit.intime desc
+	  ]]>
+	</sql>
+</mapper> 

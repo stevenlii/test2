@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script> 
+   //关闭窗口方法
+   function  closeDialog(){
+       window.parent.fillBackAndCloseDialog("#dialog");
+   }
+   
+   jQuery(document).ready(function() {
+	   $("#nextRunTime").html("$!{taskInf.nextRunTime}".substring(0,19));
+	   $("#modTime").html("$!{taskInf.modTime}".substring(0,19));
+   });
+</script>
+</head>
+<body>
+	<div>
+      <table class="infowrite" cellspacing="0" cellpadding="0" >
+       <tr >
+         <th width="30%">任务编号：</th>
+		 <td class="td">$!{taskInf.taskId}</td>
+       </tr>
+        <tr >
+         <th>所属平台：</th>
+         <td class="td1">$!{taskInf.platName}</td>
+       </tr>
+	   <tr >
+         <th>任务说明：</th>
+         <td class="td">$!{taskInf.taskDesc}</td>
+       </tr>
+       <tr >
+       <tr>
+         <th>触发地址：</th>
+         <td class="td1">$!{taskInf.postUrl}</td>
+       </tr>
+       <tr>
+         <th>是否启用：</th>
+         <td class="td">#if("2"=="$!{taskInf.state}")启用#end#if("4"=="$!{taskInf.state}")不启用#end</td>
+       </tr>
+         <th>定时规则：</th>
+         <td class="td1">$!{taskInf.taskRuleDesc}</td>
+       </tr>
+       <tr>
+         <th>下次执行时间：</th>
+         <td class="td" ><label id="nextRunTime"></label></td>
+       </tr>
+       <tr >
+         <th>错误重试：</th>
+         <td class="td1">#if("2"=="$!{taskInf.isReTry}")是#end#if("4"=="$!{taskInf.isReTry}")否#end</td>
+       </tr>
+       #if("2"=="$!{taskInf.isReTry}")
+       <tr>
+         <th>重试次数：</th>
+         <td class="td" >$!{taskInf.reTryTimes}次</td>
+       </tr>
+       <tr>
+         <th>重试间隔时间：</th>
+         <td class="td1">$!{taskInf.reTryInterval}分钟</td>                         
+       </tr>
+       <tr>
+         <th>反馈超时阀值：</th>
+         <td class="td">$!{taskInf.retTimeout}分钟</td>
+       </tr>
+       #end
+       <tr>
+         <th>最后修改时间：</th>
+         <td class="td"><label id="modTime"></label></td>                         
+       </tr>
+       <tr>
+         <th>最后修改人：</th>
+         <td class="td1">$!{taskInf.modUser}</td>
+       </tr>
+     </table>
+   </div>
+   <div class="pop_btn">
+	   <input name="close" type="button" class="popbtn" value="关闭" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+</body>
+</html>
+ 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 商户管理 -->
+<Options>
+	<!-- 查询按钮 -->
+	<Option>
+		<code>001</code>
+		<url>hfMngBusi/merbusiconf/query.do</url>
+	</Option>
+	<!-- 导出按钮 -->
+	<Option>
+		<code>002</code>
+		<url>hfMngBusi/merbusiconf/export.do</url>
+	</Option>
+	<!-- 禁用按钮 -->
+	<Option>
+		<code>003</code>
+		<url>hfMngBusi/merbusiconf/disable.do</url>
+	</Option>
+	<!-- 启用按钮 -->
+	<Option>
+		<code>004</code>
+		<url>hfMngBusi/merbusiconf/enable.do</url>
+	</Option>
+	<!-- 添加按钮 -->
+	<Option>
+		<code>005</code>
+		<url>hfMngBusi/merbusiconf/save.do</url>
+	</Option>
+	
+	<!-- 审核通过操作 -->
+	<Option>
+		<code>011</code>
+		<url>hfMngBusi/merbusiconfaudit/auditPass.do</url>
+	</Option>
+	<!-- 审核不通过操作 -->
+	<Option>
+		<code>012</code>
+		<url>hfMngBusi/merbusiconfaudit/auditNotPass.do</url>
+	</Option>
+</Options>

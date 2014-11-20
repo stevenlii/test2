@@ -1,0 +1,463 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+﻿<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<link rel="stylesheet" href="$request.contextPath/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/zTreeStyle.css">
+<script src="$request.contextPath/js/ui/jquery.ztree.all-3.4.js"></script>
+<script src="$request.contextPath/js/busi/goodsInf.js"></script>
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/validate/css/v1.css">
+
+<script>
+var setting = {
+	data: {simpleData: {enable: true}},
+	callback: {beforeClick: beforeClick,onClick: onClick}
+};
+	    $.validator.addMethod("notEmpty", function(value) {
+	    	if(getPushInfValue()=="11"){
+	    		return true;
+	  		}else{
+	  			if(value==""){
+	  				return false;
+	  			}
+	  		}
+	    	return true;
+	    }, '请填写商品描述');
+        
+  	 jQuery(document).ready(function() {
+  		jQuery("#container").width(jQuery(window).width());
+  		
+  		var zNodes1="${zNodes}";
+  		var zNodes=eval(zNodes1);
+  		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+  		var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+  		var node = treeObj.getNodeByParam("id", "$!{goods.category}", null);
+  		if(node!=null){
+  			treeObj.selectNode(node);
+  			onClick("", "treeDemo", node);
+  		}
+  		
+  		if(getPushInfValue()=="11"){
+  			hideStar('star');
+  		}
+            //获取风控类型列表
+  	 $('#goodsType').omCombo({
+                dataSource : '$request.contextPath/option/goodstype.do',
+                width:'150px',
+                listMaxHeight:150,
+                emptyText:'请选择..',
+                forceSelection: true,
+                onSuccess:function(data, textStatus, event){
+					if(data.length!=0){
+				  	    //回风控类型填值
+				        $('#goodsType').omCombo('value','$!{goods.goodsType}');
+					} 
+  	 			}
+            });
+  	
+	  	  $.validator.addMethod("notEmptyBY", function(value) {
+	      	if($("input[name='pushInfBY']:checked").val()=="11"){
+	      		return true;
+	    		}else{
+	    			if(value==""){
+	    				return false;
+	    			}
+	    		}
+	      	return true;
+	      }, '请填写商品描述');
+	  	$.validator.addMethod("notChinese", function(value) {
+		 	var words = value.split("");
+		 	for (var i=0;i<words.length;i++) {
+				if(words[i].charCodeAt(0)>256){
+					return false;
+				}
+			}
+	        return true;
+	    }, "客服电话只能为数字或字符");
+  	 	  jQuery("#dataform").validate({
+                rules : {
+                    "goodsName": {
+                        required : true,
+                        maxlength : 13
+                    },
+                    "busiType": {
+                        required : true
+                    },
+                     "category" : {
+                    	required : true
+                    },
+                     "servType" : {
+                    	required : true
+                    },
+                    "servMonth" : {
+                        required : true,
+                        digits :  true
+                    },
+                     "conMode" :  {
+                        required :true 
+                    },
+                     "interval" :  {
+                        required :true,
+                        digits :  true
+                    }, 
+                    "goodsType" : {
+                    	required : true
+                    },
+                    "pushInf" : {
+                        required :true
+                    },
+                    "goodsDesc1" : {
+                    	notEmpty : true,
+                    	maxlength : 44
+                    },
+                    "goodsDesc2" : {
+                    	notEmpty : true,
+                    	maxlength : 25
+                    },
+                    "cusPhone" :{
+                       required:true,
+                       notChinese:true
+                    }
+                },
+                messages : {
+                    "goodsName": {
+                        required : "请输入商户名称",
+                        maxlength : "商品名长度不能超过13位"
+                    },
+                    "busiType":{
+                      required : " 请选择业务覆盖类型"
+                    },
+                    "category":{
+                      required : " 请选择商品类型"
+                    },
+                    "servType":{
+                      required : " 请选择服务类型"
+                    },
+                    "servMonth" : {
+                        required : "请填写服务月份" ,
+                        digits :  "请填写数字"
+                    },
+                    "conMode" :  {
+                        required :  "请选择续费方式"
+                    },
+                     "interval" :  {
+                        required : "请填写间隔周期",
+                        digits :   "请填写数字"
+                    },
+                    "goodsType":{
+                        required : " 请选择风控类型"
+                      },
+                      "pushInf" : {
+                          required : "请选择商品信息"
+                       },
+                      "goodsDesc1" : {
+                      	maxlength : "按次商品最多44个字"
+                      },
+                      "goodsDesc2" : {
+                      	maxlength : "包月商品最多25个字"
+                      },
+                    "cusPhone":{
+                      required : "请填写客服电话"
+                     }
+                },
+                errorPlacement : function(error, element) { 
+                    if(error.html()){
+	                    $(element).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            var attentionElement = $(this).next().children().eq(0);
+	                            attentionElement.css('display','block');
+	    	                    attentionElement.next().html(error);
+	    	                    attentionElement.next().css('display','block');
+	                        }
+	                    });
+                    }
+    	        },
+    	        showErrors: function(errorMap, errorList) {
+                    if(errorList && errorList.length > 0){
+                        $.each(errorList,function(index,obj){
+                            var msg = this.message;
+                            $(obj.element).parents().map(function(){
+    	                        if(this.tagName.toLowerCase()=='td'){
+    	                            var attentionElement = $(this).next().children().eq(0);
+    	                            attentionElement.show();
+    	    	                    attentionElement.next().html(msg);
+    	                        }
+    	                    });
+ 	                   });
+                    }else{
+                        $(this.currentElements).parents().map(function(){
+	                        if(this.tagName.toLowerCase()=='td'){
+	                            $(this).next().children().eq(0).hide();
+	                        }
+	                    });
+                    }
+                    this.defaultShowErrors();
+                },
+                submitHandler : function(){
+ 					jQuery(this).submit();
+                    return false;
+                }
+            });
+  	 	 jQuery('#dataform').submit(function() {
+  	 		 if($!{goods.servType}==2){
+  	 			 $("#goodsDesc").val( $("#goodsDesc1").val() );
+  	 		 }else{
+  	 			 $("#goodsDesc").val( $("#goodsDesc2").val() );
+  	 		 }
+  	 	 	if (!jQuery("#dataform").valid()) 
+                 return false;
+  	 	    if(!checkAmount()){ //验证金额问题
+    	        return false;
+            }
+  	 	    
+  	 	    //start  校验是否有修改的数据 
+  	 	    var goodsName=$("input[name='goodsName']").val();
+ 	    	var busiType = "";
+ 	    	$("input[name='busiType']:checked").each(function(){
+                	busiType += $(this).val();
+            });
+ 	    	if(busiType == "1001"){
+ 	    		busiType = "11";
+ 	    	}
+  	 	  	var category=$("input[name='category']").val();
+  	 	  	var goodsType=$("input[name='goodsType']").val();
+  	 	  	var priceMode=$('input:radio[name="priceMode"]:checked').val();
+	  	 	var pushInf=$('input:radio[name="pushInf"]:checked').val();
+	  	 	if(pushInf=="01"){
+	  	 		pushInf="1";
+	  	 	}
+	  	 	var amount=$("input[name='amount']").val();
+	  	 	var goodsDesc=$("input[name='goodsDesc']").val();
+	  	 	var cusPhone=$("input[name='cusPhone']").val();
+  	 	  	if("$!{goods.goodsName}" == goodsName){
+  	 	  		if("$!{goods.busiType}" == busiType){
+  	 	  			if("$!{goods.category}" == category){
+  	 	  				if("$!{goods.goodsType}" == goodsType){
+  	 	  					if("$!{goods.priceMode}" == priceMode){
+  	 	  						if("$!{goods.pushInf}" == pushInf){
+	  	 	  						var flag = true;
+	  	 	  						if(priceMode == 0){
+	  	 	  							if("$!{goods.amount}" != amount){
+	  	 	  								flag = false;
+	  	 	  							}
+	  	 	  						}
+	  	 	  						if(flag){
+	  	 	  							if("$!{goods.goodsDesc}" == goodsDesc){
+	  	 	  								if("$!{goods.cusPhone}" == cusPhone){
+	  	 	  									if(3 == $!{goods.servType}){
+	  	 	  										var servMonth=$("input[name='servMonth']").val();
+	  	 	  										var conMode=$('input:radio[name="conMode"]:checked').val();
+	  	 	  										var interval=$("input[name='interval']").val();
+	  	 	  										if("$!{goods.servMonth}" == servMonth && "$!{goods.conMode}" == conMode
+	  	 	  												&& "$!{goods.interval}" == interval){
+	  	 	  											window.parent.$.omMessageBox.alert({
+	  	 	  												content:'没有修改，不需提交'
+	  	 	  											});
+	  	 	  											return false;
+	  	 	  										}
+	  	 	  									}else{
+	  	 	  										window.parent.$.omMessageBox.alert({
+	  	 	  											content:'没有修改，不需提交'
+	  	 	  										});
+	  	 	  										return false;
+	  	 	  									}
+	  	 	  								}
+	  	 	  							}
+	  	 	  						}
+  	 	  						}
+  	 	  					}
+  	 	  				}
+  	 	  			}
+  	 	  		}
+  	 	  	}
+  	 	  	//校验修改 end
+  	 	  	
+            jQuery(this).omAjaxSubmit({async:  false,success:function(res){           
+            	var msg = "";
+	  			var ty = "";
+           		if(res !='1') {
+           			ty = 'error';
+    		  		var msg = '操作失败';
+    		  		if(res != '0'){
+    		  			msg = res;
+    		  		}
+    		   }else{
+    			   ty = 'success';
+    			   msg = '操作成功，已提交审核';
+    			   closeDialog(); 
+    			   window.parent.shuaxin();
+    		   }
+           		window.parent.$.omMessageBox.alert({
+           			type : ty,
+           			title : '操作提示',
+           			content : msg
+           		});
+	                 }
+	             });	             
+                  return false; 
+            });
+  	 	 
+  	 	 //增加定价模式与金额的联动
+  	 	if($("input[name='priceMode']:checked").val() == '0'){
+			jQuery('#amountSpan').show();
+		}else{
+			jQuery('#amountSpan').hide();
+		}
+  	 	jQuery("input[name='priceMode']").click(function(){
+  	 			if(this.value == '0'){
+  	 				jQuery('#amountSpan').show();
+  	 			}else{
+  	 				jQuery('#amountSpan').hide();
+  	 			}
+  	 	});
+
+  	 });
+  	 function showResponse(responseText, statusText) {
+        var result = eval("("+responseText+")");
+          if(result.code=='0'){
+          	window.parent.fillBackAndCloseDialog(result.msg);
+          }
+        }
+  //关闭窗口方法
+   function  closeDialog(){
+          window.parent.fillBackAndCloseDialog("#dialog"); 
+     }
+</script>
+</head>
+<body>
+<div id="container">
+    <form id ="dataform" method="post" name="dataform" action="${request.contextPath}/goodsinf/update.do">
+      <table class="infowrite" cellspacing="0" cellpadding="0">
+       <tr >
+         <th  width="20%" align="left" ><span>*</span>所属商户：</th>
+         <td   class="td"><label>
+          <input  name="merName"  value="$!{goods.merId}-$!{goods.merName}" type="text" disabled='disabled' class="input2"/> 
+          <input type="hidden" name="merId"  value="$!{goods.merId}" type="text"  /> 
+         </label></td>
+        <td width="25%" class="td"><span class="errorImg"></span><span class="errorMsg"></span></td> </tr>
+       <tr >
+         <th><span>*</span>商品号：</th>
+         <td class="td1"><input  name="goodsId"  value="$!{goods.goodsId}" type="text" disabled='disabled' class="input1"></td>
+         <input type="hidden" name="goodsId"  value="$!{goods.goodsId}" type="text"  /> 
+          <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td></tr>
+       <tr >
+         <th><span>*</span>商品名称：</th>
+         <td class="td"><input  name="goodsName"  value="$!{goods.goodsName}" type="text" size="30" maxlength="13" class="input2"></td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td> </tr>
+       <tr >
+         <th><span>*</span>业务覆盖：</th>
+         <td class="td1"><input type="checkbox" id="busiType1" name="busiType" value="10" #if($!{goods.busiType}=="10") checked="checked" #elseif ($!{goods.BusiType}=="11") checked #end />
+           全网 &nbsp;&nbsp;
+             <input type="checkbox" id="busiType2" name="busiType" value="01" #if($!{goods.busiType}=="01") checked  #elseif ($!{goods.BusiType}=="11") checked  #end />
+         省网 </td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+          </tr>
+       
+       <tr>
+         <th><span>*</span>商品分类：</th>
+        <td class="td">
+	        <span class="om-combo om-widget om-state-default" style="width: 150px;">
+		        <input type="text" id="goodsCategory" readonly value="" onclick="showMenu(''); return false;" onkeydown="refuseBackspace()" class="select1" style="width: 129px;"><span onclick="showMenu(''); return false;" class="om-combo-trigger ioi_trigger"></span>
+		    </span>
+	      	<input type="hidden" id="category" name="category" value="$!{goods.category}" type="text" />
+        </td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr >
+         <th><span>*</span>风控类型：</th>
+         <td class="td1"><input id="goodsType" name="goodsType" class="select1"/></td>
+          <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span>*</span>服务类型：</th>
+         <td class="td"><input type="radio" name="servType" value="$!{goods.servType}"  #if($!{goods.servType}==2)checked #end  onClick="display('servMonth','interval','conMode')" disabled='disabled'/>
+                              按次 &nbsp;&nbsp;
+           <input type="radio" name="servType" value="$!{goods.servType}" #if($!{goods.servType}==3) checked #end onClick="showTr('servMonth','interval','conMode')" disabled='disabled'/>
+                                    包月</td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+         <input type="hidden" name="servType" value="$!{goods.servType}"/>
+       </tr>
+       #if($!{goods.servType}==3)
+       <tr id="servMonth" >
+         <th><span>*</span>服务月份：</th>
+         <td class="td1"><input name="servMonth" value="$!{goods.servMonth}" type="text" maxlength="3" class="input1" /></div></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+        <th><span>*</span>续费方式：</th>
+           <td class="td"><input type="radio" name="conMode" value="0" #if($!{goods.conMode}==0)checked #end/>
+                                                   正向 &nbsp;&nbsp;
+               <input type="radio" name="conMode" value="1" #if($!{goods.conMode}==1)checked #end />
+                                                     反向
+               <input type="radio" name="conMode" value="2" #if($!{goods.conMode}==2)checked #end />
+                                            取消
+             </td>
+          <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+        </tr>
+      <tr>   
+         <th><span>*</span>间隔周期：</th>
+         <td class="td1"><input name="interval" type="text" value="$!{goods.interval}" maxlength="3" class="input1" /></td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+     </div>
+     #end
+        <tr>
+         <th><span>*</span>价格模式：</th>
+         <td class="td"><input type="radio" id="priceDJ" name="priceMode" value="0" #if($!{goods.priceMode}==0) checked #end/>
+                 定价 &nbsp;&nbsp;  <span id="amountSpan" style="color:black;"><input id="amount" name="amount" #if($!{goods.priceMode}==0) value="$!{goods.amount}"  #end size="13" maxlength="13" class="input1" />分</span>
+           <input type="radio" id="priceFDJ" name="priceMode" value="1" #if($!{goods.priceMode}==1) checked #end/>
+                非定价</td>
+         <td class="td"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span >*</span>商品信息：</th>
+         <td class="td1"><input type="radio" name="pushInf" value="12" #if($!{goods.pushInf}==12)checked #end onclick="showStar('star')" />
+                            下发描述+信息
+           <input type="radio" name="pushInf" value="11" #if($!{goods.pushInf}==11)checked #end onclick="hideStar('star')" />
+                             仅下发商品信息
+           <input type="radio" name="pushInf" value="01" #if($!{goods.pushInf}==01)checked #end onclick="showStar('star')" />
+                              仅下发商品描述</td>
+         <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+        <tr>
+         <th><span id="star">*</span>商品描述：</th>
+         <td class="td">
+         	<input type="hidden" name="goodsDesc" id="goodsDesc" value="$!{goods.goodsDesc}" type="text" />
+         	#if($!{goods.servType}==2)
+         		<input name="goodsDesc1" id="goodsDesc1" type="text" value="$!{goods.goodsDesc}" maxlength="45" class="input2" />
+         	#else
+         		<input name="goodsDesc2" id="goodsDesc2" type="text" value="$!{goods.goodsDesc}" maxlength="26" class="input2" />
+            #end
+         </td>
+          <td class="td"><span class="errorImg" id="imgstar"></span><span class="errorMsg" id="msgstar"></span></td>
+       </tr>
+     
+        <tr>
+         <th><span>*</span>客服电话：</th>
+         <td class="td1"><input name="cusPhone" type="text" value="$!{goods.cusPhone}" maxlength="32" class="input2" /></td>
+       <td class="td1"><span class="errorImg"></span><span class="errorMsg"></span></td>
+       </tr>
+       <tr>
+	       <td class="td" colspan="3"><span>*注意：<br/>走非小额支付银行扣费的商品:1.价格模式只能配置"定价模式";2.商品信息只能配置"下发描述+信息"。</td>
+	   </tr>
+     </table>
+	 <div class="pop_btn">
+	   <input name="Submit" type="submit" class="popbtn"  value="修改" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	     <input name="close" type="button" class="popbtn"  value="取消" onclick="closeDialog();" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'"/>
+	 </div>
+	 </form>
+</div>
+<div id="menuContent" class="list_zTree">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:160px; height:200px;overflow:auto;"></ul>
+</div>
+</body>
+</html> 
+  
+ 

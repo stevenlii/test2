@@ -1,0 +1,528 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css"
+        type="text/css">
+        <link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css"
+        type="text/css">
+        <script src="$request.contextPath/js/ui/jquery.min.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-core.js">
+        </script>
+        <script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-mouse.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-draggable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-position.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-resizable.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-dialog.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-validate.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-messagebox.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-button.js">
+        </script>
+        <script src="$request.contextPath/js/ui/js/om-combo.js">
+        </script>
+        <script src="$request.contextPath/js/busi/meraudit.js">
+        </script>
+        <script>
+            jQuery(document).ready(function() {
+                var optStr = "${opts}";
+                var opts = optStr.split(',');
+                jQuery('[code]').each(function() {
+                    var code = $(this).attr("code");
+                    for (var i = 0; i < opts.length; i++) {
+                        if (code == opts[i]) {
+                            $(this).css('display', 'inline');
+                        }
+                    };
+                });
+            });
+            //商户审核通过方法
+            function goPass(id) {
+                var resultDesc = document.getElementById("resultDesc").value;
+                if (byteCount(resultDesc) > 64) {
+                    alert("审核意见最大长度为64个字符！");
+                    return false;
+                }
+                var flag = confirm("确认审核通过此信息？");
+                if (flag) {
+                    $.ajax({
+                        url: '$request.contextPath/meraudit/merAuditPass.do',
+                        type: 'POST',
+                        dataType: 'text',
+                        data: {
+                            'id': id,
+                            'resultDesc': resultDesc
+                        },
+                        success: function(data) {
+                            closeDialog();
+                            window.parent.shuaxin();
+                            window.parent.showSimpleTip(data);
+                        }
+                    });
+                }
+            }
+        </script>
+    </head>
+    
+    <body>
+        <!--商户修改审核详情页面-->
+        <form id="dataform-mod" method="post" name="dataform-mod">
+            <div class="pop_list_sh">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="48%" valign="middle" class="td2">
+                            	修改前
+                        </td>
+                        <td width="10">
+                        </td>
+                        <td width="50%" class="td3">
+                            	修改后
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="10">
+                        </td>
+                        <td rowspan="2">
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table cellpadding="0" cellspacing="0" class="infowrite">
+                                <tr>
+                                    <th>
+                                        	商户号：
+                                    </th>
+                                    <td width="60%" class="td">
+                                        <label>
+                                            ${oldMer.merId}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	商户名称：
+                                    </th>
+                                    <td class="td1">
+                                        $!{oldMer.merName}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	业务属性：
+                                    </th>
+                                    <td class="td">
+                                        $!{oldMer.busiType}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	商户分类：
+                                    </th>
+                                    <td class="td1">
+                                        $!{oldMer.category}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	接口类型：
+                                    </th>
+                                    <td class="td">
+                                        $!{oldMer.interType}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	是否报备：
+                                    </th>
+                                    <td class="td1">
+                                        $!{oldMer.chnlCheck}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	对账下载：
+                                    </th>
+                                    <td class="td">
+                                        #if ($!{oldMer.fileDL} == 0) 否 #else 是 #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	运营负责人：
+                                    </th>
+                                    <td class="td1">
+                                        $!{oldMer.operator}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	公司名称：
+                                    </th>
+                                    <td class="td">
+                                        $!{oldMer.companyName}
+                                    </td>
+                                </tr>
+                                <tr>
+		                        <th>
+		                            	公司介绍：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                            $!{oldMer.companyDesc}
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	业务介绍：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                            $!{oldMer.busiDesc}
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	商户网址：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                            $!{oldMer.merWeb}
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	自有营销渠道：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                            $!{oldMer.saleChannel}
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	注册资本：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                            $!{oldMer.regCapital}&nbsp;万元
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	注册时间：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                            $!{oldMer.regTime}
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	商户来源：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                            $!{oldMer.srcMer}
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	年收益：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                            $!{oldMer.yearProfit}&nbsp;万元
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	用户规模：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                            $!{oldMer.userScale}&nbsp;人
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	运营支撑：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                            $!{oldMer.support}&nbsp;人
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            	分成比例：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                            $!{oldMer.sharedRate}
+		                        </td>
+		                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table cellpadding="0" cellspacing="0" class="infowrite">
+                                <tr>
+                                    <th>
+                                        	商户号：
+                                    </th>
+                                    <td width="60%" class="td">
+                                        ${audit.merId}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	商户名称：
+                                    </th>
+                                    <td class="td1">
+                                        #if($!{audit.merName} != $!{oldMer.merName})
+                                        <span>
+                                            $!{audit.merName}
+                                        </span>
+                                        #else $!{audit.merName} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	业务属性：
+                                    </th>
+                                    <td class="td">
+                                        #if(${audit.busiType} != ${oldMer.busiType})
+                                        <span>
+                                            $!{audit.busiType}
+                                        </span>
+                                        #else $!{audit.busiType} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	商户分类：
+                                    </th>
+                                    <td class="td1">
+                                        #if(${audit.category} != ${oldMer.category})
+                                        <span>
+                                            $!{audit.category}
+                                        </span>
+                                        #else $!{audit.category} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	接口类型：
+                                    </th>
+                                    <td class="td">
+                                        #if(${audit.interType} != ${oldMer.interType})
+                                        <span>
+                                            $!{audit.interType}
+                                        </span>
+                                        #else $!{audit.interType} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	是否报备：
+                                    </th>
+                                    <td class="td1">
+                                        #if(${audit.chnlCheck} != ${oldMer.chnlCheck})
+                                        <span>
+                                            $!{audit.chnlCheck}
+                                        </span>
+                                        #else $!{audit.chnlCheck} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	对账下载：
+                                    </th>
+                                    <td class="td">
+                                        #if(${audit.fileDL} != ${oldMer.fileDL})
+                                        <span>
+                                            $!{audit.fileDLName}
+                                        </span>
+                                        #else $!{audit.fileDLName} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	运营负责人：
+                                    </th>
+                                    <td class="td1">
+                                        #if($!{audit.operator} != $!{oldMer.operator})
+                                        <span>
+                                            $!{audit.operator}
+                                        </span>
+                                        #else $!{audit.operator} #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        	公司名称：
+                                    </th>
+                                    <td class="td">
+                                        #if(${audit.companyName} != ${oldMer.companyName})
+                                        <span>
+                                            $!{audit.companyName}
+                                        </span>
+                                        #else $!{audit.companyName} #end
+                                    </td>
+                                </tr>
+                                <tr>
+		                        <th>
+		                            公司介绍：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                        	#if($!{audit.companyDesc} != $!{oldMer.companyDesc})
+                                        <span>
+                                            $!{audit.companyDesc}
+                                        </span>
+                                    #else $!{audit.companyDesc} #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            业务介绍：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                        	#if($!{audit.busiDesc} != $!{oldMer.busiDesc})
+                                        <span>
+                                            $!{audit.busiDesc}
+                                        </span>
+                                    #else $!{audit.busiDesc} #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            商户网址：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                        	#if($!{audit.merWeb} != $!{oldMer.merWeb})
+                                        <span>
+                                            $!{audit.merWeb}
+                                        </span>
+                                    #else $!{audit.merWeb} #end
+		                            
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            自有营销渠道：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                        	#if($!{audit.saleChannel} != $!{oldMer.saleChannel})
+                                        <span>
+                                            $!{audit.saleChannel}
+                                        </span>
+                                    #else $!{audit.saleChannel} #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            注册资本：
+		                        </th>
+		                        <td class="td1" colspan="2">
+									#if($!{audit.regCapital} != $!{oldMer.regCapital})
+                                        <span>
+                                            $!{audit.regCapital}&nbsp;万元
+                                        </span>
+                                    #else $!{audit.regCapital}&nbsp;万元 #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            注册时间：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                        	#if($!{audit.regTime} != $!{oldMer.regTime})
+                                        <span>
+                                            $!{audit.regTime}
+                                        </span>
+                                    #else $!{audit.regTime} #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            商户来源：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                        	#if($!{audit.srcMer} != $!{oldMer.srcMer})
+                                        <span>
+                                            $!{audit.srcMer}
+                                        </span>
+                                    #else $!{audit.srcMer} #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            年收益：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                        	#if($!{audit.yearProfit} != $!{oldMer.yearProfit})
+                                        <span>
+                                            $!{audit.yearProfit}&nbsp;万元
+                                        </span>
+                                    #else $!{audit.yearProfit}&nbsp;万元 #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            用户规模：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                        	#if($!{audit.userScale} != $!{oldMer.userScale})
+                                        <span>
+                                            $!{audit.userScale}&nbsp;人
+                                        </span>
+                                    #else $!{audit.userScale}&nbsp;人 #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            运营支撑：
+		                        </th>
+		                        <td class="td" colspan="2">
+		                        	#if($!{audit.support} != $!{oldMer.support})
+                                        <span>
+                                            $!{audit.support}&nbsp;人
+                                        </span>
+                                    #else $!{audit.support}&nbsp;人 #end
+		                        </td>
+		                    </tr>
+		                    <tr>
+		                        <th>
+		                            分成比例：
+		                        </th>
+		                        <td class="td1" colspan="2">
+		                        	#if($!{audit.sharedRate} != $!{oldMer.sharedRate})
+                                        <span>
+                                            $!{audit.sharedRate}
+                                        </span>
+                                    #else $!{audit.sharedRate} #end
+		                        </td>
+		                    </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="63" colspan="3" align="left" valign="bottom">
+                            <textarea id="resultDesc" name="resultDesc" rows="3" style="{width:100%;}">
+                            </textarea>
+                        </td>
+                    </tr>
+                </table>
+                <div class="pop_btn_sh">
+                    <input type="button" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'"
+                    onmouseout="this.className='popbtn'" value="通过" onclick="goPass($audit.id)"
+                    />
+                    <input type="button" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'"
+                    onmouseout="this.className='popbtn'" value="不通过" onclick="goNotPass($audit.id)"
+                    />
+                    <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'"
+                    onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog(0)"
+                    />
+                </div>
+            </div>
+        </form>
+    </body>
+
+</html>

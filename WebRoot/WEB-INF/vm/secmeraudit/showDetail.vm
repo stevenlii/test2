@@ -1,0 +1,49 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/secmeraudit.js"></script>
+</head>
+<body>
+<div>	
+<!--审核后的商户详情页面-->
+<form id="dataform" method="post" name="dataform">
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0" width="100%" >
+		<tr>
+		    <th width="125">二级商户号：</th>
+			<td class="td">${newSecMer.subMerId}</td>
+			#if(${auditType}==3)
+				<td width="40%" class="td" rowspan="2"><h2>禁用-><span style="color:red">启用</span><h2></td>
+			#elseif(${auditType}==4)
+				<td width="40%" class="td" rowspan="2"><h2>启用-><span style="color:red">禁用</span><h2></td>
+			#end
+		</tr>
+		<tr>
+		    <th >二级商户名称：</th>
+			<td class="td1">$!{newSecMer.subMerName}</td>
+		</tr>
+		<tr>
+		    <th>运营负责人：</th>
+			<td class="td" colspan="2">$!{newSecMer.operator}</td>
+		</tr>
+		#if(${resultDesc} == "")
+	     #else
+	     	<tr><td height="63" colspan="3" align="left" valign="bottom"><textarea id="resultDesc1" rows="3" disabled="disabled" style="width:98%">$!{resultDesc}</textarea></td></tr>
+	     #end
+	</table>
+	 <div class="pop_btn_sh">
+	   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	 </div>
+</form>
+</div>
+</body>
+</html>

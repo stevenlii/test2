@@ -1,0 +1,80 @@
+<html>
+<head>
+<link rel="stylesheet" href="${request.contextPath}/profile/default/css/common.css" type="text/css">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/busi/chnlbankaudit.js"></script>
+<script>
+jQuery(document).ready(function() {
+	var optStr="${opts}";
+	var opts=optStr.split(',');
+	jQuery('[code]').each(function () {
+		var code=$(this).attr("code");
+		for(var i=0;i<opts.length;i++){
+			if(code==opts[i]){
+				$(this).css('display','inline');						
+			}
+		};
+	});
+});
+</script>
+</head>
+<body>
+<!--新增或启用/禁用审核详情页面-->
+<form id ="dataform-add" method="post" name="dataform-add">
+<table align="center" style="width:100%">
+<tr><td>
+	<table align="left" class="infowrite" cellspacing="0" cellpadding="0" width="100%" >
+		<tr>
+		    <th width="115">渠道编号：</th>
+			<td class="td" colspan="2">${chnlBank.channelId}</td>
+		</tr>
+		<tr>
+		    <th >渠道名称：</th>
+			<td class="td1" colspan="2">$!{chnlName}</td>
+		</tr>
+		<tr>
+		    <th>上线省份：</th>
+			<td class="td">$!{bankName}</td>
+			#if(${audit.auditType}==3)
+				<td width="40%" class="td" rowspan="2"><h2>禁用-><span style="color:red">启用</span><h2></td>
+			#elseif(${audit.auditType}==4)
+				<td width="40%" class="td" rowspan="2"><h2>启用-><span style="color:red">禁用</span><h2></td>
+			#else
+				<td class="td"></td>
+			#end
+		</tr>
+		<tr>
+		    <th>负责人：</th>
+			<td class="td1">$!{chnlBank.service_user}</td>
+			#if(${audit.auditType}==1)
+				<td class="td1"></td>
+			#end
+		</tr>
+		<tr>
+			<td colspan="3" align="left" valign="bottom"><textarea id="resultDesc" name="resultDesc" rows="3" style="width:100%;" #if($!{audit.state}==0)#else disabled="disabled" #end>$!{audit.resultDesc}</textarea></td>
+		</tr>
+		</table>
+		</td></tr>
+		<tr><td align="center">
+			#if($!{audit.state}==0)
+			   <input type="button" class="popbtn" code="011" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="通过" onclick="goPass1($audit.id)"/>
+			   <input type="button" class="popbtn" code="012" style="display:none" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="不通过" onclick="goNotPass($audit.id)"/>
+			#end
+			   <input type="button" class="popbtn" onmouseover="this.className='popbtnhover'" onmouseout="this.className='popbtn'" value="关闭" onclick="closeDialog()"/>
+		</td></tr>
+	</table>
+</form>
+</body>
+</html>

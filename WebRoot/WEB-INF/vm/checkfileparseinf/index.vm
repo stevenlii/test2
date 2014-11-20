@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css" >
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script src="$request.contextPath/js/busi/checkfileparseinf.js"></script>
+<style>
+	.input_text {
+	    border: 1px solid #6D869E;
+	    height: 17px;
+	    vertical-align: middle;
+	    width: 50%;
+	}
+	.errorMsg {
+	    background:  url("$request.contextPath/profile/validate/images/alert.png) center no-repeat white;
+		background-position: 5px 50%;
+		background-color: #FCEFE3;
+		text-align: left;
+		padding: 2px 2px 2px 25px;
+		border: 1px solid red;
+		display: none;
+		width: 100px;
+		margin-top: -18px;
+		margin-left: 18px;
+		position: absolute;
+		border-radius: 4px;
+	}
+	.errorImg{
+	    background: url("$request.contextPath/profile/validate/images/invalid.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 16px;
+	    cursor: pointer;
+	    vertical-align: inherit;
+	}
+	/*自定义图标，样式前加上om-messageTip，提高其优先级*/
+    .om - messageTip.om - messageTip - image - aomsdk {
+        background - image: url("$request.contextPath/profile/validate/images/invalid.png");
+    }
+</style>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+		// 按钮权限控制
+        var optStr = "${opts}";
+        var opts = optStr.split(',');
+        jQuery('[code]').each(function() {
+            var code = $(this).attr("code");
+            for (var i = 0; i < opts.length; i++) {
+                if (code == opts[i]) {
+                    $(this).css('display', 'inline');
+                }
+            }
+        });
+		
+		$(".signin").click(function(e) {
+            e.preventDefault();
+            $("fieldset#signin_menu").toggle();
+            $(".signin").toggleClass("menu-open");
+        });
+		
+		$("fieldset#signin_menu").mouseup(function() {
+			return false
+		});
+		
+		$(document).mouseup(function(e) {
+			if($(e.target).parent("a.signin").length==0) {
+				$(".signin").removeClass("menu-open");
+				$("fieldset#signin_menu").hide();
+			}
+		});	
+		
+		//初始化商户列表
+        $('#merId').omCombo({
+             dataSource: '$request.contextPath/option/couponmerinflist.do',
+            width: '135px',
+            emptyText: '请选择..',
+            forceSelection: true,
+            listAutoWidth: true
+        });
+		
+		//初始化文件类型列表
+        $('#fileType').omCombo({
+            dataSource: [{text:'日交易',value:'1'},{text:'日清算',value:'2'},{text:'月清算',value:'3'}],
+            width: '80px',
+            emptyText: '请选择..',
+            forceSelection: true
+        });
+		
+		//初始化文件状态列表
+        $('#fileState').omCombo({
+            dataSource: [{text:'初始化',value:'1'},{text:'已校验',value:'2'},{text:'已转换',value:'3'},{text:'已完成',value:'4'},{text:'已完成(无交易)',value:'5'}],
+            width: '80px',
+            emptyText: '请选择..',
+            forceSelection: true,
+            listAutoWidth: true
+        });
+		
+        jQuery('#grid').omGrid({
+            dataSource: "$request.contextPath/checkfileparseinf/query.do?queryKey=checkfileparseinf.all",
+            width: '100%',
+            height: 446,
+            limit: 15,
+            colModel: [{
+                header: '对账时间',
+                name: 'statDate',
+                width: 100,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.STATDATE + "'>" + rowData.STATDATE + "</a>";
+                }
+            },
+        
+            {
+                header: '商户',
+                name: 'mer',
+                width: 320,
+                align: 'left',
+				renderer: function(value, rowData, rowIndex) {
+					return "<a title='" + rowData.MERID + "'>" + rowData.MERNAME + "（" + rowData.MERID + "）" + "</a>";
+                }
+            },
+            {
+                header: '文件类型',
+                name: 'fileType',
+                width: 160,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					var fileTypeName = '';
+					if( rowData.FILETYPE == '1' ){
+						fileTypeName = '日交易';
+					}else if( rowData.FILETYPE == '2' ){
+						fileTypeName = '日清算';
+					}else if( rowData.FILETYPE == '3' ){
+						fileTypeName = '月清算';
+					}else{
+						'未知类型';
+					}
+					return "<a title='" + fileTypeName + "'>" + fileTypeName + "</a>";
+                }
+            },
+            {
+                header: '文件状态',
+                name: 'fileState',
+                width: 160,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+					var fileStateName = '';
+					if( rowData.FILESTATE == '1' ){
+						fileStateName = '初始化';
+					}else if( rowData.FILESTATE == '2' ){
+						fileStateName = '已效验';
+					}else if( rowData.FILESTATE == '3' ){
+						fileStateName = '已转化';
+					}else if( rowData.FILESTATE == '4' ){
+						fileStateName = '已完成';
+					}else if( rowData.FILESTATE == '5' ){
+						fileStateName = '已完成(无交易)';
+					}else{
+						'未知状态';
+					}
+                    return "<a title='" + fileStateName + "'>" + fileStateName + "</a>";
+                }
+            },
+            {
+                header: '错误次数',
+                name: 'dealTimes',
+                width: 120,
+                align: 'left',
+                renderer: function(value, rowData, rowIndex) {
+                    return "<a title='" + rowData.DEALTIMES + "'>" + rowData.DEALTIMES + "</a>";
+                }
+            },
+            {
+                header: '操作',
+                name: 'optr',
+                width: 100,
+                align: 'center',
+                renderer: function(value, rowData, rowIndex) {
+                    var result = "<img title='错误次数置零' src='${request.contextPath}/profile/default/images/tool_modify.png' onclick='resetDealTimes(\"" + rowData.FILENAME + "\",\"" + rowData.FILETYPE + "\")' />";
+					//result += "&nbsp;&nbsp;<img title='删除' src='${request.contextPath}/profile/default/images/tool_del.png' onclick='deleteTask(\"" + rowData.FILENAME + "\",\"" + rowData.FILETYPE + "\")' />";
+					if( rowData.FILESTATE == '4' || rowData.FILESTATE == '5' ){
+						result += "&nbsp;&nbsp;<img title='重新导入' src='${request.contextPath}/profile/default/images/tool_Enable.png' onclick='reset(\"" + rowData.FILENAME + "\",\"" + rowData.FILETYPE + "\")' />";
+					}else{
+						result += "&nbsp;&nbsp;<img title='重新导入' src='${request.contextPath}/profile/default/images/tool_Enable1.png' />";
+					}
+					
+                    return result;
+                }
+            }]
+        });
+
+        jQuery( "#dialog").omDialog({
+            autoOpen: false
+        });
+        
+		jQuery('#modify').bind('click',
+        function() {
+            var selections = $('#grid').omGrid('getSelections', true);
+            if (selections.length == 0) {
+                alert('请至少选择一行记录');
+                return false;
+            }
+            showModifyDialog(selections[0].MERID); //显示dialog
+        });
+		
+		$('.errorImg').bind('mouseover',function(){
+        $(this).next().css('display','block');
+		}).bind('mouseout',function(){
+				$(this).next().css('display','none');
+		});
+		
+		jQuery('#dataform').submit(function() {
+			if (!jQuery("#dataform").valid()) 
+				return false;
+			jQuery(this).omAjaxSubmit({
+    			success:function(res){
+ 
+				}
+			});
+			
+			return false; 
+		});
+	});
+	
+	
+	var timeout = 500;
+    var closetimer= 0;
+    var ddmenuitem = 0;
+    // open hidden layer
+    function mopen(id)
+    {	
+    	// cancel close timer
+    	mcancelclosetime();
+    
+    	// close old layer
+    	if(ddmenuitem) ddmenuitem.style.visibility = 'hidden';
+    
+    	// get new layer and show it
+    	ddmenuitem = document.getElementById(id);
+    	ddmenuitem.style.visibility = 'visible';
+    
+    }
+    // close showed layer
+    function mclose()
+    {
+    	if(ddmenuitem) ddmenuitem.style.visibility = 'hidden';
+    }
+    
+    // go close timer
+    function mclosetime()
+    {
+    	closetimer = window.setTimeout(mclose, timeout);
+    }
+    
+    // cancel close timer
+    function mcancelclosetime()
+    {
+    	if(closetimer)
+    	{
+    		window.clearTimeout(closetimer);
+    		closetimer = null;
+    	}
+    }
+    
+    // close layer when click-out
+    document.onclick = mclose; 
+</script>
+</head>
+<body>
+ <div class="main_list">
+ 
+   <!--列表查询区-->
+   <div class="list_search" style="height: 40px;">
+   <table width="100%" border="0">
+   <tr>
+    <td>
+      <form id="form" action="" method="post"> 
+        <table width="100%" border="0">
+          <tr height="50">
+			<th width="10%">商户：</th>
+              <td><input id="merId" name="merId" /></td>
+            <th width="10%">文件类型：</th>
+              <td><input id="fileType" name="fileType" /></td>
+		   <th width="10%">文件状态：</th>
+             <td><input id="fileState" name="fileState" /></td>
+           <th width="10%">开始时间：</th>
+		     <td><input type="text" id="startDate" name="startDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+		   <th width="10%">结束时间：</th>
+		     <td><input type="text" id="endDate" name="endDate" onfocus="WdatePicker({startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})" class="Wdate" style="width:100px"/></td>
+         </tr>
+        </table>
+       </form> 
+       </td>
+        <td rowspan="2">
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<input id="query" name="query" type="image" value="ee" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query()"  />
+			&nbsp;&nbsp;<input name="添加兑换券" type="image"  value="ee" src="${request.contextPath}/profile/default/images/btn_Add.png" onclick="add()"/>
+        </td>
+       </tr>
+        </table>
+      </div>
+    
+ <!--列表查询区-->
+
+  <div align="center">
+         <table  align="left" id="grid" ></table>
+     </div>
+    
+  
+ <div id="dialog">
+	<iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+
+</body>
+</html>

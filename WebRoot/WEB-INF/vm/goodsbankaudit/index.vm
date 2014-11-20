@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${request.contextPath}/js/ui/themes/default/om-all.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/profile/default/css/common.css">
+<script src="$request.contextPath/js/ui/jquery.min.js"></script>
+<script src="$request.contextPath/js/ui/js/om-core.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-grid.js"></script>
+<script src="$request.contextPath/js/ui/js/om-mouse.js"></script>
+<script src="$request.contextPath/js/ui/js/om-draggable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-position.js"></script>
+<script src="$request.contextPath/js/ui/js/om-resizable.js"></script>
+<script src="$request.contextPath/js/ui/js/om-dialog.js"></script>
+<script src="$request.contextPath/js/ui/js/om-combo.js"></script>
+<script src="$request.contextPath/js/ui/js/om-messagebox.js"></script>
+<script src="$request.contextPath/js/ui/js/om-button.js"></script>
+<script src="$request.contextPath/js/ui/js/om-calendar.js"></script>
+<script src="$request.contextPath/js/ui/js/om-validate.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/om-ajaxsubmit.js"></script>
+<script src="$request.contextPath/js/busi/goodsbankaudit.js"></script>
+<script type="text/javascript" src="$request.contextPath/js/ui/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+ 	  var url="$request.contextPath/goodsbankaudit/query.do?queryKey=audit.allGoodsBankAudits";
+ 	  
+      jQuery(document).ready(function() {
+    	  jQuery("#search_div").width(jQuery(window).width()-20);
+    	  
+    	  var optStr="${opts}";
+    	  var opts=optStr.split(',');
+    	  jQuery('[code]').each(function () {
+    		  var code=$(this).attr("code");
+    		  for(var i=0;i<opts.length;i++){
+    			  if(code==opts[i]){
+    				  $(this).css('display','inline');						
+    			  }
+    		  };
+    	  });
+    	  
+		jQuery('#grid').omGrid({
+				dataSource : "$request.contextPath/goodsbankaudit/query.do?queryKey=audit.allGoodsBankAudits",
+				width:'100%',
+				autoFit : true,
+                height : 455,
+                limit : 15,
+                singleSelect : false,
+                colModel : [ {header : '商户号', name : 'MERID',width : 100, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}}, 
+                             {header : '商品号', name : 'GOODSID',width : 80, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}}, 
+                             {header : '商品银行', name : 'BANKNAME', width : 100, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"("+rowData.BANKID+")'>"+value+"("+rowData.BANKID+")</a>";
+                             		}}, 
+                             {header : '提交时间', name : 'INTIME', width : 100, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}}, 
+                             {header : '提交人', name : 'CREATOR',width : 60, align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}}, 
+                             {header : '审核人', name : 'MODUSER',width : 60,align : 'center',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}}, 
+                             {header : '审核类型', name : 'AUDITTYPE',width : 70,align : 'center',renderer:function(value , rowData , rowIndex){
+                             			if (value=='1')
+     											return "<a title='新增'>新增</a>";
+     									else if (value=='2')
+					                 			return "<a title='修改'>修改</a>";
+					                 	else if (value=='3')
+					                 			return "<a title='启用'>启用</a>";
+					                 	else if (value=='4')
+					                 			return "<a title='禁用'>禁用</a>";
+					                 	else if (value=='0')
+					                 			return "<a title='未知'>未知</a>";
+                             		}}, 
+                             {header : '审核状态', name : 'STATE',width : 70,align : 'center',renderer:function(value , rowData , rowIndex){
+                           				if (value==1)
+                       						return "<a title='不通过'>不通过</a>";
+					                 	else if (value==0)
+				                 			return "<a title='待审核'>待审核</a>";
+					                 	else if (value==2)
+				                 			return "<a title='通过'>通过</a>";
+                             		}},
+                     		 {header : '操作原因', name : 'DESC',width : 80,align : 'left',renderer:function(value , rowData , rowIndex){
+                             			return "<a title='"+value+"'>"+value+"</a>";
+                             		}},
+                             {header : '操作', name:'',width : 130, align : 'center',renderer:function(value , rowData , rowIndex){
+                                	var state = rowData.STATE;
+                 					var auditType = rowData.AUDITTYPE;
+                 					var id = rowData.ID;
+                 					var result="";
+                 					if (auditType=='0'){
+                 						return "<span color='red'>非法数据</span>";
+                 					} else {
+                 						if(state==0){ //待审核，操作按钮正常
+                 							if(optStr.indexOf("011")!=-1){
+                                     			result+="<input name='通过' title='通过' type='image' src='${request.contextPath}/profile/default/images/tool_pass.png' onclick='singlePass(&quot;" + id + "&quot;)'/>&nbsp;";
+                                     		}
+                                     		if(optStr.indexOf("012")!=-1){
+                                     			result+="<input name='不通过' title='不通过' type='image' src='${request.contextPath}/profile/default/images/tool_nopass.png' onclick='openNotPass(&quot;" + id + "&quot;)'/>&nbsp;";
+                                     		}
+                 						}else{  //已审核，操作按钮变灰
+                 							if(optStr.indexOf("011")!=-1){
+                                     			result+="<input name='通过' title='通过' type='image' src='${request.contextPath}/profile/default/images/tool_pass1.png' />&nbsp;";
+                                     		}
+                                     		if(optStr.indexOf("012")!=-1){
+                                     			result+="<input name='不通过' title='不通过' type='image' src='${request.contextPath}/profile/default/images/tool_nopass1.png' />&nbsp;";
+                                     		}
+                 						}
+                 						result+="<input id='detail' name='detail' type='image' title='详细' src='${request.contextPath}/profile/default/images/tool_details.png' onclick='show(&quot;" + id + "&quot;, " + auditType + "," + state + ")' />";
+                                     	return result;
+                 					}
+               }}],
+               autoFit:true
+            });
+            
+            jQuery( "#dialog").omDialog({
+                autoOpen: false
+             });
+        
+        //获取提交人列表
+        $('#creator').omCombo({
+               dataSource : '$request.contextPath/option/creatorlist.do',
+                width:'91px',
+                emptyText:'全部 ' ,
+                listMaxHeight:150,
+                onSuccess:function(data, textStatus, event){
+	      	     var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	      	     data.unshift(tmp);
+                } ,
+                forceSelection : true   ,
+                lazyLoad : true
+            });
+            
+        //获取审核人列表   modUser
+        $('#modUser').omCombo({
+               dataSource : '$request.contextPath/option/modUserlist.do',
+               width:'91px',
+               emptyText:'全部 ' ,
+               listMaxHeight:150,
+               onSuccess:function(data, textStatus, event){
+	      	    var tmp = $.parseJSON('{"value":"","text":"全部"}');
+	      	    data.unshift(tmp);
+               } ,
+               forceSelection : true   ,
+               lazyLoad : true
+            });
+        //初始化审核状态
+        $('#state').omCombo({
+               dataSource : [{text:'全部',value:''},{text:'待审核',value:'0'},{text:'不通过',value:'1'},{text:'通过',value:'2'}],
+               width:'91px',
+               emptyText:'全部 ' ,
+               forceSelection : true   
+            });
+        $('#state').omCombo('value','0');
+        
+        //初始化审核类型
+        $('#auditType').omCombo({
+               dataSource : [{text:'全部',value:''},{text:'新增',value:'1'},{text:'修改',value:'2'}],
+               width:'91px',
+               emptyText:'全部 ' ,
+               forceSelection : true   
+            });
+            
+//         var dialog = $("#dialog-notPass").omDialog({
+//	      		title:'审核不通过',
+//	            width: 350,
+//                autoOpen : false,
+//                modal : true,
+//                resizable : false,
+//                buttons: {
+//                    "提交" : function(){
+//		                singleNotPass();
+//		                return false; //阻止form的默认提交动作
+//		            },
+//                    "取消" : function() {
+//                        $("#dialog-notPass").omDialog("close");//关闭dialog
+//                    }
+//                }
+//	      });
+        
+        $('#grid').omGrid("setData", url+"&state=0");
+    });
+</script>
+</head>
+<body>
+    
+      <div class="list_btntool">
+       <table border="0" width="100%">
+        <tr>
+          <td align="left">
+             <input name="批量通过" type="image" code="011" style="display:none" src="${request.contextPath}/profile/default/images/bnt_pass.png" title='批量通过' value="通过" onclick="batchPass();"/>
+             <input name="批量不通过" type="image" code="012" style="display:none" src="${request.contextPath}/profile/default/images/bnt_no_pass.png" title='批量不通过' value="不通过" onclick="batchNotPass();"/>
+          </td>
+         </tr>
+         </table>
+       </div>
+    
+ <!--列表查询区-->
+ <div  id="search_div">
+   <div class="list_search">
+   <table width="100%" border="0">
+       <tr>
+        <td  align="left" >
+          <!--查询块区 start--> 
+           <form id="form" action="" method="post"> 
+            <table width="100%" border="0">
+              <tr>
+				<th width="10%">审核状态：</th>
+				<td><input id="state" name="state" class="select1" /></td>
+         		<th width="10%" height="30">审核类型：</th>
+         		<td><input id="auditType" name="auditType" class="select1" /></td>
+         		<th width="10%">商户号：</th>
+         		<td ><input id="merId" name="merId" maxlength="4" class="input1"/></td>
+        		<th width="10%">提交时间：</th>
+         		<td >
+         		    <input type="text" id="from" name="from" onfocus="WdatePicker({startDate:'%y-%M-%d 00:00:00',dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:120px"/>
+         		</td>
+		        </tr>
+		        <tr>
+		         <th width="10%">提交人：</th>
+		         <td><input id="creator" name="creator" class="select1" /></td>
+		         <th width="10%">审核人：</th>
+		         <td><input id="modUser" name="modUser" class="select1" /></td>
+		         <th >商品号：</th>
+		         <td><input id="goodsId" name="goodsId" maxlength="6" class="input1"/></td>
+		         <th >至：</th>
+		         <td><input type="text" id="to" name="to" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate" style="width:120px"/></td>
+		       </tr>
+        </table>
+        </form> 
+       </td>
+         <td align="left">
+          <input id="query" title="查询" name="submit" type="image" src="${request.contextPath}/profile/default/images/Search_bnt.png" onclick="query();"/>
+         </td>
+       </tr>
+     </table>
+     </form> 
+     </div>
+     </div>
+   
+   <!--列表区-->
+    <table id="grid" align="left"></table>
+    
+ <div id="dialog">
+    <iframe frameborder="0" style="width:100%;height:99%" src="about:blank"></iframe>
+ </div>
+</body>
+</html>
